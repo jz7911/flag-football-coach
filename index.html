@@ -372,7 +372,14 @@ textarea{min-height:80px;resize:none;}
     <select id="p-yrs"><option value="1">1 year</option><option value="2">2 years</option><option value="3">3 years</option></select>
     <div style="font-size:12px;color:var(--g3);margin:10px 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Rate each skill 1–5</div>
     <div id="skill-raters"></div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
+    <div style="display:flex;align-items:center;gap:10px;margin:12px 0 10px;padding:10px 12px;background:var(--navy3);border-radius:9px;">
+      <input type="checkbox" id="p-primary" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;">
+      <div>
+        <div style="font-size:13px;font-weight:600;">Primary skill player</div>
+        <div style="font-size:11px;color:var(--g3);margin-top:1px;">Gets more 1st-string starts at QB/RB. Uncheck for developmental players who rotate fairly.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
       <button class="btn btn-outline" onclick="closeModal('modal-player')" style="flex:1;">Cancel</button>
       <button class="btn btn-gold" onclick="savePlayer()" style="flex:2;">Save Player</button>
     </div>
@@ -615,6 +622,7 @@ function savePlayer() {
     grade:document.getElementById('p-grade').value,
     yrs:+document.getElementById('p-yrs').value,
     skills:SKILLS.map(s=>state.newSkills[s]||3),
+    primary: document.getElementById('p-primary').checked,
     playtime:{}, touchGames:[]
   };
   activeRoster().push(player);
@@ -639,6 +647,7 @@ function renderRoster() {
           <span style="font-size:14px;font-weight:600;">${p.name}</span>
           <span class="badge b-blue">${p.grade}</span>
           <span class="badge ${expC}">${p.yrs}yr</span>
+          <span onclick="togglePrimary(${pi})" class="badge ${p.primary?'b-gold':'b-gray'}" style="cursor:pointer;" title="Tap to toggle">${p.primary?'★ Primary':'○ Dev'}</span>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;">
           ${SKILLS.map((s,i)=>`<div style="text-align:center;">
@@ -659,6 +668,10 @@ function renderRoster() {
 }
 
 function updSkill(pi,si,v){activeRoster()[pi].skills[si]=v;save();renderRoster();}
+function togglePrimary(pi){
+  activeRoster()[pi].primary = !activeRoster()[pi].primary;
+  save(); renderRoster();
+}
 function removePlayer(pi){
   const r=activeRoster();
   if(confirm('Remove '+r[pi].name+'?')){r.splice(pi,1);save();renderRoster();}
@@ -3272,105 +3285,178 @@ function rbDesireScore(playerIdx) {
   return skillScore * overdueMult + (ago * 0.3);
 }
 
+function isPrimary(playerIdx) {
+  const p = activeRoster()[playerIdx];
+  return p && p.primary === true;
+}
+
+// Count how many games this player has started at a skill position
+function skillStartCount(playerIdx) {
+  return activeSkillHistory().filter(h => h.playerIdx===playerIdx && (h.pos==='QB'||h.pos==='RB')).length;
+}
+
+// Season-fairness score: developmentals who have NEVER started skill get a huge boost
+function fairnessBoost(playerIdx, pos) {
+  const starts = skillStartCount(playerIdx);
+  const primary = isPrimary(playerIdx);
+  if(primary) return 0; // primaries don't need the fairness boost
+  // Developmental player with no skill starts gets strongest boost
+  if(starts === 0) return 50;
+  if(starts === 1) return 20;
+  if(starts === 2) return 5;
+  return 0;
+}
+
+function qbScore(playerIdx, string) {
+  const p = activeRoster()[playerIdx];
+  if(!p) return 0;
+  const ago = gamesAgoForPos(playerIdx, 'QB');
+  const skill = p.skills[2]||3;
+  const primary = isPrimary(playerIdx);
+  // String 1: primaries get priority; developmentals get fairness boost
+  if(string === 0) {
+    const base = skill * (primary ? 3 : 1);
+    const overdue = ago >= 3 ? 30 : ago >= 2 ? 15 : 0;
+    return base + overdue + fairnessBoost(playerIdx,'QB');
+  }
+  // Strings 2-3: spread evenly by rotation
+  return skill + (ago * 2);
+}
+
+function rbScore(playerIdx, string) {
+  const p = activeRoster()[playerIdx];
+  if(!p) return 0;
+  const ago = gamesAgoForPos(playerIdx, 'RB');
+  const skill = (p.skills[6]||3) + (p.skills[9]||3);
+  const primary = isPrimary(playerIdx);
+  if(string === 0) {
+    const base = skill * (primary ? 2 : 1);
+    const overdue = ago >= 3 ? 25 : ago >= 2 ? 12 : 0;
+    return base + overdue + fairnessBoost(playerIdx,'RB');
+  }
+  return skill + (ago * 1.5);
+}
+
 function generateGameRoster(gameNum) {
   const roster = activeRoster();
   if(!roster.length) return null;
 
   const is56 = state.division === '56';
-  const numPlayers = is56 ? 6 : 8;
-  const usePlayers = roster.slice(0, numPlayers); // use first N players (or all if fewer)
-  const allIdx = usePlayers.map((_,i)=>i);
+  const allIdx = roster.map((_,i)=>i);
+  const primaries = allIdx.filter(i=>isPrimary(i));
+  const devs = allIdx.filter(i=>!isPrimary(i));
 
-  // --- Pick QB ---
-  // Sort by desire score descending
-  const qbRanked = [...allIdx].sort((a,b) => qbDesireScore(b) - qbDesireScore(a));
-  // Best QB gets the job, but if they played last game too, check if someone else is overdue
-  const qbIdx = qbRanked[0];
+  // Generate all 3 strings
+  const strings = [{}, {}, {}]; // offense assignments per string
+  const defStrings = [{}, {}, {}];
 
-  // --- Pick RBs ---
-  // Remove QB from RB pool (they can still carry, but primary RB slots go to others)
-  const rbPool = allIdx.filter(i => i !== qbIdx);
-  const rbRanked = [...rbPool].sort((a,b) => rbDesireScore(b) - rbDesireScore(a));
-  const numRBs = is56 ? 2 : 3; // RB1 + RB2 + eligible T slots for 7/8
-  const rbIdxs = rbRanked.slice(0, numRBs);
+  // ── Helper: assign one string of offense ──
+  function assignOffenseString(strIdx, exclude) {
+    const used = new Set(exclude || []);
+    const available = (i) => !used.has(i);
 
-  // --- Assign OL ---
-  const olPool = allIdx.filter(i => i !== qbIdx && !rbIdxs.includes(i));
-  // For OL, rotate - prefer players who haven't been on line recently
-  const olRanked = [...olPool].sort((a,b) => {
-    const aAgo = gamesAgoForPos(a, 'OL');
-    const bAgo = gamesAgoForPos(b, 'OL');
-    // Players who have been on line recently get lower priority
-    return bAgo - aAgo;
-  });
-  const numOL = is56 ? 3 : 4; // C + G + G (+ extra G for 7/8)
-  const olIdxs = olRanked.slice(0, numOL);
+    // Pick QB for this string
+    const qbCandidates = allIdx.filter(available);
+    const qbPick = qbCandidates.sort((a,b)=>qbScore(b,strIdx)-qbScore(a,strIdx))[0];
+    if(qbPick === undefined) return {};
+    used.add(qbPick);
 
-  // --- Build the roster object ---
-  const positions = is56 ? DEPTH_POSITIONS_56 : DEPTH_POSITIONS;
-  const offPos = positions.offense;
-  const defPos = positions.defense;
+    const numRBs = is56 ? 2 : 2; // QB + RB1 + RB2 are the skill spots
+    const rbCandidates = allIdx.filter(available);
+    const rbSorted = rbCandidates.sort((a,b)=>rbScore(b,strIdx)-rbScore(a,strIdx));
+    const rbPicks = rbSorted.slice(0, numRBs);
+    rbPicks.forEach(i => used.add(i));
 
-  const rosterMap = {};
+    // Eligible T WRs (7/8 only) - next best available
+    let tPicks = [];
+    if(!is56) {
+      const tCandidates = allIdx.filter(available);
+      const tSorted = tCandidates.sort((a,b)=>{
+        const aAgo = gamesAgoForPos(a,'RB'); const bAgo = gamesAgoForPos(b,'RB');
+        return bAgo - aAgo; // rotate by who hasn't been skill recently
+      });
+      tPicks = tSorted.slice(0,2);
+      tPicks.forEach(i => used.add(i));
+    }
 
-  if(is56) {
-    rosterMap['QB'] = qbIdx;
-    rosterMap['Left Back'] = rbIdxs[0];
-    rosterMap['Right Back'] = rbIdxs[1];
-    rosterMap['Center'] = olIdxs[0];
-    rosterMap['Left Guard'] = olIdxs[1];
-    rosterMap['Right Guard'] = olIdxs[2] !== undefined ? olIdxs[2] : olIdxs[0];
-  } else {
-    rosterMap['QB'] = qbIdx;
-    rosterMap['RB1'] = rbIdxs[0];
-    rosterMap['RB2'] = rbIdxs[1];
-    rosterMap['Left T (WR)'] = rbIdxs[2] !== undefined ? rbIdxs[2] : rbIdxs[0];
-    rosterMap['Right T (WR)'] = rbIdxs[2] !== undefined ? rbIdxs[1] : rbIdxs[1];
-    rosterMap['Center'] = olIdxs[0];
-    rosterMap['Left Guard'] = olIdxs[1] !== undefined ? olIdxs[1] : olIdxs[0];
-    rosterMap['Right Guard'] = olIdxs[2] !== undefined ? olIdxs[2] : olIdxs[0];
-    rosterMap['Left T (WR)'] = rbIdxs[2] !== undefined ? rbIdxs[2] : (allIdx.find(i=>!Object.values(rosterMap).includes(i)) || rbIdxs[0]);
-    rosterMap['Right T (WR)'] = allIdx.find(i=>!Object.values(rosterMap).includes(i)) || rbIdxs[1];
+    // OL — prefer players who've been on line recently (they're used to it) for str 1
+    // but rotate for strings 2-3
+    const olCandidates = allIdx.filter(available);
+    const olSorted = olCandidates.sort((a,b)=>{
+      const aAgo = gamesAgoForPos(a,'OL');
+      const bAgo = gamesAgoForPos(b,'OL');
+      return strIdx === 0 ? aAgo - bAgo : bAgo - aAgo; // str1: rotate line in, others: rotate out
+    });
+    const numOL = is56 ? 3 : 3;
+    const olPicks = olSorted.slice(0, numOL);
+
+    const m = {};
+    if(is56) {
+      m['QB'] = qbPick;
+      m['Left Back'] = rbPicks[0];
+      m['Right Back'] = rbPicks[1] !== undefined ? rbPicks[1] : rbPicks[0];
+      m['Center'] = olPicks[0];
+      m['Left Guard'] = olPicks[1] !== undefined ? olPicks[1] : olPicks[0];
+      m['Right Guard'] = olPicks[2] !== undefined ? olPicks[2] : olPicks[0];
+    } else {
+      m['QB'] = qbPick;
+      m['RB1'] = rbPicks[0];
+      m['RB2'] = rbPicks[1] !== undefined ? rbPicks[1] : rbPicks[0];
+      m['Left T (WR)'] = tPicks[0] !== undefined ? tPicks[0] : rbPicks[0];
+      m['Right T (WR)'] = tPicks[1] !== undefined ? tPicks[1] : rbPicks[1] !== undefined ? rbPicks[1] : rbPicks[0];
+      m['Center'] = olPicks[0];
+      m['Left Guard'] = olPicks[1] !== undefined ? olPicks[1] : olPicks[0];
+      m['Right Guard'] = olPicks[2] !== undefined ? olPicks[2] : olPicks[0];
+    }
+    return m;
   }
 
-  // Defense — use best-fit by ratings, still rotating
-  const defRanked = {
-    ILB: [...allIdx].sort((a,b)=>posScore(activeRoster()[b].skills,'ILB')-posScore(activeRoster()[a].skills,'ILB')),
-    OLB: [...allIdx].sort((a,b)=>posScore(activeRoster()[b].skills,'OLB')-posScore(activeRoster()[a].skills,'OLB')),
-    DE:  [...allIdx].sort((a,b)=>posScore(activeRoster()[b].skills,'DE') -posScore(activeRoster()[a].skills,'DE')),
-    DT:  [...allIdx].sort((a,b)=>posScore(activeRoster()[b].skills,'DT') -posScore(activeRoster()[a].skills,'DT')),
-    DB:  [...allIdx].sort((a,b)=>posScore(activeRoster()[b].skills,'DB') -posScore(activeRoster()[a].skills,'DB')),
-  };
+  // ── Build 3 strings, each excluding players already used in previous strings ──
+  strings[0] = assignOffenseString(0, []);
+  strings[1] = assignOffenseString(1, Object.values(strings[0]));
+  strings[2] = assignOffenseString(2, [...Object.values(strings[0]), ...Object.values(strings[1])]);
 
-  const defAssigned = {};
-  const defPosMap56 = {
-    'Left DL':'DE','Right DL':'DE',
-    'Left LB':'OLB','Right LB':'OLB','Middle LB':'ILB','Deep LB':'DB'
-  };
-  const defPosMap78 = {
-    'Left DE':'DE','Right DE':'DE','Left DT':'DT','Right DT':'DT',
-    'Left ILB':'ILB','Right ILB':'ILB','Left OLB':'OLB','Right OLB':'OLB'
-  };
+  // ── Defense: 3 strings by rating fit, rotated ──
+  const defPosMap56 = {'Left DL':'DE','Right DL':'DE','Left LB':'OLB','Right LB':'OLB','Middle LB':'ILB','Deep LB':'DB'};
+  const defPosMap78 = {'Left DE':'DE','Right DE':'DE','Left DT':'DT','Right DT':'DT','Left ILB':'ILB','Right ILB':'ILB','Left OLB':'OLB','Right OLB':'OLB'};
   const defPosMap = is56 ? defPosMap56 : defPosMap78;
-  const usedDef = new Set();
+  const positions = is56 ? DEPTH_POSITIONS_56 : DEPTH_POSITIONS;
 
-  defPos.forEach(slot => {
-    const basePos = defPosMap[slot] || 'ILB';
-    const ranked = defRanked[basePos] || [...allIdx];
-    const pick = ranked.find(i => !usedDef.has(i)) || ranked[0];
-    defAssigned[slot] = pick;
-    usedDef.add(pick);
-  });
+  for(let strIdx = 0; strIdx < 3; strIdx++) {
+    const usedDef = new Set();
+    const prevUsed = strIdx > 0 ? new Set(Object.values(defStrings[strIdx-1])) : new Set();
+    positions.defense.forEach(slot => {
+      const base = defPosMap[slot] || 'ILB';
+      const candidates = [...allIdx]
+        .filter(i => !usedDef.has(i))
+        .sort((a,b) => {
+          const aScore = posScore(roster[a].skills, base);
+          const bScore = posScore(roster[b].skills, base);
+          // Deprioritize players already in previous strings for this string
+          const aMult = prevUsed.has(a) ? 0.5 : 1;
+          const bMult = prevUsed.has(b) ? 0.5 : 1;
+          return bScore * bMult - aScore * aMult;
+        });
+      const pick = candidates[0] !== undefined ? candidates[0] : allIdx[0];
+      defStrings[strIdx][slot] = pick;
+      usedDef.add(pick);
+    });
+  }
 
   return {
     gameNum,
     generated: Date.now(),
-    offense: {...rosterMap},
-    defense: {...defAssigned},
+    offense: strings[0],
+    offense2: strings[1],
+    offense3: strings[2],
+    defense: defStrings[0],
+    defense2: defStrings[1],
+    defense3: defStrings[2],
     notes: '',
     locked: false
   };
 }
+
 
 function getOrCreateGameRoster(gameNum) {
   const rosters = activeGameRosters();
@@ -3393,21 +3479,22 @@ function lockRoster(gameNum) {
     // When locking, record skill position history
     if(r.locked) {
       const hist = activeSkillHistory();
-      const skillPos78 = ['QB','Wing Back','Flex Back','Left T (WR)','Right T (WR)'];
+      const skillPos78 = ['QB','RB1','RB2','Left T (WR)','Right T (WR)'];
       const skillPos56 = ['QB','Left Back','Right Back'];
       const skillPosToTrack = state.division==='56' ? skillPos56 : skillPos78;
-      // Record QB
+      // Record skill positions from 1st string only (starters get credit)
       skillPosToTrack.forEach(pos => {
         const idx = r.offense[pos];
-        if(idx !== undefined) {
-          hist.push({gameNum, playerIdx: idx, pos: pos==='QB'?'QB':'RB'});
-        }
+        if(idx !== undefined) hist.push({gameNum, playerIdx: idx, pos: pos==='QB'?'QB':'RB'});
       });
-      // Record line
-      const linePos = state.division==='56' ? ['Center','Left Guard','Right Guard'] : ['Center','Left Guard','Right Guard'];
-      linePos.forEach(pos => {
-        const idx = r.offense[pos];
-        if(idx !== undefined) hist.push({gameNum, playerIdx: idx, pos:'OL'});
+      // Record line from all 3 strings
+      const linePos = ['Center','Left Guard','Right Guard'];
+      ['offense','offense2','offense3'].forEach(key => {
+        if(!r[key]) return;
+        linePos.forEach(pos => {
+          const idx = r[key][pos];
+          if(idx !== undefined) hist.push({gameNum, playerIdx: idx, pos:'OL'});
+        });
       });
     }
     save();
@@ -3559,16 +3646,13 @@ function renderAutoRoster(el) {
         </div>
       </div>`;
 
-    // Helper: get player name for a depth chart slot (string 2 & 3)
-    const dc = activeDepthChart();
-    const getStringPlayer = (pos, str) => {
-      if(str === 0) {
-        // String 1 = from game roster
-        const idx = pos in gameRoster.offense ? gameRoster.offense[pos] : gameRoster.defense[pos];
-        return idx !== undefined ? roster[idx] : null;
-      }
-      const slots = dc[pos] || [];
-      const idx = slots[str];
+    // Get player for a given string (all from game roster now)
+    const getStringPlayer = (pos, str, side) => {
+      side = side || 'offense';
+      const keyMap = {0: side, 1: side+'2', 2: side+'3'};
+      const key = keyMap[str] || side;
+      const section = gameRoster[key] || gameRoster[side] || {};
+      const idx = section[pos];
       return idx !== undefined ? roster[idx] : null;
     };
 
@@ -3614,8 +3698,8 @@ function renderAutoRoster(el) {
     positions.defense.forEach(pos => {
       const pIdx = gameRoster.defense[pos];
       const p1 = pIdx !== undefined ? roster[pIdx] : null;
-      const p2 = getStringPlayer(pos, 1);
-      const p3 = getStringPlayer(pos, 2);
+      const p2 = getStringPlayer(pos, 1, 'defense');
+      const p3 = getStringPlayer(pos, 2, 'defense');
       h += `<div style="display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:4px;margin-bottom:4px;align-items:center;">
         <div style="font-size:10px;color:var(--g3);font-weight:600;text-transform:uppercase;padding:0 4px;">${pos}</div>
         <div onclick="${locked?'':` swapRosterSlot(${g},'defense','${pos}')`}" style="padding:6px 8px;border-radius:7px;background:var(--navy3);border:1px solid transparent;cursor:${locked?'default':'pointer'};text-align:center;">
@@ -3629,7 +3713,7 @@ function renderAutoRoster(el) {
         </div>
       </div>`;
     });
-    h += `<div style="font-size:10px;color:var(--g3);margin-top:6px;font-style:italic;">1st string from game roster (tap to swap). 2nd/3rd from depth chart — set in Depth Chart tab.</div>
+    h += `<div style="font-size:10px;color:var(--g3);margin-top:6px;font-style:italic;">All 3 strings auto-generated. Tap any 1st string name to swap. Regen rebuilds all 3 strings.</div>
     </div>`;
   }
 
