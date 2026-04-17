@@ -213,8 +213,10 @@ textarea{min-height:80px;resize:none;}
     <div class="metric"><div class="metric-val">14</div><div class="metric-lbl">Plays</div></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <button class="btn btn-gold" onclick="showPage('pg-depth',document.querySelectorAll('.nav-item')[3])" style="padding:10px;">📊 Depth Chart</button>
+    <button class="btn btn-gold" onclick="showPage('pg-gameday',document.querySelectorAll('.nav-item')[4])" style="padding:10px;">🏟️ Game Day</button>
+    <button class="btn btn-outline" onclick="showPage('pg-depth',document.querySelectorAll('.nav-item')[3])" style="padding:10px;">📊 Depth Chart</button>
     <button class="btn btn-outline" onclick="showPage('pg-practices')" style="padding:10px;">📋 Practices</button>
+    <button class="btn btn-outline" onclick="showPage('pg-tools')" style="padding:10px;">🛠️ Tools</button>
   </div>
 
   <div class="card card-gold">
@@ -281,6 +283,10 @@ textarea{min-height:80px;resize:none;}
     <button class="btn btn-outline" onclick="exportRoster()">💾 Backup</button>
     <button class="btn btn-outline" onclick="importRoster()">📂 Restore</button>
   </div>
+  <div style="display:flex;gap:8px;margin-bottom:8px;">
+    <button class="btn btn-outline" onclick="snapshotRatings()" style="flex:1;font-size:11px;">📸 Snapshot ratings</button>
+    <button class="btn btn-outline" onclick="showRatingHistory()" style="flex:1;font-size:11px;">📈 Progress</button>
+  </div>
   <div style="font-size:11px;color:var(--g3);margin-bottom:12px;padding:7px 10px;background:var(--navy3);border-radius:8px;">Your roster saves automatically to this browser. Tap <strong style="color:var(--white);">Backup</strong> to download a file you can restore anytime — even after clearing your browser.</div>
   <div id="roster-list"><div class="empty"><div class="empty-icon">👥</div><div class="empty-text">No players yet.<br>Add your roster to get position suggestions.</div></div></div>
 </div>
@@ -313,6 +319,8 @@ textarea{min-height:80px;resize:none;}
     <div class="tab" onclick="pbTab('bank',this)">Play Bank</div>
     <div class="tab" onclick="pbTab('defense',this)">Defense</div>
     <div class="tab" onclick="pbTab('formation',this)">Formations</div>
+    <div class="tab" onclick="pbTab('playlog',this)">Play Log</div>
+    <div class="tab" onclick="pbTab('callsheet',this)">Call Sheet</div>
   </div>
   <div id="pb-content"></div>
 </div>
@@ -323,9 +331,16 @@ textarea{min-height:80px;resize:none;}
     <div class="tab active" onclick="toolTab('situations',this)">Situations</div>
     <div class="tab" onclick="toolTab('touches',this)">Touches</div>
     <div class="tab" onclick="toolTab('games',this)">Game Log</div>
-    <div class="tab" onclick="toolTab('tips',this)">Coaching Tips</div>
+    <div class="tab" onclick="toolTab('scouting',this)">Scouting</div>
+    <div class="tab" onclick="toolTab('culture',this)">Culture</div>
+    <div class="tab" onclick="toolTab('tips',this)">Tips</div>
   </div>
   <div id="tools-content"></div>
+</div>
+
+<!-- ══ GAME DAY ══ -->
+<div class="page" id="pg-gameday">
+  <div id="gameday-content"></div>
 </div>
 
 <!-- ══ DEPTH CHART ══ -->
@@ -354,8 +369,8 @@ textarea{min-height:80px;resize:none;}
   <button class="nav-item" onclick="showPage('pg-depth',this)">
     <div class="nav-icon">📊</div><div class="nav-label">Depth</div>
   </button>
-  <button class="nav-item" onclick="showPage('pg-tools',this)">
-    <div class="nav-icon">🛠️</div><div class="nav-label">Tools</div>
+  <button class="nav-item" onclick="showPage('pg-gameday',this)">
+    <div class="nav-icon">🏟️</div><div class="nav-label">Game Day</div>
   </button>
 </nav>
 
@@ -475,7 +490,11 @@ let state = {
   depthChart56:{},
   gameRosters56:[],
   skillPosHistory56:[],
-  newSkills:{}
+  newSkills:{},
+  playLog:[],
+  scouting:[],
+  ratingHistory:[],
+  callSheet:{78:[],56:[]}  // ordered list of play IDs for game call sheet
 };
 let selectedDrill = null;
 let selectedPlay = null;
@@ -563,7 +582,7 @@ function showPage(id, btn) {
   document.getElementById(id).classList.add('active');
   if(btn) btn.classList.add('active');
   else {
-    const navMap = {'pg-home':0,'pg-roster':1,'pg-playbook':2,'pg-depth':3,'pg-tools':4};
+    const navMap = {'pg-home':0,'pg-roster':1,'pg-playbook':2,'pg-depth':3,'pg-gameday':4};
     const idx = navMap[id];
     if(idx !== undefined) document.querySelectorAll('.nav-item')[idx].classList.add('active');
   }
@@ -572,6 +591,8 @@ function showPage(id, btn) {
   if(id==='pg-roster') renderRoster();
   if(id==='pg-tools') renderToolContent();
   if(id==='pg-depth') renderDepthContent();
+  if(id==='pg-gameday') renderGameDay();
+  if(id==='pg-tools') renderToolContent();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -648,6 +669,7 @@ function renderRoster() {
           <span class="badge b-blue">${p.grade}</span>
           <span class="badge ${expC}">${p.yrs}yr</span>
           <span onclick="togglePrimary(${pi})" class="badge ${p.primary?'b-gold':'b-gray'}" style="cursor:pointer;" title="Tap to toggle">${p.primary?'★ Primary':'○ Dev'}</span>
+          <span onclick="cycleAvail(${pi})" class="badge ${(p.avail||'available')==='available'?'b-green':(p.avail==='limited'?'b-amber':'b-red')}" style="cursor:pointer;">${(p.avail||'available')==='available'?'✓ Available':(p.avail==='limited'?'~ Limited':'✗ Out')}</span>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;">
           ${SKILLS.map((s,i)=>`<div style="text-align:center;">
@@ -671,6 +693,16 @@ function updSkill(pi,si,v){activeRoster()[pi].skills[si]=v;save();renderRoster()
 function togglePrimary(pi){
   activeRoster()[pi].primary = !activeRoster()[pi].primary;
   save(); renderRoster();
+}
+function cycleAvail(pi){
+  const p = activeRoster()[pi];
+  const cycle = {available:'limited', limited:'out', out:'available'};
+  p.avail = cycle[p.avail||'available'];
+  save(); renderRoster();
+}
+function playerAvail(playerIdx){
+  const p = activeRoster()[playerIdx];
+  return p ? (p.avail||'available') : 'available';
 }
 function removePlayer(pi){
   const r=activeRoster();
@@ -1420,6 +1452,36 @@ function getActivePracticePlans() {
   return state.division === '56' ? PRACTICE_PLANS_56 : PRACTICE_PLANS;
 }
 
+function sharePracticePlan() {
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===curPracWeek);
+  if(!wk) return;
+  const tl={wu:'WARM-UP',sk:'SKILL',tm:'TEAM',gm:'GAME'};
+  let text = `PRACTICE PLAN — WEEK ${wk.w}: ${wk.theme.toUpperCase()}
+${'='.repeat(50)}
+
+`;
+  wk.prac.forEach(pr => {
+    text += `
+--- ${pr.lbl} (75 min) ---
+`;
+    pr.blocks.forEach(b => {
+      text += `
+[${tl[b.t]||b.t.toUpperCase()}] min ${b.min}
+${b.name}
+${b.desc}
+`;
+    });
+  });
+  text += `
+${'='.repeat(50)}
+Generated by Flag Football Coach App`;
+  navigator.clipboard.writeText(text).then(()=>alert('Practice plan copied! Paste it into a text message or email.')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    alert('Practice plan copied! Paste it into a text message or email.');
+  });
+}
+
 function renderPracPlans(el) {
   const plans = getActivePracticePlans();
   const wks = document.createElement('div');
@@ -1623,6 +1685,8 @@ function pbTab(tab, el) {
 
 function renderPbContent() {
   const el = document.getElementById('pb-content');
+  if(curPbSub === 'playlog') { renderPlayLog(el); return; }
+  if(curPbSub === 'callsheet') { renderCallSheet(el); return; }
   if(state.division === '56') {
     renderPbContent56(el);
     return;
@@ -1813,7 +1877,7 @@ function renderPlayCard(p, showRemove) {
     <div class="dc-footer" style="margin-top:7px;">
       <span class="badge b-${p.tier==='Core'?'green':p.tier==='Advanced'||p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
       ${p.pass?'<span class="badge b-blue">Pass</span>':'<span class="badge b-gray">Run</span>'}
-      <span class="badge b-${p.mis==='Very High'?'red':p.mis==='High'?'amber':p.mis==='Med'?'blue':'gray'}">${p.mis} mis.</span>
+      ${(()=>{const s=getPlayStats(p.id);return s?`<span class="badge b-${s.pct>=60?'green':s.pct>=30?'amber':'red'}">${s.pct}% W (${s.total})</span>`:'';})()}
     </div>
   </div>`;
 }
@@ -1946,6 +2010,8 @@ function renderToolContent() {
   if(curToolTab === 'situations') renderSituations(el);
   else if(curToolTab === 'touches') renderTouches(el);
   else if(curToolTab === 'games') renderGames(el);
+  else if(curToolTab === 'scouting') renderScouting(el);
+  else if(curToolTab === 'culture') renderCulture(el);
   else if(curToolTab === 'tips') renderTips(el);
 }
 
@@ -2851,6 +2917,619 @@ function renderHome() {
 }
 
 // Init — runs after all functions are defined
+// ════════════════════════════════════════════
+// PLAY EFFECTIVENESS LOG
+// ════════════════════════════════════════════
+function logPlay(playId, playName, result) {
+  const gameNum = activeGames().length;
+  state.playLog.push({gameNum, playId, playName, result, division:state.division, ts:Date.now()});
+  save();
+}
+
+function getPlayStats(playId) {
+  const entries = state.playLog.filter(e=>e.playId===playId && e.division===state.division);
+  if(!entries.length) return null;
+  const worked = entries.filter(e=>e.result==='worked').length;
+  const ok = entries.filter(e=>e.result==='ok').length;
+  const failed = entries.filter(e=>e.result==='failed').length;
+  const total = entries.length;
+  const pct = Math.round(worked/total*100);
+  return {worked, ok, failed, total, pct, entries};
+}
+
+function renderPlayLog(el) {
+  const gameNum = activeGames().length || 1;
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const activePbIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
+  const activePlays = bank.filter(p=>activePbIds.includes(p.id));
+
+  let h = `<div class="card" style="margin-bottom:10px;">
+    <div class="card-title">Play effectiveness log</div>
+    <div class="card-sub">Rate each play after you run it in a game. Builds a season-long picture of what actually works.</div>
+  </div>`;
+
+  if(!activePlays.length) {
+    h += '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Add plays to your active playbook first.</div></div>';
+    el.innerHTML = h; return;
+  }
+
+  // Season summary bars
+  h += '<div style="margin-bottom:14px;">';
+  activePlays.forEach(p => {
+    const stats = getPlayStats(p.id);
+    const w = stats?stats.worked:0, o=stats?stats.ok:0, f=stats?stats.failed:0, t=stats?stats.total:0;
+    const wPct = t?Math.round(w/t*100):0;
+    h += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--navy3);">
+      <div style="width:90px;font-size:11px;font-weight:500;flex-shrink:0;">${p.n}</div>
+      <div style="flex:1;height:8px;background:var(--navy3);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${wPct}%;background:var(--green);border-radius:4px;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--g3);min-width:60px;text-align:right;">${t?`${w}W ${o}OK ${f}F`:'no data'}</div>
+      <div style="display:flex;gap:3px;">
+        <button onclick="logPlay('${p.id}','${p.n}','worked')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:var(--green);font-size:10px;font-weight:600;cursor:pointer;">W</button>
+        <button onclick="logPlay('${p.id}','${p.n}','ok')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.1);color:var(--amber);font-size:10px;font-weight:600;cursor:pointer;">OK</button>
+        <button onclick="logPlay('${p.id}','${p.n}','failed')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1);color:var(--red);font-size:10px;font-weight:600;cursor:pointer;">F</button>
+      </div>
+    </div>`;
+  });
+  h += '</div>';
+
+  // Recent log entries
+  const recent = [...state.playLog].filter(e=>e.division===division).reverse().slice(0,20);
+  if(recent.length) {
+    h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase;">Recent entries</div>`;
+    recent.forEach(e => {
+      const color = e.result==='worked'?'var(--green)':e.result==='ok'?'var(--amber)':'var(--red)';
+      const label = e.result==='worked'?'Worked':e.result==='ok'?'OK':'Failed';
+      h += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--navy3);">
+        <div style="font-size:11px;color:var(--g3);min-width:50px;">G${e.gameNum||'?'}</div>
+        <div style="font-size:12px;flex:1;">${e.playName}</div>
+        <div style="font-size:10px;font-weight:700;color:${color};">${label}</div>
+        <button onclick="removePlayLog(${state.playLog.indexOf(e)})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:14px;">×</button>
+      </div>`;
+    });
+  }
+
+  if(!state.playLog.filter(e=>e.division===division).length) {
+    h += '<div style="font-size:12px;color:var(--g3);text-align:center;padding:16px 0;">Tap W, OK, or F after running each play in a game.</div>';
+  }
+  el.innerHTML = h;
+}
+
+function removePlayLog(idx) {
+  if(idx>=0 && idx<state.playLog.length) {
+    state.playLog.splice(idx,1); save();
+    const el = document.getElementById('pb-content');
+    if(el) renderPlayLog(el);
+  }
+}
+
+// ════════════════════════════════════════════
+// OPPONENT SCOUTING
+// ════════════════════════════════════════════
+let editScoutingGame = null;
+
+function renderScouting(el) {
+  const division = state.division;
+  const games = activeGames();
+  const scouts = state.scouting.filter(s=>s.division===division);
+
+  let h = `<div class="card card-gold" style="margin-bottom:10px;">
+    <div class="card-title">Opponent scouting</div>
+    <div class="card-sub">Note each opponent's tendencies before the game. Helps you pick plays that counter what you expect to see.</div>
+  </div>`;
+
+  for(let g=1; g<=10; g++) {
+    const scout = scouts.find(s=>s.gameNum===g);
+    const gameName = games[g-1] ? games[g-1].opp||`Game ${g}` : `Game ${g}`;
+    const isPast = g <= games.length;
+    const isCurrent = g === games.length+1;
+
+    h += `<div class="card" style="margin-bottom:8px;${isCurrent?'border-color:rgba(245,166,35,.4);':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${scout?'10px':'0'}">
+        <div>
+          <div style="font-size:13px;font-weight:600;">Game ${g} — ${gameName} ${isCurrent?'<span class="badge b-gold" style="font-size:9px;">NEXT</span>':''}</div>
+          ${scout?'':`<div style="font-size:11px;color:var(--g3);margin-top:2px;">No scouting notes yet</div>`}
+        </div>
+        <button onclick="openScoutEdit(${g})" class="btn btn-sm ${scout?'':'btn-gold'}" style="font-size:10px;">${scout?'Edit':'+ Add'}</button>
+      </div>
+      ${scout?`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
+          ${scout.formation?`<div><span style="color:var(--g3);">Formation:</span> <strong>${scout.formation}</strong></div>`:''}
+          ${scout.bestPlayer?`<div><span style="color:var(--g3);">Watch:</span> <strong style="color:var(--red);">${scout.bestPlayer}</strong></div>`:''}
+          ${scout.tendencies?`<div style="grid-column:1/-1;"><span style="color:var(--g3);">Tendencies:</span> ${scout.tendencies}</div>`:''}
+          ${scout.watchFor?`<div style="grid-column:1/-1;"><span style="color:var(--g3);">Watch for:</span> ${scout.watchFor}</div>`:''}
+          ${scout.notes?`<div style="grid-column:1/-1;font-style:italic;color:var(--g3);">${scout.notes}</div>`:''}
+        </div>
+        ${scout.playRecs?`<div style="margin-top:8px;padding:7px 10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:7px;">
+          <div style="font-size:10px;color:var(--gold);font-weight:600;margin-bottom:3px;">SUGGESTED PLAYS</div>
+          <div style="font-size:11px;">${scout.playRecs}</div>
+        </div>`:''}
+      `:''}
+    </div>`;
+  }
+
+  // Scout edit modal trigger (uses the slot-picker modal repurposed)
+  el.innerHTML = h;
+}
+
+function openScoutEdit(gameNum) {
+  editScoutingGame = gameNum;
+  const division = state.division;
+  const existing = state.scouting.find(s=>s.gameNum===gameNum&&s.division===division)||{};
+  document.getElementById('slot-picker-content').innerHTML = `
+    <div class="modal-title">Scouting — Game ${gameNum}</div>
+    <label>Opponent name</label>
+    <input type="text" id="sc-opp" placeholder="e.g. Team Red" value="${existing.oppName||''}">
+    <label>Their formation</label>
+    <input type="text" id="sc-form" placeholder="e.g. Spread, Wing-T, Double Wing" value="${existing.formation||''}">
+    <label>Their tendencies</label>
+    <input type="text" id="sc-tend" placeholder="e.g. Always sweep right, heavy run game" value="${existing.tendencies||''}">
+    <label>Player to watch (# or name)</label>
+    <input type="text" id="sc-player" placeholder="e.g. #12, very fast" value="${existing.bestPlayer||''}">
+    <label>Watch out for</label>
+    <input type="text" id="sc-watch" placeholder="e.g. Reverse play, shotgun QB" value="${existing.watchFor||''}">
+    <label>Suggested plays vs this team</label>
+    <input type="text" id="sc-recs" placeholder="e.g. Counter, QB bootleg (they over-pursue)" value="${existing.playRecs||''}">
+    <label>Other notes</label>
+    <input type="text" id="sc-notes" placeholder="General observations" value="${existing.notes||''}">
+    <button class="btn btn-gold" onclick="saveScout()" style="width:100%;margin-top:10px;">Save scouting notes</button>
+  `;
+  document.getElementById('slot-picker-pos').value = 'scout';
+  openModal('modal-slot-picker');
+}
+
+function saveScout() {
+  const gameNum = editScoutingGame;
+  const division = state.division;
+  const existing = state.scouting.findIndex(s=>s.gameNum===gameNum&&s.division===division);
+  const data = {
+    gameNum, division,
+    oppName: document.getElementById('sc-opp').value,
+    formation: document.getElementById('sc-form').value,
+    tendencies: document.getElementById('sc-tend').value,
+    bestPlayer: document.getElementById('sc-player').value,
+    watchFor: document.getElementById('sc-watch').value,
+    playRecs: document.getElementById('sc-recs').value,
+    notes: document.getElementById('sc-notes').value,
+  };
+  if(existing>=0) state.scouting[existing]=data;
+  else state.scouting.push(data);
+  save();
+  closeModal('modal-slot-picker');
+  renderToolContent();
+}
+
+// ════════════════════════════════════════════
+// PLAYER DEVELOPMENT TRACKING
+// ════════════════════════════════════════════
+function snapshotRatings() {
+  const roster = activeRoster();
+  const week = activeWeek();
+  const division = state.division;
+  const ts = Date.now();
+  roster.forEach((p,i) => {
+    state.ratingHistory.push({
+      playerIdx:i, name:p.name,
+      skills:[...p.skills],
+      week, division, ts,
+      label: `Week ${week}`
+    });
+  });
+  save();
+  alert(`Ratings snapshot saved for Week ${week}! You can compare these against future ratings.`);
+}
+
+function showRatingHistory() {
+  const roster = activeRoster();
+  const division = state.division;
+  const history = state.ratingHistory.filter(h=>h.division===division);
+
+  let h = `<div class="modal-title">Player development</div>`;
+
+  if(!history.length) {
+    h += `<div style="font-size:13px;color:var(--g3);padding:16px 0;">No snapshots yet. Tap "Snapshot ratings" on the Roster page to save current ratings, then re-snapshot at Week 4 and Week 8 to track growth.</div>`;
+  } else {
+    roster.forEach((p,pi) => {
+      const snaps = history.filter(h=>h.name===p.name).sort((a,b)=>a.ts-b.ts);
+      if(!snaps.length) return;
+      const first = snaps[0];
+      const latest = snaps[snaps.length-1];
+      h += `<div style="margin-bottom:14px;padding:10px;background:var(--navy3);border-radius:9px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">${p.name}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          ${SKILLS.map((s,i) => {
+            const start = first.skills[i]||3;
+            const end = latest.skills[i]||3;
+            const delta = end-start;
+            const color = delta>0?'var(--green)':delta<0?'var(--red)':'var(--g3)';
+            return `<div style="text-align:center;padding:4px 6px;background:var(--navy2);border-radius:6px;">
+              <div style="font-size:9px;color:var(--g3);">${SK[i]}</div>
+              <div style="font-size:12px;font-weight:600;">${start}→${end}</div>
+              <div style="font-size:10px;color:${color};">${delta>0?'+'+delta:delta===0?'—':delta}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--g3);margin-top:5px;">${snaps.length} snapshot${snaps.length>1?'s':''} · First: ${first.label||'Week 1'} · Latest: ${latest.label||'Recent'}</div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'devhistory';
+  openModal('modal-slot-picker');
+}
+
+// ════════════════════════════════════════════
+// PRINTABLE CALL SHEET
+// ════════════════════════════════════════════
+function getCallSheet() {
+  if(!state.callSheet) state.callSheet = {'78':[],'56':[]};
+  return state.callSheet[state.division] || [];
+}
+
+function renderCallSheet(el) {
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
+  const activePlays = bank.filter(p=>activeIds.includes(p.id));
+  const sheet = getCallSheet();
+
+  let h = `<div class="card card-gold" style="margin-bottom:10px;">
+    <div class="card-title">Game call sheet</div>
+    <div class="card-sub">Pick up to 8 plays in priority order. Tap Print to generate a wristband-style card you can bring to the sideline.</div>
+  </div>`;
+
+  // Current call sheet
+  h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Call sheet (drag to reorder)</div>`;
+
+  if(!sheet.length) {
+    h += `<div style="font-size:12px;color:var(--g3);padding:12px;background:var(--navy3);border-radius:8px;margin-bottom:12px;">Select plays from the list below to build your call sheet.</div>`;
+  } else {
+    sheet.forEach((id, idx) => {
+      const p = bank.find(x=>x.id===id);
+      if(!p) return;
+      const stats = getPlayStats(id);
+      h += `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--navy3);border-radius:8px;margin-bottom:5px;">
+        <div style="font-size:16px;font-weight:700;color:var(--gold);min-width:22px;">${idx+1}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${p.n}</div>
+          <div style="font-size:10px;color:var(--g3);">${p.formation} ${stats?` · ${stats.pct}% works (${stats.total} uses)`:''}</div>
+        </div>
+        <div style="display:flex;gap:4px;">
+          ${idx>0?`<button onclick="moveCallSheet(${idx},-1)" class="btn btn-sm" style="padding:3px 7px;">↑</button>`:''}
+          ${idx<sheet.length-1?`<button onclick="moveCallSheet(${idx},1)" class="btn btn-sm" style="padding:3px 7px;">↓</button>`:''}
+          <button onclick="removeCallSheet('${id}')" class="btn btn-danger btn-sm" style="padding:3px 7px;">×</button>
+        </div>
+      </div>`;
+    });
+    h += `<div style="display:flex;gap:8px;margin:10px 0 16px;">
+      <button onclick="printCallSheet()" class="btn btn-gold" style="flex:1;">🖨️ Print call sheet</button>
+      <button onclick="clearCallSheet()" class="btn btn-danger btn-sm">Clear</button>
+    </div>`;
+  }
+
+  // Available plays to add
+  h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Add plays</div>`;
+  activePlays.filter(p=>!sheet.includes(p.id)).forEach(p => {
+    const stats = getPlayStats(p.id);
+    h += `<div onclick="addToCallSheet('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--navy2);border:1px solid var(--navy3);border-radius:8px;margin-bottom:5px;cursor:pointer;">
+      <div style="font-size:11px;color:var(--gold);">+</div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:500;">${p.n}</div>
+        <div style="font-size:10px;color:var(--g3);">${p.mis} misdirection · ${p.pass?'Pass':'Run'}${stats?` · ${stats.pct}% works`:''}</div>
+      </div>
+      <span class="badge b-${p.tier==='Core'?'green':'amber'}">${p.tier}</span>
+    </div>`;
+  });
+
+  el.innerHTML = h;
+}
+
+function addToCallSheet(id) {
+  if(!state.callSheet) state.callSheet={'78':[],'56':[]};
+  const sheet = getCallSheet();
+  if(sheet.length >= 8) { alert('Max 8 plays on the call sheet.'); return; }
+  if(!sheet.includes(id)) { sheet.push(id); save(); }
+  renderPbContent();
+}
+
+function removeCallSheet(id) {
+  const sheet = getCallSheet();
+  const idx = sheet.indexOf(id);
+  if(idx>=0) { sheet.splice(idx,1); save(); renderPbContent(); }
+}
+
+function moveCallSheet(idx, dir) {
+  const sheet = getCallSheet();
+  const newIdx = idx+dir;
+  if(newIdx<0||newIdx>=sheet.length) return;
+  [sheet[idx],sheet[newIdx]]=[sheet[newIdx],sheet[idx]];
+  save(); renderPbContent();
+}
+
+function clearCallSheet() {
+  if(confirm('Clear the call sheet?')) {
+    if(!state.callSheet) state.callSheet={'78':[],'56':[]};
+    state.callSheet[state.division]=[];
+    save(); renderPbContent();
+  }
+}
+
+function printCallSheet() {
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const sheet = getCallSheet();
+  const plays = sheet.map(id=>bank.find(p=>p.id===id)).filter(Boolean);
+  const gameNum = activeGames().length+1;
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Call Sheet Game ${gameNum}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;background:#fff;color:#000;}
+    .sheet{width:4in;padding:8px;border:2px solid #000;}
+    .header{text-align:center;font-size:14px;font-weight:bold;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:6px;}
+    .play{display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid #ccc;}
+    .play:last-child{border-bottom:none;}
+    .num{font-size:18px;font-weight:bold;color:#000;min-width:20px;line-height:1.2;}
+    .play-name{font-size:12px;font-weight:bold;}
+    .play-note{font-size:10px;color:#444;margin-top:1px;}
+    @media print{body{margin:0;}.sheet{border:2px solid #000;}}
+  </style></head>
+  <body onload="window.print()">
+  <div class="sheet">
+    <div class="header">GAME ${gameNum} CALL SHEET<br><span style="font-size:11px;font-weight:normal;">${division==='56'?'5/6 Division':'7/8 Division'} · ${new Date().toLocaleDateString()}</span></div>
+    ${plays.map((p,i)=>`<div class="play">
+      <div class="num">${i+1}</div>
+      <div>
+        <div class="play-name">${p.n}</div>
+        <div class="play-note">${p.note.substring(0,80)}...</div>
+      </div>
+    </div>`).join('')}
+    ${plays.length<8?Array(8-plays.length).fill(0).map((_,i)=>`<div class="play"><div class="num">${plays.length+i+1}</div><div class="play-note" style="color:#999;">___________________________</div></div>`).join(''):''}
+  </div></body></html>`;
+
+  const w = window.open('','_blank','width=500,height=700');
+  if(w) { w.document.write(html); w.document.close(); }
+  else { alert('Please allow pop-ups to print the call sheet.'); }
+}
+
+// ════════════════════════════════════════════
+// TEAM CULTURE TOOLS
+// ════════════════════════════════════════════
+function renderCulture(el) {
+  const division = state.division;
+  if(!state.culture) state.culture = {potw:'',cheer:'',moments:[]};
+  const c = state.culture;
+
+  let h = `<div class="card card-gold" style="margin-bottom:10px;">
+    <div class="card-title">Team culture</div>
+    <div class="card-sub">Track the moments and people that make this team special. These are what kids remember years later.</div>
+  </div>`;
+
+  // Player of the Week
+  h += `<div class="card" style="margin-bottom:10px;">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Player of the week</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="potw-input" placeholder="Player name + what they did" value="${c.potw||''}" style="flex:1;margin:0;">
+      <button onclick="savePotw()" class="btn btn-gold btn-sm">Save</button>
+    </div>
+    ${c.potw?`<div style="margin-top:8px;padding:10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:8px;font-size:13px;">⭐ ${c.potw}</div>`:''}
+  </div>`;
+
+  // Team cheer
+  h += `<div class="card" style="margin-bottom:10px;">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Team cheer</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="cheer-input" placeholder="e.g. 1-2-3 RUSH!" value="${c.cheer||''}" style="flex:1;margin:0;">
+      <button onclick="saveCheer()" class="btn btn-gold btn-sm">Save</button>
+    </div>
+    ${c.cheer?`<div style="margin-top:8px;padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:16px;font-weight:700;text-align:center;">📣 ${c.cheer}</div>`:''}
+  </div>`;
+
+  // Season moments wall
+  h += `<div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:600;">Season moments wall</div>
+      <button onclick="addMoment()" class="btn btn-gold btn-sm">+ Add</button>
+    </div>
+    ${!c.moments||!c.moments.length?
+      `<div style="font-size:12px;color:var(--g3);text-align:center;padding:16px 0;">No moments yet. Add the first great play, the first catch, the first flag pull that saved the day.</div>`:
+      `<div style="display:flex;flex-direction:column;gap:6px;">
+        ${c.moments.map((m,i)=>`<div style="padding:10px 12px;background:var(--navy3);border-radius:8px;display:flex;gap:8px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">${m.emoji||'⭐'}</div>
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:600;">${m.player}</div>
+            <div style="font-size:11px;color:var(--g3);margin-top:2px;">${m.moment}</div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;">Game ${m.game||'?'}</div>
+          </div>
+          <button onclick="removeMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:16px;">×</button>
+        </div>`).join('')}
+      </div>`
+    }
+  </div>`;
+
+  el.innerHTML = h;
+}
+
+function savePotw() {
+  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
+  state.culture.potw = document.getElementById('potw-input').value;
+  save(); renderToolContent();
+}
+
+function saveCheer() {
+  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
+  state.culture.cheer = document.getElementById('cheer-input').value;
+  save(); renderToolContent();
+}
+
+function addMoment() {
+  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
+  const player = prompt('Player name:'); if(!player) return;
+  const moment = prompt('What happened? (describe the moment):'); if(!moment) return;
+  const game = prompt('Game number:') || '?';
+  const emojis = ['⭐','🏈','🏆','🔥','💪','🎯','👏','🦁'];
+  const emoji = emojis[Math.floor(Math.random()*emojis.length)];
+  state.culture.moments.push({player, moment, game, emoji, ts:Date.now()});
+  save(); renderToolContent();
+}
+
+function removeMoment(i) {
+  if(confirm('Remove this moment?')) {
+    state.culture.moments.splice(i,1); save(); renderToolContent();
+  }
+}
+
+// ════════════════════════════════════════════
+// GAME DAY SIDELINE MODE
+// ════════════════════════════════════════════
+let gamedayCurrentPlay = 0;
+let gamedaySeries = 1;
+let gamedayDown = 1;
+let gamedayTimeouts = {us:1, them:1};
+
+function renderGameDay() {
+  const el = document.getElementById('gameday-content');
+  if(!el) return;
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const sheet = getCallSheet();
+  const plays = sheet.map(id=>bank.find(p=>p.id===id)).filter(Boolean);
+  const roster = activeRoster();
+  const gameNum = activeGames().length+1;
+  const gameRoster = activeGameRosters().find(r=>r.gameNum===gameNum);
+
+  // QB and ball carriers for current game
+  const qbIdx = gameRoster ? gameRoster.offense['QB'] : null;
+  const rb1Idx = gameRoster ? (gameRoster.offense['RB1']||gameRoster.offense['Left Back']) : null;
+  const rb2Idx = gameRoster ? (gameRoster.offense['RB2']||gameRoster.offense['Right Back']) : null;
+
+  const qb = qbIdx!==null&&qbIdx!==undefined ? roster[qbIdx] : null;
+  const rb1 = rb1Idx!==null&&rb1Idx!==undefined ? roster[rb1Idx] : null;
+  const rb2 = rb2Idx!==null&&rb2Idx!==undefined ? roster[rb2Idx] : null;
+
+  const cheer = state.culture ? state.culture.cheer : '';
+  const curPlay = plays[gamedayCurrentPlay];
+
+  let h = `<div style="padding:0;">`;
+
+  // Game header
+  h += `<div style="background:var(--navy2);border-bottom:1px solid var(--navy3);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-size:15px;font-weight:700;">Game ${gameNum} ${division==='56'?'· 5/6':'· 7/8'}</div>
+      <div style="font-size:11px;color:var(--g3);">Series ${gamedaySeries} · Down ${gamedayDown}</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="text-align:center;padding:4px 10px;background:var(--navy3);border-radius:8px;">
+        <div style="font-size:9px;color:var(--g3);">OUR TO</div>
+        <div style="font-size:16px;font-weight:700;color:${gamedayTimeouts.us>0?'var(--gold)':'var(--red)'};">${gamedayTimeouts.us}</div>
+        <button onclick="useTimeout('us')" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);font-size:9px;cursor:pointer;padding:1px 4px;">USE</button>
+      </div>
+    </div>
+  </div>`;
+
+  // Current play — BIG
+  h += `<div style="padding:14px;">`;
+  if(curPlay) {
+    h += `<div style="background:var(--navy2);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center;">
+      <div style="font-size:11px;color:var(--gold);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">Play ${gamedayCurrentPlay+1} of ${plays.length}</div>
+      <div style="font-size:28px;font-weight:700;margin-bottom:6px;">${curPlay.n}</div>
+      <div style="font-size:12px;color:var(--g3);line-height:1.5;">${curPlay.note.substring(0,80)}...</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+        ${gamedayCurrentPlay>0?`<button onclick="prevPlay()" class="btn btn-sm">← Prev</button>`:''}
+        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','worked')" style="padding:8px 14px;border-radius:8px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green);font-weight:600;cursor:pointer;font-size:12px;">✓ Worked</button>
+        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','ok')" style="padding:8px 14px;border-radius:8px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--amber);font-weight:600;cursor:pointer;font-size:12px;">OK</button>
+        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','failed')" style="padding:8px 14px;border-radius:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);font-weight:600;cursor:pointer;font-size:12px;">✗ Failed</button>
+        ${gamedayCurrentPlay<plays.length-1?`<button onclick="nextPlay()" class="btn btn-sm">Next →</button>`:''}
+      </div>
+    </div>`;
+  } else {
+    h += `<div style="background:var(--navy3);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:14px;color:var(--g3);">No call sheet loaded.</div>
+      <button onclick="showPage('pg-playbook')" class="btn btn-gold" style="margin-top:8px;font-size:12px;">Build call sheet →</button>
+    </div>`;
+  }
+
+  // Down tracker
+  h += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+    ${[1,2,3,4].map(d=>`<button onclick="gamedayDown=${d};renderGameDay()" style="padding:10px;border-radius:8px;border:2px solid ${gamedayDown===d?'var(--gold)':'var(--navy3)'};background:${gamedayDown===d?'rgba(245,166,35,.15)':'var(--navy3)'};color:${gamedayDown===d?'var(--gold)':'var(--g3)'};font-weight:700;font-size:15px;cursor:pointer;">${d}${d===1?'st':d===2?'nd':d===3?'rd':'th'}</button>`).join('')}
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <button onclick="nextSeries()" class="btn btn-gold" style="flex:1;padding:12px;font-size:14px;font-weight:700;">Next series →</button>
+    <button onclick="showPage('pg-depth',document.querySelectorAll('.nav-item')[3])" class="btn btn-outline" style="padding:12px;font-size:12px;">Roster</button>
+  </div>`;
+
+  // Personnel on field
+  h += `<div class="card" style="margin-bottom:10px;">
+    <div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">1st string on field</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+      ${[{label:'QB',p:qb},{label:'RB1',p:rb1},{label:'RB2',p:rb2}].map(({label,p})=>`<div style="padding:8px;background:var(--navy3);border-radius:8px;text-align:center;">
+        <div style="font-size:9px;color:var(--gold);font-weight:600;">${label}</div>
+        <div style="font-size:13px;font-weight:600;margin-top:2px;">${p?p.name.split(' ')[0]:'—'}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+
+  // Touch tracker
+  const overdueCarries = roster.filter((p,i)=>{
+    if((p.avail||'available')==='out') return false;
+    const carries=p.touchGames||[];
+    const total=activeGames().length;
+    const lastCarry=carries.length?Math.max(...carries):null;
+    const ago=lastCarry!==null?total-lastCarry:total;
+    return division==='56'?(ago>=1&&total>=1):(ago>=3&&total>=1);
+  });
+  if(overdueCarries.length) {
+    h += `<div style="padding:10px 12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px;">⚠ NEEDS A CARRY</div>
+      <div style="font-size:13px;">${overdueCarries.map(p=>p.name.split(' ')[0]).join(', ')}</div>
+    </div>`;
+  }
+
+  // Quick play list
+  if(plays.length) {
+    h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Quick call</div>
+    <div style="display:flex;flex-direction:column;gap:4px;">`;
+    plays.forEach((p,i) => {
+      h += `<button onclick="gamedayCurrentPlay=${i};renderGameDay()" style="padding:10px 12px;border-radius:8px;background:${i===gamedayCurrentPlay?'rgba(245,166,35,.1)':'var(--navy3)'};border:1px solid ${i===gamedayCurrentPlay?'rgba(245,166,35,.3)':'var(--navy3)'};display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;">
+        <div style="font-size:16px;font-weight:700;color:var(--gold);min-width:22px;">${i+1}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--white);">${p.n}</div>
+          <div style="font-size:10px;color:var(--g3);">${p.pass?'Pass':'Run'} · ${p.mis} misdirection</div>
+        </div>
+        ${i===gamedayCurrentPlay?'<div style="font-size:10px;color:var(--gold);">▶ ACTIVE</div>':''}
+      </button>`;
+    });
+    h += '</div>';
+  }
+
+  if(cheer){h += '<div style="margin-top:16px;padding:14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;text-align:center;"><div style="font-size:20px;font-weight:700;">📣 '+cheer+'</div></div>';}
+
+  h += '</div></div>';
+  el.innerHTML = h;
+}
+
+function nextPlay() {
+  const sheet = getCallSheet();
+  if(gamedayCurrentPlay < sheet.length-1) { gamedayCurrentPlay++; renderGameDay(); }
+}
+function prevPlay() {
+  if(gamedayCurrentPlay > 0) { gamedayCurrentPlay--; renderGameDay(); }
+}
+function nextSeries() {
+  gamedaySeries++;
+  gamedayDown = 1;
+  gamedayCurrentPlay = 0;
+  renderGameDay();
+}
+function useTimeout(side) {
+  if(gamedayTimeouts[side] > 0) { gamedayTimeouts[side]--; renderGameDay(); }
+}
+
 function initApp() {
   save();
   renderHome();
@@ -3342,7 +4021,8 @@ function generateGameRoster(gameNum) {
   if(!roster.length) return null;
 
   const is56 = state.division === '56';
-  const allIdx = roster.map((_,i)=>i);
+  // Exclude players marked as 'out'; weight down 'limited'
+  const allIdx = roster.map((_,i)=>i).filter(i=>playerAvail(i)!=='out');
   const primaries = allIdx.filter(i=>isPrimary(i));
   const devs = allIdx.filter(i=>!isPrimary(i));
 
@@ -3589,9 +4269,15 @@ function renderAutoRoster(el) {
   const is56 = state.division === '56';
   const positions = is56 ? DEPTH_POSITIONS_56 : DEPTH_POSITIONS;
 
+  const outPlayers = roster.filter(p=>(p.avail||'available')==='out');
+  const limitedPlayers = roster.filter(p=>p.avail==='limited');
   let h = `<div class="card card-gold" style="margin-bottom:10px;">
     <div class="card-title">Game roster generator</div>
     <div class="card-sub">Auto-generates fair rotations. QB and RB positions rotate so every player gets a skill position every 2 games. Tap any name to swap. Lock when happy.</div>
+    ${outPlayers.length||limitedPlayers.length?`<div style="margin-top:8px;font-size:11px;">
+      ${outPlayers.length?`<span style="color:var(--red);margin-right:10px;">✗ Out: ${outPlayers.map(p=>p.name.split(' ')[0]).join(', ')}</span>`:''}
+      ${limitedPlayers.length?`<span style="color:var(--amber);">~ Limited: ${limitedPlayers.map(p=>p.name.split(' ')[0]).join(', ')}</span>`:''}
+    </div>`:''}
   </div>`;
 
   // QB rotation overview
