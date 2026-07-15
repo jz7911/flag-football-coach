@@ -273,7 +273,7 @@ textarea{min-height:80px;resize:none;}
       <span style="color:var(--gold);">●</span> Play fast — sprint to LOS, no dawdling ever<br>
       <span style="color:var(--gold);">●</span> Be physical — aggressive (legal) flag pursuit and blocking<br>
       <span style="color:var(--gold);">●</span> Celebrate together — same team TD celebration every score<br>
-      <span style="color:var(--gold);">●</span> Every carry matters — track touches across 3-game window<br>
+      <span style="color:var(--gold);">●</span> Blocking wins games — celebrate it as loudly as TDs<br>
       <span style="color:var(--gold);">●</span> Compete to win — effort and execution, not just participation
     </div>
   </div>
@@ -416,9 +416,9 @@ textarea{min-height:80px;resize:none;}
     <label>Full name</label>
     <input type="text" id="p-name" placeholder="e.g. Jake Smith">
     <label>Grade</label>
-    <select id="p-grade"><option value="2nd">2nd grade</option><option value="3rd">3rd grade</option></select>
+    <select id="p-grade"><option value="K">Kindergarten</option><option value="1st">1st grade</option><option value="2nd">2nd grade</option><option value="3rd">3rd grade</option><option value="4th">4th grade</option></select>
     <label>Years of experience</label>
-    <select id="p-yrs"><option value="1">1 year</option><option value="2">2 years</option><option value="3">3 years</option></select>
+    <select id="p-yrs"><option value="0">0 years (first season)</option><option value="1">1 year</option><option value="2">2 years</option><option value="3">3 years</option><option value="4">4+ years</option></select>
     <div style="font-size:12px;color:var(--g3);margin:10px 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Rate each skill 1–5</div>
     <div id="skill-raters"></div>
     <div style="display:flex;align-items:center;gap:10px;margin:12px 0 10px;padding:10px 12px;background:var(--navy3);border-radius:9px;">
@@ -471,6 +471,21 @@ textarea{min-height:80px;resize:none;}
     <div style="margin-top:12px;">
       <button class="btn btn-outline" onclick="closeModal('modal-slot-picker')" style="width:100%;">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- CULTURE EDIT MODAL (dedicated — avoids iOS input focus issues) -->
+<div class="modal-overlay" id="modal-culture" onclick="if(event.target===this)closeModal('modal-culture')">
+  <div class="modal">
+    <div class="modal-handle" onclick="closeModal('modal-culture')"></div>
+    <div id="culture-modal-title" class="modal-title"></div>
+    <div id="culture-modal-hint" style="font-size:12px;color:var(--g3);margin-bottom:10px;"></div>
+    <input type="text" id="culture-modal-input" style="width:100%;font-size:16px;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;" id="culture-modal-btns">
+      <button onclick="clearCurrentCultureField()" id="culture-clear-btn" class="btn btn-danger" style="display:none;flex:1;">Clear</button>
+      <button onclick="saveCurrentCultureField()" class="btn btn-gold" style="flex:2;min-height:48px;font-size:15px;">Save</button>
+    </div>
+    <button class="btn btn-outline" onclick="closeModal('modal-culture')" style="width:100%;margin-top:8px;">Cancel</button>
   </div>
 </div>
 
@@ -750,14 +765,14 @@ function renderRoster() {
   el.innerHTML = roster.map((p,pi)=>{
     const t = topPos(p);
     const ini = p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-    const expC = p.yrs>=3?'b-green':p.yrs==2?'b-amber':'b-red';
+    const expC = p.yrs>=3?'b-green':p.yrs>=2?'b-amber':p.yrs>=1?'b-red':'b-gray';
     return `<div class="p-row">
       <div class="avatar">${ini}</div>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px;">
           <span style="font-size:14px;font-weight:600;">${p.name}</span>
           <span class="badge b-blue">${p.grade}</span>
-          <span class="badge ${expC}">${p.yrs}yr</span>
+          <span class="badge ${expC}">${p.yrs===0||p.yrs==='0'?'New':''+p.yrs+'yr'}</span>
           <span onclick="togglePrimary(${pi})" class="badge ${p.primary?'b-gold':'b-gray'}" style="cursor:pointer;" title="Tap to toggle">${p.primary?'★ Primary':'○ Dev'}</span>
           ${(()=>{
             const akey=state.division+'_'+p.id;
@@ -4423,56 +4438,58 @@ function renderCulture(el) {
   el.innerHTML = h;
 }
 
+let _cultureField = null;
+
 function openCultureEdit(field) {
   if(!state.culture) state.culture = {potw:'',cheer:'',moments:[]};
+  _cultureField = field;
+
   const labels = {
-    potw:    {title:'Player of the week',    placeholder:'Player name + what they did',         hint:''},
-    blocker: {title:'Blocker of the week',   placeholder:'Player name + the block they made',   hint:'The block that sprung the run. Name it every week.'},
-    cheer:   {title:'Team cheer',            placeholder:'e.g. 1-2-3 RUSH!',                   hint:'Shown on the Game Day screen. Same cheer every game builds ritual.'},
+    potw:    {title:'Player of the week',  placeholder:'Player name + what they did',       hint:''},
+    blocker: {title:'Blocker of the week', placeholder:'Player name + the block they made', hint:'The block that sprung the run. Name it every week.'},
+    cheer:   {title:'Team cheer',          placeholder:'e.g. 1-2-3 RUSH!',                 hint:'Shown on Game Day. Same cheer every game builds ritual.'},
   };
-  const cfg = labels[field];
+  const cfg = labels[field] || {title:field, placeholder:'', hint:''};
   const current = state.culture[field] || '';
 
-  let h = `<div class="modal-title">${cfg.title}</div>
-    ${cfg.hint ? `<div style="font-size:12px;color:var(--g3);margin-bottom:10px;">${cfg.hint}</div>` : ''}
-    <input type="text" id="culture-edit-input" placeholder="${cfg.placeholder}" value="${current.replace(/"/g,'&quot;')}" style="width:100%;font-size:16px;">
-    <div style="display:flex;gap:8px;margin-top:4px;">
-      ${current ? `<button onclick="clearCultureField('${field}')" class="btn btn-danger" style="flex:1;">Clear</button>` : ''}
-      <button onclick="saveCultureField('${field}')" class="btn btn-gold" style="flex:2;min-height:48px;font-size:15px;">Save</button>
-    </div>`;
+  document.getElementById('culture-modal-title').textContent = cfg.title;
+  const hintEl = document.getElementById('culture-modal-hint');
+  hintEl.textContent = cfg.hint;
+  hintEl.style.display = cfg.hint ? '' : 'none';
 
-  document.getElementById('slot-picker-content').innerHTML = h;
-  document.getElementById('slot-picker-pos').value = 'cultureedit';
-  openModal('modal-slot-picker');
+  const inp = document.getElementById('culture-modal-input');
+  inp.placeholder = cfg.placeholder;
+  inp.value = current;
 
-  // Focus the input after modal opens
-  setTimeout(() => {
-    const inp = document.getElementById('culture-edit-input');
-    if(inp) inp.focus();
-  }, 150);
+  const clearBtn = document.getElementById('culture-clear-btn');
+  clearBtn.style.display = current ? '' : 'none';
+
+  openModal('modal-culture');
+  setTimeout(() => inp.focus(), 200);
 }
 
-function saveCultureField(field) {
+function saveCurrentCultureField() {
+  if(!_cultureField) return;
   if(!state.culture) state.culture = {potw:'',cheer:'',moments:[]};
-  const val = (document.getElementById('culture-edit-input').value || '').trim();
-  state.culture[field] = val;
+  const val = (document.getElementById('culture-modal-input').value || '').trim();
+  state.culture[_cultureField] = val;
   save();
-  closeModal('modal-slot-picker');
+  closeModal('modal-culture');
   renderToolContent();
   showToast('Saved!');
 }
 
-function clearCultureField(field) {
-  if(!state.culture) return;
-  state.culture[field] = '';
+function clearCurrentCultureField() {
+  if(!_cultureField || !state.culture) return;
+  state.culture[_cultureField] = '';
   save();
-  closeModal('modal-slot-picker');
+  closeModal('modal-culture');
   renderToolContent();
 }
 
-function savePotw()    { saveCultureField('potw'); }
-function saveBlocker() { saveCultureField('blocker'); }
-function saveCheer()   { saveCultureField('cheer'); }
+function savePotw()    { saveCurrentCultureField(); }
+function saveBlocker() { saveCurrentCultureField(); }
+function saveCheer()   { saveCurrentCultureField(); }
 
 
 
