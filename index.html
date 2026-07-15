@@ -19,7 +19,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
-body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);display:flex;flex-direction:column;}
+html{overflow-x:hidden;}
+body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);display:flex;flex-direction:column;overflow-x:hidden;-webkit-text-size-adjust:100%;touch-action:manipulation;}
 .app{height:100%;display:flex;flex-direction:column;overflow:hidden;}
 
 /* HEADER */
@@ -32,7 +33,7 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 
 /* BOTTOM NAV */
 .bot-nav{display:flex;background:var(--navy2);border-top:1px solid var(--navy3);padding-bottom:var(--safe-bottom);flex-shrink:0;height:calc(var(--tab-h) + var(--safe-bottom));}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:8px 2px;border:none;background:transparent;color:var(--g3);transition:color .15s;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:8px 2px;border:none;background:transparent;color:var(--g3);transition:color .15s;-webkit-tap-highlight-color:rgba(245,166,35,.15);touch-action:manipulation;}
 .nav-item.active{color:var(--gold);}
 .nav-icon{font-size:20px;line-height:1;}
 .nav-label{font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
@@ -59,7 +60,8 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 .b-gray{background:rgba(148,163,184,.1);color:var(--g3);border:1px solid rgba(148,163,184,.2);}
 
 /* BUTTONS */
-.btn{padding:11px 16px;border-radius:9px;border:1px solid var(--navy3);background:var(--navy3);cursor:pointer;font-size:13px;font-family:'Barlow',sans-serif;color:var(--white);font-weight:500;min-height:44px;}
+.btn{padding:11px 16px;border-radius:9px;border:1px solid var(--navy3);background:var(--navy3);cursor:pointer;font-size:13px;font-family:'Barlow',sans-serif;color:var(--white);font-weight:500;min-height:44px;-webkit-tap-highlight-color:rgba(245,166,35,.2);touch-action:manipulation;}
+.btn:active{opacity:.8;transform:scale(.98);}
 .btn:active{opacity:.75;}
 .btn-gold{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600;}
 .btn-outline{background:transparent;border-color:var(--navy3);}
@@ -84,7 +86,7 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 
 /* SKILL PIPS */
 .pips{display:flex;gap:2px;}
-.pip{width:14px;height:14px;border-radius:3px;background:var(--navy3);cursor:pointer;transition:background .1s;}
+.pip{width:18px;height:18px;border-radius:4px;background:var(--navy3);cursor:pointer;transition:background .1s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .pip.on{background:var(--gold);}
 
 /* PLAYER ROW */
@@ -184,6 +186,25 @@ textarea{min-height:80px;resize:none;}
 .drag-handle{color:var(--g3);font-size:16px;cursor:grab;padding:0 4px;}
 .toast{position:fixed;bottom:calc(70px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy2);color:var(--white);border:1px solid var(--navy3);padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;max-width:85vw;overflow:hidden;text-overflow:ellipsis;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── Mobile responsive overrides ── */
+@media (max-width: 390px) {
+  .hdr-title { font-size: 14px; }
+  .tab { padding: 8px 10px; font-size: 12px; }
+  .metric-val { font-size: 24px; }
+  .card { padding: 12px; }
+  .p-row { padding: 10px 0; }
+  .drill-card { padding: 10px; }
+  .btn { padding: 10px 12px; font-size: 12px; }
+  .modal { padding: 16px 12px calc(16px + var(--safe-bottom)); }
+  .nav-label { font-size: 9px; }
+  .nav-icon { font-size: 20px; }
+}
+@media (max-width: 350px) {
+  .hdr { padding: calc(var(--safe-top) + 6px) 10px 8px; gap: 6px; }
+  .hdr-badge { display: none; }
+  .tab { padding: 7px 8px; font-size: 11px; }
+}
 </style>
 </head>
 <body>
@@ -217,10 +238,10 @@ textarea{min-height:80px;resize:none;}
     <div class="metric"><div class="metric-val">14</div><div class="metric-lbl">Plays</div></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <button class="btn btn-gold" onclick="showPage('pg-gameday',null,true)" style="padding:10px;font-size:13px;">🏟️ Game Day</button>
-    <button class="btn btn-outline" onclick="showPage('pg-depth',null,true)" style="padding:10px;font-size:13px;">📊 Depth Chart</button>
-    <button class="btn btn-outline" onclick="showPage('pg-practices',null,true)" style="padding:10px;font-size:13px;">📋 Practices</button>
-    <button class="btn btn-outline" onclick="showPage('pg-tools',null,true)" style="padding:10px;font-size:13px;">🛠️ Tools</button>
+    <button class="btn btn-gold" onclick="showPage('pg-gameday',null,true)" style="padding:12px 8px;font-size:14px;min-height:52px;">🏟️ Game Day</button>
+    <button class="btn btn-outline" onclick="showPage('pg-depth',null,true)" style="padding:12px 8px;font-size:14px;min-height:52px;">📊 Depth Chart</button>
+    <button class="btn btn-outline" onclick="showPage('pg-practices',null,true)" style="padding:12px 8px;font-size:14px;min-height:52px;">📋 Practices</button>
+    <button class="btn btn-outline" onclick="showPage('pg-tools',null,true)" style="padding:12px 8px;font-size:14px;min-height:52px;">🛠️ Tools</button>
   </div>
 
   <div class="card card-gold">
@@ -325,11 +346,11 @@ textarea{min-height:80px;resize:none;}
     </div>
   </div>
   <div class="tab-row">
-    <div class="tab active" onclick="pbTab('active',this)">Active Playbook</div>
+    <div class="tab active" onclick="pbTab('active',this)">Active</div>
     <div class="tab" onclick="pbTab('bank',this)">Play Bank</div>
     <div class="tab" onclick="pbTab('defense',this)">Defense</div>
     <div class="tab" onclick="pbTab('formation',this)">Formations</div>
-    <div class="tab" onclick="pbTab('playlog',this)">Play Log</div>
+    <div class="tab" onclick="pbTab('playlog',this)">Log</div>
     <div class="tab" onclick="pbTab('callsheet',this)">Call Sheet</div>
   </div>
   <div id="pb-content"></div>
@@ -341,7 +362,7 @@ textarea{min-height:80px;resize:none;}
   <div class="tab-row">
     <div class="tab active" onclick="toolTab('situations',this)">Situations</div>
     <div class="tab" onclick="toolTab('touches',this)">Touches</div>
-    <div class="tab" onclick="toolTab('games',this)">Game Log</div>
+    <div class="tab" onclick="toolTab('games',this)">Games</div>
     <div class="tab" onclick="toolTab('scouting',this)">Scouting</div>
     <div class="tab" onclick="toolTab('culture',this)">Culture</div>
     <div class="tab" onclick="toolTab('tips',this)">Tips</div>
@@ -1220,6 +1241,104 @@ const DRILLS = [
    desc:'Kicker takes exactly 2 steps before kicking (no long approach). Partner receives the kick. Builds consistent, compact kick mechanics. Walk through the approach steps before going at full pace.',
    cue:'Have players walk through the approach steps before going at a faster pace.',
    type:'sk',fdm:true,fdmDiv:'both'},
+
+  // ── From React app FDM practice plan data ──
+  {id:'d106',cat:'Agility',name:'Walking Knee Hugs',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players walk 10 yards lifting each knee high and hugging it to the chest with both arms before stepping forward. Builds hip flexor mobility and body control. Part of dynamic warm-up sequence.',
+   cue:'Stand tall. Drive the knee up, not the body down. Alternate legs every step.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d107',cat:'Agility',name:'High Skips',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players skip 10 yards with maximum vertical height on each skip. Drive the knee up, push hard off the ground, get maximum air. Arm swing is opposite the drive leg. Builds explosive hip drive and coordination.',
+   cue:'Knee up, push off hard. Go for HEIGHT, not distance. Arm opposite the drive leg.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d108',cat:'Agility',name:'Bounds',time:5,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players bound forward with large single-leg strides, pushing off one foot and landing on the other. Like running in slow motion with exaggerated push-off. Builds explosive leg strength and single-leg power.',
+   cue:'Push hard off each foot. Land softly on the opposite foot. Cover as much ground as possible per bound.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d109',cat:'Agility',name:'Bird Dog',time:4,group:'Full team',equip:'None',level:'All',
+   desc:'On hands and knees, extend opposite arm and leg simultaneously and hold for 2 seconds. Core stabilization and balance drill. Usually 1 minute, sets of 10 per side. Used at start of 8+ practice sessions.',
+   cue:'Keep the back flat -- do not let the hips rotate. Extend long, not high.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d110',cat:'Agility',name:'Racetrack',time:6,group:'Full team',equip:'Cones (square)',level:'All',
+   desc:'Cones set in a large square (racetrack). Players run continuously around the track, changing locomotion on each straight: sprint, shuffle, backpedal, skip. Coach calls out the skill at each corner.',
+   cue:'Be sure to focus on movement skills, not just speed. Add in skips, hops, shuffles.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d111',cat:'Agility',name:'Quick Feet Reaction',time:6,group:'Full team',equip:'None',level:'All',
+   desc:'Players do rapid in-place foot movement (buzz the feet). On coach signal (visual or verbal), they explode in the called direction (left, right, forward, sprint). Builds reactive quickness.',
+   cue:'Be quick but do not hurry. Balance matters more than pure speed.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d112',cat:'Special Teams',name:'No-Step Kick Drill',time:6,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Kicker must kick the ball with NO approach steps -- plant foot, drop, kick. Isolates contact mechanics completely. Builds eye-foot coordination and consistent contact point before adding footwork.',
+   cue:'Eyes on the contact point through the kick. Shoelaces to the ball.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d113',cat:'Special Teams',name:'Contact Dots Drill',time:6,group:'Individual',equip:'Ball,Cones',level:'All',
+   desc:'Cones placed on the ground mark the exact contact point (center-bottom of ball for punt, slightly below center for place kick). Kicker practices hitting the marked spot consistently before adding full motion.',
+   cue:'Find the contact dot. Swing through it. Do not look up until follow-through is complete.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d114',cat:'Special Teams',name:'Balance Kicks',time:5,group:'Individual',equip:'Ball',level:'All',
+   desc:'Player kicks, then holds the follow-through position balanced on one foot for 3 seconds. Builds follow-through mechanics and landing balance. Do 5 reps then switch leg.',
+   cue:'Hold the finish. Front foot flat, back foot even with or slightly behind. Look for stability.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+  {id:'d115',cat:'Routes & Receiving',name:'Receiver Stance and Start',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'WRs practice the 2-point stance (inside foot forward, equal weight distribution, slight lean) and first step. On snap sound: no false step, push off front leg, hip drive from back leg, arms opposite.',
+   cue:'Start from a staggered stance. Inside foot forward. No false steps.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d116',cat:'Ball Carrier',name:'Running Back Stance and Start',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'RBs practice their 2-point stance (feet parallel and shoulder-width, slight forward lean) and first step. Focus on a clean, balanced start with a powerful first drive step.',
+   cue:'Start with feet shoulder-width apart in an athletic stance. Powerful first step.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d117',cat:'QB Skills',name:'Horizontal L to Vertical L',time:4,group:'Individual',equip:'None',level:'All',
+   desc:'QB raises throwing arm: elbow at shoulder height (horizontal L). Then rotates to elbow above shoulder (vertical L). Builds the arm position and shoulder rotation pattern for proper throwing mechanics.',
+   cue:'Great way to work on arm position. Hands and elbows mirror each other.',
+   type:'sk',fdm:true,fdmDiv:'both'},
+  {id:'d118',cat:'QB Skills',name:'Thumb to Pocket',time:4,group:'Individual',equip:'Ball',level:'All',
+   desc:'QB throws and finishes with the thumb of the throwing hand pointed at the opposite hip pocket. Cue for proper follow-through and wrist snap. 10 reps focusing only on the finish position.',
+   cue:'Thumb finishes at the opposite hip pocket. Look for stability in the finish.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d119',cat:'Team Concepts',name:'3v3 Passing Only',time:10,group:'6',equip:'Ball,Cones',level:'Intermediate',
+   desc:'3v3 in a small field. The ball can only advance by passing (no running with it). Players rotate all positions. Great for developing passing game IQ, route running, and coverage concepts simultaneously.',
+   cue:'Players must rotate all positions. Define the playing area clearly.',
+   type:'gm',fdm:true,fdmDiv:'78'},
+  {id:'d120',cat:'Team Concepts',name:'Army-Navy Game',time:8,group:'Full team',equip:'Ball,Flags',level:'All',
+   desc:'Offense vs defense scrimmage where offense starts in a specific formation and defense must set and hold assignments. Coach calls plays. Focuses on execution and defensive recognition. Competitive full-team drill.',
+   cue:'Be creative -- add in different movement skills for the defense.',
+   type:'tm',fdm:true,fdmDiv:'78'},
+  {id:'d121',cat:'Agility',name:'180 Jumps',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players jump and rotate 180 degrees in the air, landing facing the opposite direction. 10 reps. Builds explosive rotational power and landing mechanics.',
+   cue:'Coordinated arm swing. Land with balance. Focus on landing mechanics -- knees bent.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d122',cat:'Agility',name:'Crab Crawls',time:5,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players in crab position (hands and feet on ground, belly up) crawl forward 10 yards. Builds upper body and core strength in a fun, kid-friendly way. Race format increases engagement.',
+   cue:'Keep hips up. Move opposite hand and foot together.',
+   type:'wu',fdm:true,fdmDiv:'56'},
+  {id:'d123',cat:'Agility',name:'Gear Runs Random Order',time:5,group:'Full team',equip:'Cones',level:'All',
+   desc:'Same as Gear Runs (1st-4th gear) but coach calls gears in random order rather than sequential. Players must react and instantly change speed. Builds reactive speed transitions.',
+   cue:'Coach calls out the speeds in any random order. React instantly.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d124',cat:'Agility',name:'Acceleration Drills',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players start from a static position (standing, sitting, or lying) and sprint through a 10-yard acceleration zone on signal. Focus on the first 3 steps: push angle, hip drive, arm pump.',
+   cue:'Get the head turned and find the ball while accelerating. Drive the arms.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d125',cat:'Agility',name:'Deceleration Drills',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players sprint at full speed to a cone, then decelerate to a complete stop in control. Focus on chopping feet, sinking hips, and keeping weight forward. Then hold the athletic stance.',
+   cue:'Throw the ball at the back shoulder of the receiver. Chop feet, sink hips.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d126',cat:'Routes & Receiving',name:'Mesh Read and React',time:8,group:'4',equip:'Ball',level:'Intermediate',
+   desc:'Two receivers run crossing routes (mesh). QB reads coverage and throws to whichever receiver is open. Defenders try to disrupt. Builds QB decision-making and receiver separation technique.',
+   cue:'Focus on ball security through the exchange. Eyes through the mesh.',
+   type:'tm',fdm:true,fdmDiv:'78'},
+  {id:'d127',cat:'Defense',name:'Partner Mirror Drill',time:6,group:'Pairs',equip:'None',level:'All',
+   desc:'Two players face each other 1-2 yards apart. One leads, one mirrors every movement (lateral, forward, back) without letting them get past. Footwork and reaction drill for man coverage and OL/DL.',
+   cue:'Stay low. Keep the head level. Try to stay low and keep the head level.',
+   type:'sk',fdm:true,fdmDiv:'both'},
+  {id:'d128',cat:'Agility',name:'Single-Leg Quad Stretch and Reach',time:4,group:'Full team',equip:'None',level:'All',
+   desc:'Players walk forward: lift one foot behind, grab ankle with same hand (quad stretch), then reach the opposite arm overhead and hold for one step. Builds hip flexor mobility and dynamic balance.',
+   cue:'Stand tall during the stretch and reach. Balance before taking the next step.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d129',cat:'Agility',name:'Arm Slaps and Arm Hugs',time:3,group:'Full team',equip:'None',level:'All',
+   desc:'Players slap arms outward (external rotation) then hug arms inward across chest (internal rotation). 15 reps. Arm shoulder warm-up used before any throwing session.',
+   cue:'Get the arms and shoulders loose. Never throw with a cold arm.',
+   type:'wu',fdm:true,fdmDiv:'both'},
 ];
 
 // ════════════════════════════════════════════
@@ -1612,6 +1731,305 @@ const CHARACTER_THEMES = [
   {theme:'Teamwork',tip:'Season close: revisit teamwork. What has this team built together? Name specific moments.'},
 ];
 
+// ════════════════════════════════════════════
+// FDM PRE-BUILT PLAN TEMPLATES (from USA Football FDM + React app data)
+// These are week-by-week templates that can be loaded into the Practice Builder
+// ════════════════════════════════════════════
+const FDM_TEMPLATES = {
+  '56': [
+    {title:'Week 1 — Foundations (5+)',theme:'Teamwork',drills:[
+      {name:'Character Theme: Teamwork',dur:3},{name:'Straight Leg March',dur:5},
+      {name:'Skipping',dur:3},{name:'Single-Leg Quad Stretch and Reach',dur:3},
+      {name:'Gear Runs (My Gears)',dur:3},{name:'Log Roll Bonanza',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Meet in the Middle Grip Drill',dur:3},
+      {name:'Catch and Step with Partner',dur:4},{name:'Hot Potato',dur:4},
+      {name:'Snake Run',dur:5},{name:'No Hands Get Up',dur:1},
+      {name:'Position Tag',dur:5},{name:'Hydration Break',dur:2},
+      {name:'Team Offense (plays/handoffs)',dur:10},{name:'Team Defense (flag pull zones)',dur:10},
+      {name:'Cool Down — reinforce Teamwork',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 2 — Running and Receiving (5+)',theme:'Teamwork',drills:[
+      {name:'Character Theme: Teamwork',dur:3},{name:'Walking Knee Hugs',dur:3},
+      {name:'Hops Forward/Backward',dur:3},{name:'Lateral Shuffle',dur:3},
+      {name:'Gallops',dur:3},{name:'Gear Runs',dur:2},{name:'Position Tag',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Meet in the Middle Grip Drill',dur:2},
+      {name:'Partner Step and Throw',dur:5},{name:'Throw and Catch Relay',dur:5},
+      {name:'QB Open-Steps Handoff',dur:4},{name:'Multi-Directional Get Up and Go',dur:2},
+      {name:'Learning to Fall Forward/Backward',dur:4},{name:'Hydration Break',dur:2},
+      {name:'Team Offense',dur:10},{name:'Team Defense',dur:10},
+      {name:'Cool Down — reinforce Teamwork',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 3 — Kicking and Fundamentals (5+)',theme:'Hydration',drills:[
+      {name:'Character Theme: Hydration',dur:3},{name:'Lateral Shuffle',dur:3},
+      {name:'Backwards Run',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Crab Crawls',dur:3},{name:'Jump/Hop Relay',dur:3},{name:'Blob Tag',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Toss Drill',dur:3},
+      {name:'Trunk Rotation Throws',dur:3},{name:'Receiver Stance and Start',dur:3},
+      {name:'Running Back Stance and Start',dur:3},{name:'Balance Kicks',dur:5},
+      {name:'Partner Kicks',dur:4},{name:'Bear Crawl',dur:3},{name:'Log Rolls',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:9},{name:'Team Defense',dur:9},
+      {name:'Cool Down — reinforce Hydration',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 4 — Offensive Skills (5+)',theme:'Hydration',drills:[
+      {name:'Character Theme: Hydration',dur:3},{name:'Gallop',dur:3},
+      {name:'Crab Crawls',dur:3},{name:'Heel/Toe Walk',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Jump/Hop Relay',dur:3},{name:'Log Roll Bonanza',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Thumb to Pocket',dur:2},
+      {name:'Partner Step and Throw',dur:4},{name:'Toss Drill',dur:4},
+      {name:'Catch Low-Medium-High',dur:5},{name:'Toss Drill',dur:3},
+      {name:'Forward/Backward Shoulder Rolls',dur:4},{name:'Mousetrap',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:9},{name:'Team Defense',dur:9},
+      {name:'Cool Down — reinforce Hydration',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 5 — Defensive Drills (5+)',theme:'Sportsmanship',drills:[
+      {name:'Character Theme: Sportsmanship',dur:3},{name:'Skipping',dur:3},
+      {name:'High Knees',dur:3},{name:'Butt Kicks',dur:3},{name:'Lateral Shuffle',dur:3},
+      {name:'Scatter Run',dur:3},{name:'Players Choice',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Do Not Cross the Line',dur:2},
+      {name:'Trunk Rotation Throws',dur:5},{name:'YAC Yards After Catch',dur:4},
+      {name:'Red Light Green Light (with ball)',dur:4},
+      {name:'Animal Relay',dur:4},{name:'Learning to Fall Side to Side',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:10},{name:'Team Defense',dur:10},
+      {name:'Cool Down — reinforce Sportsmanship',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 6 — Integrated Offense (5+)',theme:'Sportsmanship',drills:[
+      {name:'Character Theme: Sportsmanship',dur:3},{name:'Straight Leg March',dur:3},
+      {name:'1-Leg Hops',dur:3},{name:'Forward/Backward Runs',dur:3},{name:'Gallop',dur:3},
+      {name:'Switch Tag',dur:3},{name:'Zig-Zag Tag',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Horizontal L to Vertical L',dur:2},
+      {name:'Catch and Step with Partner',dur:5},{name:'Handoff Relay',dur:5},
+      {name:'Partner Kicks',dur:5},{name:'Hollow Rolls',dur:2},
+      {name:'Angle of Pursuit Drill',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:9},{name:'Team Defense',dur:9},
+      {name:'Cool Down — reinforce Sportsmanship',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 7 — Mid-Season Review (5+)',theme:'Nutrition',drills:[
+      {name:'Character Theme: Nutrition',dur:3},{name:'Walking Knee Hugs',dur:3},
+      {name:'Lateral Shuffle',dur:3},{name:'Crab Crawls',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Gear Runs',dur:2},{name:'Blob Tag',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Meet in the Middle Grip Drill',dur:2},
+      {name:'Towel Drill',dur:2},{name:'Trunk Rotation Throws',dur:4},
+      {name:'Hot Potato',dur:4},{name:'Toss Drill',dur:4},
+      {name:'Multi-Directional Get Up and Go',dur:3},
+      {name:'Forward/Backward Shoulder Rolls',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:9},{name:'Team Defense',dur:9},
+      {name:'Cool Down — reinforce Nutrition',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 8 — Contact and Skills (5+)',theme:'Nutrition',drills:[
+      {name:'Character Theme: Nutrition',dur:3},{name:'Lunge',dur:3},
+      {name:'Arm Circles',dur:2},{name:'Bear Crawls',dur:3},{name:'Gallop',dur:3},
+      {name:'Stop and Go Flow',dur:3},{name:'Sharks and Minnows (short)',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Throw and Catch Relay',dur:3},
+      {name:'Crossing Routes',dur:5},{name:'Throw and Catch Relay',dur:3},
+      {name:'Mesh with Step-Over',dur:5},{name:'Angle of Pursuit Drill',dur:4},
+      {name:'Log Roll Bonanza',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:10},{name:'Team Defense',dur:10},
+      {name:'Cool Down — reinforce Nutrition',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 9 — Complex Patterns (5+)',theme:'Leadership',drills:[
+      {name:'Character Theme: Leadership',dur:3},{name:'Single-Leg Quad Stretch and Reach',dur:3},
+      {name:'Skipping',dur:3},{name:'Forward/Backward Runs',dur:3},
+      {name:'Lateral Shuffle',dur:3},{name:'Gear Runs',dur:2},{name:'4-Way Balance',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Horizontal L to Vertical L',dur:1},
+      {name:'Clockwork Hands',dur:5},{name:'Clockwork Hands (receiving)',dur:4},
+      {name:'One-Step Kicks',dur:5},
+      {name:'Helicopters',dur:2},{name:'Forward Roll to Sprint Relay',dur:3},
+      {name:'Animal Relay',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:10},{name:'Team Defense',dur:10},
+      {name:'Cool Down — reinforce Leadership',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 10 — Endurance and Pace (5+)',theme:'Leadership',drills:[
+      {name:'Character Theme: Leadership',dur:3},{name:'High Knees',dur:3},
+      {name:'Butt Kicks',dur:3},{name:'Carioca',dur:3},{name:'Gear Runs',dur:2},
+      {name:'Partner Mirror Drill',dur:2},{name:'Players Choice',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Arm Slaps and Arm Hugs',dur:1},
+      {name:'Ultimate Football',dur:15},{name:'Ultimate Football (see above)',dur:0},
+      {name:'Elephant Walk',dur:3},{name:'Angle of Pursuit Drill',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:10},{name:'Team Defense',dur:10},
+      {name:'Cool Down — reinforce Leadership',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 11 — Playoff Prep (5+)',theme:'Recovery',drills:[
+      {name:'Character Theme: Recovery',dur:3},{name:'Straight Leg March',dur:3},
+      {name:'Forward/Backward Runs',dur:3},{name:'Carioca',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Scatter Run',dur:3},{name:'Lily Pad Jump/Hop',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Arm Circles',dur:1},
+      {name:'3v3 Passing Only',dur:12},{name:'3v3 Passing Only (see above)',dur:0},
+      {name:'Learning to Fall Forward/Backward',dur:2},
+      {name:'Army-Navy Game',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:10},{name:'Team Defense',dur:10},
+      {name:'Cool Down — reinforce Recovery',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+    {title:'Week 12 — Championship Focus (5+)',theme:'Recovery',drills:[
+      {name:'Character Theme: Recovery',dur:3},{name:'Gallop',dur:3},
+      {name:'Lateral Shuffle',dur:3},{name:'Single-Leg Quad Stretch and Reach',dur:3},
+      {name:'Jumping Jacks',dur:2},{name:'Sharks and Minnows (short)',dur:3},
+      {name:'Racetrack',dur:3},{name:'Hydration Break',dur:2},
+      {name:'Catch and Step with Partner',dur:3},
+      {name:'Trunk Rotation Throws',dur:4},{name:'Over the Shoulder Catches',dur:4},
+      {name:'Snake Run',dur:3},{name:'One-Step Partner Punts',dur:4},
+      {name:'Animal Relay',dur:4},{name:'Log Roll Bonanza',dur:2},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:9},{name:'Team Defense',dur:9},
+      {name:'Cool Down — reinforce Recovery',dur:3},{name:'Sharks and Minnows',dur:5}
+    ]},
+  ],
+  '78': [
+    {title:'Week 1 — Foundations (8+)',theme:'Teamwork',drills:[
+      {name:'Character Theme: Teamwork',dur:5},{name:'Walking Knee Hugs',dur:3},
+      {name:'Straight Leg March',dur:3},{name:'Single-Leg Quad Stretch and Reach',dur:3},
+      {name:'High Knees',dur:3},{name:'Carioca',dur:3},
+      {name:'Partner Mirror Drill',dur:5},{name:'Log Roll Bonanza',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Horizontal L to Vertical L',dur:1},
+      {name:'Meet in the Middle Grip Drill',dur:3},{name:'Trunk Rotation Throws',dur:4},
+      {name:'Partner Step and Throw',dur:4},{name:'QB Open-Steps Handoff',dur:7},
+      {name:'Animal Relay',dur:5},{name:'Forward/Backward Shoulder Rolls',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Teamwork',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 2 — Speed and Agility (8+)',theme:'Teamwork',drills:[
+      {name:'Character Theme: Teamwork',dur:5},{name:'High Skips',dur:3},
+      {name:'Butt Kicks',dur:3},{name:'Single-Leg Quad Stretch and Reach',dur:3},
+      {name:'Lateral Shuffle',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Racetrack',dur:6},{name:'Quick Feet Reaction',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Meet in the Middle Grip Drill',dur:2},
+      {name:'Trunk Rotation Throws',dur:5},{name:'Clockwork Hands',dur:5},
+      {name:'Mesh with Step-Over',dur:7},{name:'Partner Kicks',dur:5},
+      {name:'Flag Tag / Hip Tag',dur:5},{name:'Angle of Pursuit Drill',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Teamwork',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 3 — Kicking Technique (8+)',theme:'Hydration',drills:[
+      {name:'Character Theme: Hydration',dur:5},{name:'High Knees',dur:3},
+      {name:'High Skips',dur:3},{name:'Balance Strides',dur:3},
+      {name:'Arm Circles',dur:2},{name:'Lateral Shuffles',dur:3},
+      {name:'4-Way Balance',dur:5},{name:'Blob Tag',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Thumb to Pocket',dur:1},
+      {name:'Horizontal L to Vertical L',dur:2},{name:'Cross Plant and Throw',dur:5},
+      {name:'Receiver Stance and Start',dur:4},{name:'Hot Potato',dur:4},
+      {name:'Running Back Stance and Start',dur:4},
+      {name:'Partner Cross Tracking Tag',dur:4},{name:'Surfer Drill',dur:3},
+      {name:'Army-Navy Game',dur:7},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Hydration',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 4 — Offensive Development (8+)',theme:'Hydration',drills:[
+      {name:'Character Theme: Hydration',dur:5},{name:'High Knees',dur:3},
+      {name:'High Skips',dur:3},{name:'Balance Strides',dur:3},
+      {name:'Jump and Land',dur:3},{name:'Lateral Shuffles',dur:3},
+      {name:'Scatter Run',dur:5},{name:'4-Way Balance',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Thumb to Pocket',dur:2},
+      {name:'Horizontal L to Vertical L',dur:2},{name:'Clockwork Hands',dur:5},
+      {name:'Toss Drill',dur:5},{name:'Partner Punts',dur:6},
+      {name:'Push-up and Roll',dur:4},{name:'Body Lock Game',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Hydration',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 5 — Coverage and Defense (8+)',theme:'Sportsmanship',drills:[
+      {name:'Character Theme: Sportsmanship',dur:5},{name:'Butt Kicks',dur:3},
+      {name:'Bounds',dur:3},{name:'180 Jumps',dur:3},
+      {name:'Single-Leg Quad Stretch and Reach',dur:3},{name:'Carioca',dur:3},
+      {name:'Army-Navy Game',dur:7},{name:'Multi-Directional Get Up and Go',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Throw and Catch Relay',dur:5},
+      {name:'Trunk Rotation Throws',dur:5},{name:'5-Yard Quick Game',dur:6},
+      {name:'5-Yard Quick Game (receiving)',dur:5},{name:'Catch Wrap and Go',dur:5},
+      {name:'Hollow Rolls',dur:3},{name:'Learning to Fall Side to Side',dur:3},
+      {name:'Animal Relay',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Sportsmanship',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 6 — Integrated Schemes (8+)',theme:'Sportsmanship',drills:[
+      {name:'Character Theme: Sportsmanship',dur:5},{name:'High Skips',dur:3},
+      {name:'Walking Knee Hugs',dur:3},{name:'Arm Slaps and Arm Hugs',dur:2},
+      {name:'Hops Forward/Backward',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Players Choice',dur:5},{name:'Position Tag',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Towel Drill',dur:2},
+      {name:'Cross Plant and Throw',dur:4},{name:'Spot Throws',dur:4},
+      {name:'Acceleration Drills',dur:6},{name:'Mesh Read and React',dur:6},
+      {name:'Walk the Line Punts',dur:5},
+      {name:'Seal Crawl',dur:3},{name:'The Bear',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Sportsmanship',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 7 — Mid-Season Evaluation (8+)',theme:'Nutrition',drills:[
+      {name:'Character Theme: Nutrition',dur:5},{name:'High Skips',dur:3},
+      {name:'Butt Kicks',dur:3},{name:'Lateral Shuffle',dur:3},
+      {name:'Arm Slaps and Arm Hugs',dur:2},{name:'Balance Strides',dur:3},
+      {name:'Stop and Go Flow',dur:5},{name:'180 Jumps',dur:3},{name:'2-Leg Jumps',dur:2},
+      {name:'Hydration Break',dur:2},{name:'Hip Drops',dur:2},
+      {name:'1-Step Drop and Throw',dur:4},{name:'Ultimate Football',dur:8},
+      {name:'Ultimate Football (receiving)',dur:0},{name:'Coach Knockout',dur:5},
+      {name:'Log Roll Bonanza',dur:4},{name:'Forward Roll to Sprint Relay',dur:4},
+      {name:'Two-Player Rabbit Drill',dur:7},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Nutrition',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 8 — Pursuit Angles (8+)',theme:'Nutrition',drills:[
+      {name:'Character Theme: Nutrition',dur:5},{name:'High Skips',dur:3},
+      {name:'Lateral Shuffle',dur:3},{name:'Carioca',dur:3},
+      {name:'Jumping Jacks',dur:2},{name:'Reverse Lunge',dur:3},
+      {name:'Gear Runs Brake and Reverse',dur:5},{name:'Get Up Chop and Go',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Arm Flaps and Arm Circles',dur:1},
+      {name:'3-Step Drop and Throw',dur:5},{name:'Clockwork Hands',dur:5},
+      {name:'Mesh Read and React',dur:6},{name:'Partner Punts',dur:5},
+      {name:'Body Lock Game',dur:4},{name:'Push-up and Roll',dur:3},
+      {name:'Hand Fighting',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Nutrition',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 9 — Advanced Patterns (8+)',theme:'Leadership',drills:[
+      {name:'Character Theme: Leadership',dur:5},{name:'Bounds',dur:3},
+      {name:'Carioca',dur:3},{name:'Crab Crawl',dur:3},
+      {name:'Walking Knee Hugs',dur:2},{name:'Squat',dur:2},
+      {name:'Skip/Hop/Shuffle/Sprint Relay',dur:5},{name:'Players Choice',dur:5},
+      {name:'Hydration Break',dur:2},{name:'Arm Flaps and Arm Circles',dur:2},
+      {name:'3v3 Passing Only',dur:8},{name:'3v3 Passing Only (receiving)',dur:0},
+      {name:'Zig-Zag Pathway with Ball',dur:5},
+      {name:'Quick Feet Reaction',dur:3},{name:'Scatter Run',dur:5},
+      {name:'Helicopters',dur:3},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Leadership',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 10 — Conditioning (8+)',theme:'Leadership',drills:[
+      {name:'Character Theme: Leadership',dur:5},{name:'Bird Dog',dur:1},
+      {name:'Jumping Jacks',dur:2},{name:'Single-Leg Quad Stretch and Reach',dur:3},
+      {name:'Carioca',dur:3},{name:'Squat Walkout',dur:3},
+      {name:'180 Jumps',dur:3},{name:'Racetrack',dur:8},
+      {name:'Hydration Break',dur:2},{name:'Arm Flaps and Arm Circles',dur:2},
+      {name:'Trunk Rotation Throws',dur:4},{name:'3-Step Drop and Throw',dur:5},
+      {name:'Acceleration Drills',dur:5},{name:'Deceleration Drills',dur:5},
+      {name:'Punt Return Tag',dur:5},
+      {name:'Three-Player Roll and Weave',dur:4},{name:'Forward/Backward Shoulder Rolls',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Leadership',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 11 — Playoff Preparation (8+)',theme:'Recovery',drills:[
+      {name:'Character Theme: Recovery',dur:5},{name:'Walking Knee Hugs',dur:3},
+      {name:'Straight Leg March',dur:3},{name:'Butt Kicks',dur:3},
+      {name:'Alternating Lunges',dur:3},{name:'Backward Runs',dur:3},
+      {name:'Stop and Go Flow',dur:5},{name:'4-Way Balance',dur:3},
+      {name:'Single-Leg Balance and Reach',dur:2},
+      {name:'Hydration Break',dur:2},{name:'Arm Flaps and Arm Circles',dur:2},
+      {name:'Ultimate Football',dur:10},{name:'Ultimate Football (receiving)',dur:0},
+      {name:'Mesh with Step-Over',dur:5},
+      {name:'Log Roll Bonanza',dur:4},{name:'Hand Fighting',dur:4},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Recovery',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+    {title:'Week 12 — Championship Week (8+)',theme:'Recovery',drills:[
+      {name:'Character Theme: Recovery',dur:5},{name:'High Knees',dur:3},
+      {name:'Cone Jumps / Line Jumps',dur:3},{name:'Jumping Jacks',dur:2},
+      {name:'Flying 20 or 30',dur:3},{name:'4-Way Balance',dur:1},
+      {name:'Gear Runs Random Order',dur:4},{name:'Zig-Zag Tag',dur:6},
+      {name:'Hydration Break',dur:2},{name:'Arm Flaps and Arm Circles',dur:2},
+      {name:'Trunk Rotation Throws',dur:4},
+      {name:'10-Yard Intermediate Game',dur:6},{name:'10-Yard Intermediate Game (receiving)',dur:0},
+      {name:'2-Step Kicks',dur:5},
+      {name:'Animal Relay',dur:4},{name:'Flag Hip Tag Corners',dur:7},
+      {name:'Hydration Break',dur:2},{name:'Team Offense',dur:15},{name:'Team Defense',dur:15},
+      {name:'Cool Down — reinforce Recovery',dur:3},{name:'Every Man Flag Pull',dur:2}
+    ]},
+  ]
+};
+
 const PRACTICE_PLANS = [
 {w:1,phase:'Foundation',theme:'First day: flags, Wing-T stance, discover',prac:[
   {lbl:'1A',blocks:[WU_BLOCK,
@@ -1961,6 +2379,61 @@ function getFDMStructureNote() {
   return 'USA Football FDM 8+ Format: Character Dev (5) → Dynamic WU (7) → Athletic Foundations (10) → Hydration (2) → Individual Skills (28-34) → Hydration (2) → Team Offense (15) → Team Defense (15) → Cool Down + Flag Pull + Sharks and Minnows';
 }
 
+function loadFDMTemplate(weekIdx) {
+  const templates = FDM_TEMPLATES[state.division] || [];
+  const tmpl = templates[weekIdx];
+  if(!tmpl) return;
+  if(!confirm(`Load FDM Week ${weekIdx+1} template ("${tmpl.title}") into Practice Builder? This will clear your current custom plan.`)) return;
+
+  // Convert FDM template drills into our practice builder format
+  const DRILL_TYPE_MAP = {
+    'Hydration Break': 'wu', 'Character Theme': 'wu', 'Cool Down': 'gm',
+    'Team Offense': 'tm', 'Team Defense': 'tm', 'Sharks and Minnows': 'gm',
+    'Every Man Flag Pull': 'gm'
+  };
+
+  const planBlocks = tmpl.drills
+    .filter(d => d.dur > 0)
+    .map((d, i) => {
+      // Try to match to a drill in the bank by name
+      const match = DRILLS.find(dr =>
+        dr.name.toLowerCase().includes(d.name.toLowerCase().substring(0,12)) ||
+        d.name.toLowerCase().includes(dr.name.toLowerCase().substring(0,12))
+      );
+      // Determine type
+      let type = 'sk';
+      for(const [key, val] of Object.entries(DRILL_TYPE_MAP)) {
+        if(d.name.includes(key)) { type = val; break; }
+      }
+      if(match) type = match.type || type;
+
+      return {
+        id: match ? match.id : 'custom_' + i,
+        name: d.name,
+        time: d.dur,
+        cat: match ? match.cat : 'Custom',
+        desc: match ? match.desc : d.name,
+        cue: match ? match.cue : '',
+        level: match ? match.level : 'All',
+        group: match ? match.group : 'Full team',
+        equip: match ? match.equip : '',
+        type: type
+      };
+    });
+
+  if(state.division === '56') state.customPractice56 = planBlocks;
+  else state.customPractice = planBlocks;
+  save();
+
+  // Switch to builder tab
+  curPracTab = 'builder';
+  document.querySelectorAll('#pg-practices .tab').forEach((t,i) => t.classList.toggle('active', i===2));
+  const title = document.getElementById('hdr-title');
+  if(title) title.textContent = 'Practice › Practice Builder';
+  renderPracContent();
+  showToast('FDM Week ' + (weekIdx+1) + ' template loaded into builder!');
+}
+
 function sharePracticePlan() {
   const plans = getActivePracticePlans();
   const wk = plans.find(p=>p.w===curPracWeek);
@@ -2019,7 +2492,7 @@ function renderPracPlans(el) {
 }
 
 function renderPracBuilder(el) {
-  const plan = state.customPractice;
+  const plan = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
   const tc = {wu:'pb-wu',sk:'pb-sk',tm:'pb-tm',gm:'pb-gm'};
   const tl = {wu:'Warm-up',sk:'Skill',tm:'Team',gm:'Game'};
   let h = `<div class="card" style="margin-bottom:8px;">
@@ -2065,7 +2538,7 @@ function dropBlock(e, i) {
   renderPracContent();
 }
 function removePlanBlock(i) { state.customPractice.splice(i,1); save(); renderPracContent(); }
-function clearPlan() { if(confirm('Clear the custom plan?')) { state.customPractice=[]; save(); renderPracContent(); } }
+function clearPlan() { if(confirm('Clear the custom plan?')) { if(state.division==='56') state.customPractice56=[]; else state.customPractice=[]; save(); renderPracContent(); } }
 
 function renderDrillBank(el) {
   const cats = ['All',...new Set(DRILLS.map(d=>d.cat))];
@@ -3528,7 +4001,7 @@ function renderPlayLog(el) {
     const w = stats?stats.worked:0, o=stats?stats.ok:0, f=stats?stats.failed:0, t=stats?stats.total:0;
     const wPct = t?Math.round(w/t*100):0;
     h += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--navy3);">
-      <div style="width:90px;font-size:11px;font-weight:500;flex-shrink:0;">${p.n}</div>
+      <div style="min-width:70px;max-width:110px;font-size:11px;font-weight:500;flex-shrink:0;word-break:break-word;">${p.n}</div>
       <div style="flex:1;height:8px;background:var(--navy3);border-radius:4px;overflow:hidden;">
         <div style="height:100%;width:${wPct}%;background:var(--green);border-radius:4px;"></div>
       </div>
@@ -4003,13 +4476,13 @@ function renderGameDay() {
   if(curPlay) {
     h += `<div style="background:var(--navy2);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center;">
       <div style="font-size:11px;color:var(--gold);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">Play ${gamedayCurrentPlay+1} of ${plays.length}</div>
-      <div style="font-size:28px;font-weight:700;margin-bottom:6px;">${curPlay.n}</div>
+      <div style="font-size:26px;font-weight:800;margin-bottom:6px;line-height:1.1;">${curPlay.n}</div>
       <div style="font-size:12px;color:var(--g3);line-height:1.5;">${curPlay.note.substring(0,80)}...</div>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
         ${gamedayCurrentPlay>0?`<button onclick="prevPlay()" class="btn btn-sm">← Prev</button>`:''}
-        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','worked')" style="padding:8px 14px;border-radius:8px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green);font-weight:600;cursor:pointer;font-size:12px;">✓ Worked</button>
-        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','ok')" style="padding:8px 14px;border-radius:8px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--amber);font-weight:600;cursor:pointer;font-size:12px;">OK</button>
-        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','failed')" style="padding:8px 14px;border-radius:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);font-weight:600;cursor:pointer;font-size:12px;">✗ Failed</button>
+        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','worked')" style="padding:12px 16px;border-radius:10px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green);font-weight:700;cursor:pointer;font-size:14px;min-height:48px;">✓ W</button>
+        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','ok')" style="padding:12px 16px;border-radius:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--amber);font-weight:700;cursor:pointer;font-size:14px;min-height:48px;">OK</button>
+        <button onclick="logPlay('${curPlay.id}','${curPlay.n}','failed')" style="padding:12px 16px;border-radius:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);font-weight:700;cursor:pointer;font-size:14px;min-height:48px;">✗ F</button>
         ${gamedayCurrentPlay<plays.length-1?`<button onclick="nextPlay()" class="btn btn-sm">Next →</button>`:''}
       </div>
     </div>`;
@@ -5105,61 +5578,46 @@ function renderAutoRoster(el) {
     };
 
     // Offense — 3 strings
-    h += `<div style="font-size:11px;font-weight:600;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">Offense</div>`;
+    // Helper to render one position row — mobile-first design
+    const posRow = (pos, p1, p2, p3, isSkill, swapFn) => {
+      const n1 = p1 ? p1.name.split(' ')[0] : '—';
+      const n2 = p2 ? p2.name.split(' ')[0] : '—';
+      const n3 = p3 ? p3.name.split(' ')[0] : '—';
+      return `<div style="display:grid;grid-template-columns:minmax(60px,80px) 1fr 1fr 1fr;gap:3px;margin-bottom:3px;align-items:stretch;">
+        <div style="display:flex;align-items:center;padding:0 2px;font-size:10px;color:${isSkill?'var(--gold)':'var(--g3)'};font-weight:700;text-transform:uppercase;word-break:break-word;line-height:1.2;">${pos}</div>
+        <div onclick="${locked||!swapFn?'':swapFn}" style="padding:5px 4px;border-radius:6px;background:${isSkill?'rgba(245,166,35,.1)':'var(--navy3)'};border:1px solid ${isSkill?'rgba(245,166,35,.25)':'transparent'};cursor:${locked||!swapFn?'default':'pointer'};text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);">${n1}</div>
+          <div style="font-size:9px;color:var(--g3);margin-top:1px;">1st</div>
+        </div>
+        <div style="padding:5px 4px;border-radius:6px;background:rgba(59,130,246,.07);text-align:center;">
+          <div style="font-size:11px;color:var(--blue);">${n2}</div>
+          <div style="font-size:9px;color:var(--g3);margin-top:1px;">2nd</div>
+        </div>
+        <div style="padding:5px 4px;border-radius:6px;background:var(--navy3);text-align:center;">
+          <div style="font-size:11px;color:var(--g3);">${n3}</div>
+          <div style="font-size:9px;color:var(--g3);margin-top:1px;">3rd</div>
+        </div>
+      </div>`;
+    };
 
-    // Header row
-    h += `<div style="display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:4px;margin-bottom:4px;">
-      <div></div>
-      <div style="font-size:10px;font-weight:700;color:var(--gold);text-align:center;padding:3px 0;background:rgba(245,166,35,.1);border-radius:5px;">1st String</div>
-      <div style="font-size:10px;font-weight:700;color:var(--blue);text-align:center;padding:3px 0;background:rgba(59,130,246,.1);border-radius:5px;">2nd String</div>
-      <div style="font-size:10px;font-weight:700;color:var(--g3);text-align:center;padding:3px 0;background:var(--navy3);border-radius:5px;">3rd String</div>
-    </div>`;
+    h += `<div style="font-size:11px;font-weight:600;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">Offense</div>`;
 
     positions.offense.forEach(pos => {
       const isSkill = (is56 ? SKILL_POSITIONS_56 : SKILL_POSITIONS_78).includes(pos);
-      const p1 = getStringPlayer(pos, 0); // game roster
-      const p2 = getStringPlayer(pos, 1); // depth chart str 2
-      const p3 = getStringPlayer(pos, 2); // depth chart str 3
-      h += `<div style="display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:4px;margin-bottom:4px;align-items:center;">
-        <div style="font-size:10px;color:${isSkill?'var(--gold)':'var(--g3)'};font-weight:600;text-transform:uppercase;padding:0 4px;">${pos}</div>
-        <div onclick="${locked?'':` swapRosterSlot(${g},'offense','${pos}')`}" style="padding:6px 8px;border-radius:7px;background:${isSkill?'rgba(245,166,35,.1)':'var(--navy3)'};border:1px solid ${isSkill?'rgba(245,166,35,.25)':'transparent'};cursor:${locked?'default':'pointer'};text-align:center;">
-          <div style="font-size:12px;font-weight:600;color:var(--gold);">${p1?p1.name.split(' ')[0]:'—'}</div>
-        </div>
-        <div style="padding:6px 8px;border-radius:7px;background:rgba(59,130,246,.07);text-align:center;">
-          <div style="font-size:11px;color:var(--blue);">${p2?p2.name.split(' ')[0]:'—'}</div>
-        </div>
-        <div style="padding:6px 8px;border-radius:7px;background:var(--navy3);text-align:center;">
-          <div style="font-size:11px;color:var(--g3);">${p3?p3.name.split(' ')[0]:'—'}</div>
-        </div>
-      </div>`;
+      const p1 = getStringPlayer(pos, 0);
+      const p2 = getStringPlayer(pos, 1);
+      const p3 = getStringPlayer(pos, 2);
+      h += posRow(pos, p1, p2, p3, isSkill, `swapRosterSlot(${g},'offense','${pos}')`);
     });
 
-    // Defense — 3 strings
     h += `<div style="font-size:11px;font-weight:600;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;margin:10px 0 6px;">Defense</div>`;
-    h += `<div style="display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:4px;margin-bottom:4px;">
-      <div></div>
-      <div style="font-size:10px;font-weight:700;color:var(--gold);text-align:center;padding:3px 0;background:rgba(245,166,35,.1);border-radius:5px;">1st</div>
-      <div style="font-size:10px;font-weight:700;color:var(--blue);text-align:center;padding:3px 0;background:rgba(59,130,246,.1);border-radius:5px;">2nd</div>
-      <div style="font-size:10px;font-weight:700;color:var(--g3);text-align:center;padding:3px 0;background:var(--navy3);border-radius:5px;">3rd</div>
-    </div>`;
 
     positions.defense.forEach(pos => {
       const pIdx = gameRoster.defense[pos];
       const p1 = pIdx !== undefined ? roster[pIdx] : null;
       const p2 = getStringPlayer(pos, 1, 'defense');
       const p3 = getStringPlayer(pos, 2, 'defense');
-      h += `<div style="display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:4px;margin-bottom:4px;align-items:center;">
-        <div style="font-size:10px;color:var(--g3);font-weight:600;text-transform:uppercase;padding:0 4px;">${pos}</div>
-        <div onclick="${locked?'':` swapRosterSlot(${g},'defense','${pos}')`}" style="padding:6px 8px;border-radius:7px;background:var(--navy3);border:1px solid transparent;cursor:${locked?'default':'pointer'};text-align:center;">
-          <div style="font-size:12px;font-weight:600;color:var(--gold);">${p1?p1.name.split(' ')[0]:'—'}</div>
-        </div>
-        <div style="padding:6px 8px;border-radius:7px;background:rgba(59,130,246,.07);text-align:center;">
-          <div style="font-size:11px;color:var(--blue);">${p2?p2.name.split(' ')[0]:'—'}</div>
-        </div>
-        <div style="padding:6px 8px;border-radius:7px;background:var(--navy3);text-align:center;">
-          <div style="font-size:11px;color:var(--g3);">${p3?p3.name.split(' ')[0]:'—'}</div>
-        </div>
-      </div>`;
+      h += posRow(pos, p1, p2, p3, false, `swapRosterSlot(${g},'defense','${pos}')`);
     });
     h += `<div style="font-size:10px;color:var(--g3);margin-top:6px;font-style:italic;">All 3 strings auto-generated. Tap any 1st string name to swap. Regen rebuilds all 3 strings.</div>
     </div>`;
