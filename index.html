@@ -759,6 +759,15 @@ function renderRoster() {
           <span class="badge b-blue">${p.grade}</span>
           <span class="badge ${expC}">${p.yrs}yr</span>
           <span onclick="togglePrimary(${pi})" class="badge ${p.primary?'b-gold':'b-gray'}" style="cursor:pointer;" title="Tap to toggle">${p.primary?'★ Primary':'○ Dev'}</span>
+          ${(()=>{
+            const akey=state.division+'_'+p.id;
+            const a=state.fdmAssessments&&state.fdmAssessments[akey];
+            if(!a) return '';
+            const vals=Object.values(a).filter(v=>typeof v==='number');
+            if(!vals.length) return '';
+            const avg=Math.round(vals.reduce((s,v)=>s+v,0)/vals.length*10)/10;
+            return '<span class="badge b-blue" onclick="event.stopPropagation();showFDMAssessmentForPlayer('+pi+')" style="cursor:pointer;">FDM '+avg+'/3</span>';
+          })()}
           <span onclick="cycleAvail(${pi})" class="badge ${(p.avail||'available')==='available'?'b-green':(p.avail==='limited'?'b-amber':'b-red')}" style="cursor:pointer;">${(p.avail||'available')==='available'?'✓ Available':(p.avail==='limited'?'~ Limited':'✗ Out')}</span>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;">
@@ -3455,8 +3464,8 @@ const TIPS_56 = [
    body:'Do not assume every player will naturally get a carry. Check your touch tracker before play 3 of every series. If someone has not carried -- call a play for them immediately. This is the job.'},
   {cat:'5/6 Development',icon:'🎯',title:'The fake IS the skill',
    body:'At 5/6, the most valuable skill to teach is the fake handoff. A convincing fake means the defense bites, and the play works. Both players in every fake must commit 100%. Practice it every warm-up, every day.'},
-  {cat:'5/6 Development',icon:'💛',title:'Celebrate every carry, not just TDs',
-   body:'When a player who never carries finally gets the ball -- that carry is worth more than any TD. The whole team should erupt. Other players will see: my carry matters to everyone. This is the foundation of team culture.'},
+  {cat:'5/6 Development',icon:'🛡️',title:'Celebrate blocks as loudly as carries',
+   body:'In flag football, blocking (screening) is the invisible work. The sweep that goes for 20 yards only happened because a blocker put their body in the right position. Call it out by name every time: "That was Jake! He screened the defender and Marcus ran free!" If blockers know you see them, they will do it harder every play. A culture that celebrates blocking is a culture that wins.'},
   {cat:'5/6 Development',icon:'🏃',title:'Motor patterns take 20-30 reps to stick',
    body:'A 5-year-old needs to run the same play 20-30 times before the movement becomes automatic. This is why you run sweeps 20 times in week 1. Variety is the enemy of learning at this age. Same drills, more reps.'},
   {cat:'5/6 Development',icon:'⏱️',title:'No timeouts -- pace is your only control',
@@ -4340,7 +4349,6 @@ function printCallSheet() {
 // TEAM CULTURE TOOLS
 // ════════════════════════════════════════════
 function renderCulture(el) {
-  const division = state.division;
   if(!state.culture) state.culture = {potw:'',cheer:'',moments:[]};
   const c = state.culture;
 
@@ -4351,7 +4359,7 @@ function renderCulture(el) {
 
   // Player of the Week
   h += `<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Player of the week</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">⭐ Player of the week</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <input type="text" id="potw-input" placeholder="Player name + what they did" value="${c.potw||''}" style="flex:1;margin:0;">
       <button onclick="savePotw()" class="btn btn-gold btn-sm">Save</button>
@@ -4359,33 +4367,51 @@ function renderCulture(el) {
     ${c.potw?`<div style="margin-top:8px;padding:10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:8px;font-size:13px;">⭐ ${c.potw}</div>`:''}
   </div>`;
 
+  // Blocker of the Week — new
+  h += `<div class="card" style="margin-bottom:10px;">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px;">🛡️ Blocker of the week</div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:8px;">The block that sprung the run. The screen that nobody saw. Recognize it out loud every week.</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="block-input" placeholder="Player name + the block they made" value="${c.blocker||''}" style="flex:1;margin:0;">
+      <button onclick="saveBlocker()" class="btn btn-gold btn-sm">Save</button>
+    </div>
+    ${c.blocker?`<div style="margin-top:8px;padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:13px;">🛡️ ${c.blocker}</div>`:''}
+  </div>`;
+
   // Team cheer
   h += `<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Team cheer</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📣 Team cheer</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <input type="text" id="cheer-input" placeholder="e.g. 1-2-3 RUSH!" value="${c.cheer||''}" style="flex:1;margin:0;">
       <button onclick="saveCheer()" class="btn btn-gold btn-sm">Save</button>
     </div>
-    ${c.cheer?`<div style="margin-top:8px;padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:16px;font-weight:700;text-align:center;">📣 ${c.cheer}</div>`:''}
+    ${c.cheer?`<div style="margin-top:8px;padding:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:18px;font-weight:700;text-align:center;">📣 ${c.cheer}</div>`:''}
   </div>`;
 
-  // Season moments wall
+  // Season moments wall — now fully editable
   h += `<div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-size:13px;font-weight:600;">Season moments wall</div>
-      <button onclick="addMoment()" class="btn btn-gold btn-sm">+ Add</button>
+      <div style="font-size:13px;font-weight:600;">🏆 Season moments wall</div>
+      <button onclick="openAddMoment()" class="btn btn-gold btn-sm">+ Add</button>
     </div>
     ${!c.moments||!c.moments.length?
-      `<div style="font-size:12px;color:var(--g3);text-align:center;padding:16px 0;">No moments yet. Add the first great play, the first catch, the first flag pull that saved the day.</div>`:
+      `<div style="font-size:12px;color:var(--g3);text-align:center;padding:16px 0;">No moments yet.<br>Add the first great play, the first block that sprung a TD, the first flag pull that saved the game.</div>`:
       `<div style="display:flex;flex-direction:column;gap:6px;">
-        ${c.moments.map((m,i)=>`<div style="padding:10px 12px;background:var(--navy3);border-radius:8px;display:flex;gap:8px;align-items:flex-start;">
-          <div style="font-size:18px;flex-shrink:0;">${m.emoji||'⭐'}</div>
-          <div style="flex:1;">
-            <div style="font-size:12px;font-weight:600;">${m.player}</div>
-            <div style="font-size:11px;color:var(--g3);margin-top:2px;">${m.moment}</div>
-            <div style="font-size:10px;color:var(--g3);margin-top:2px;">Game ${m.game||'?'}</div>
+        ${c.moments.map((m,i)=>`<div style="padding:10px 12px;background:var(--navy3);border-radius:8px;">
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <div style="font-size:18px;flex-shrink:0;cursor:pointer;" onclick="cycleMomentEmoji(${i})">${m.emoji||'⭐'}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+                <span style="font-size:12px;font-weight:600;">${m.player}</span>
+                <span style="font-size:10px;color:var(--g3);">Game ${m.game||'?'}</span>
+              </div>
+              <div style="font-size:11px;color:var(--g3);line-height:1.4;">${m.moment}</div>
+            </div>
+            <div style="display:flex;gap:4px;flex-shrink:0;">
+              <button onclick="editMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:13px;padding:2px 4px;">✏️</button>
+              <button onclick="removeMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:16px;padding:2px 4px;">×</button>
+            </div>
           </div>
-          <button onclick="removeMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:16px;">×</button>
         </div>`).join('')}
       </div>`
     }
@@ -4400,20 +4426,84 @@ function savePotw() {
   save(); renderToolContent();
 }
 
+function saveBlocker() {
+  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
+  state.culture.blocker = document.getElementById('block-input').value;
+  save(); renderToolContent();
+}
+
 function saveCheer() {
   if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
   state.culture.cheer = document.getElementById('cheer-input').value;
   save(); renderToolContent();
 }
 
-function addMoment() {
+function openAddMoment(editIdx) {
   if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
-  const player = prompt('Player name:'); if(!player) return;
-  const moment = prompt('What happened? (describe the moment):'); if(!moment) return;
-  const game = prompt('Game number:') || '?';
-  const emojis = ['⭐','🏈','🏆','🔥','💪','🎯','👏','🦁'];
-  const emoji = emojis[Math.floor(Math.random()*emojis.length)];
-  state.culture.moments.push({player, moment, game, emoji, ts:Date.now()});
+  const isEdit = editIdx !== undefined;
+  const existing = isEdit ? state.culture.moments[editIdx] : {};
+  const emojis = ['⭐','🏈','🏆','🔥','💪','🎯','👏','🦁','🛡️','🚩','⚡','🎉'];
+
+  let h = `<div class="modal-title">${isEdit?'Edit moment':'Add a season moment'}</div>
+    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Player name</label>
+    <input type="text" id="moment-player" placeholder="e.g. Jake" value="${existing.player||''}" style="margin-bottom:10px;">
+    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">What happened?</label>
+    <input type="text" id="moment-desc" placeholder="e.g. Made the block that sprung the TD sweep" value="${existing.moment||''}" style="margin-bottom:10px;">
+    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Game number</label>
+    <input type="text" id="moment-game" placeholder="e.g. 3" value="${existing.game||''}" style="margin-bottom:12px;">
+    <label style="font-size:12px;color:var(--g3);margin-bottom:6px;display:block;">Icon (tap to pick)</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="moment-emoji-picker">
+      ${emojis.map(e=>`<button onclick="selectMomentEmoji('${e}')" id="emoji-${e}" style="width:38px;height:38px;border-radius:8px;border:2px solid ${(existing.emoji||'⭐')===e?'var(--gold)':'var(--navy3)'};background:${(existing.emoji||'⭐')===e?'rgba(245,166,35,.15)':'var(--navy3)'};font-size:18px;cursor:pointer;touch-action:manipulation;">${e}</button>`).join('')}
+    </div>
+    <input type="hidden" id="moment-emoji" value="${existing.emoji||'⭐'}">
+    <input type="hidden" id="moment-edit-idx" value="${isEdit?editIdx:''}">
+    <button onclick="saveMoment()" class="btn btn-gold" style="width:100%;min-height:48px;font-size:15px;">${isEdit?'Save changes':'Add to wall'}</button>`;
+
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'addmoment';
+  openModal('modal-slot-picker');
+}
+
+function selectMomentEmoji(e) {
+  document.getElementById('moment-emoji').value = e;
+  document.querySelectorAll('#moment-emoji-picker button').forEach(btn => {
+    const isSelected = btn.textContent === e;
+    btn.style.borderColor = isSelected ? 'var(--gold)' : 'var(--navy3)';
+    btn.style.background = isSelected ? 'rgba(245,166,35,.15)' : 'var(--navy3)';
+  });
+}
+
+function saveMoment() {
+  const player = document.getElementById('moment-player').value.trim();
+  const moment = document.getElementById('moment-desc').value.trim();
+  const game = document.getElementById('moment-game').value.trim() || '?';
+  const emoji = document.getElementById('moment-emoji').value || '⭐';
+  const editIdx = document.getElementById('moment-edit-idx').value;
+  if(!player || !moment) { alert('Please fill in player name and what happened.'); return; }
+
+  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
+  const entry = {player, moment, game, emoji, ts:Date.now()};
+
+  if(editIdx !== '') {
+    state.culture.moments[parseInt(editIdx)] = entry;
+  } else {
+    state.culture.moments.push(entry);
+  }
+  save();
+  closeModal('modal-slot-picker');
+  renderToolContent();
+  showToast(editIdx !== '' ? 'Moment updated!' : 'Moment added to the wall!');
+}
+
+function editMoment(i) {
+  openAddMoment(i);
+}
+
+function cycleMomentEmoji(i) {
+  const emojis = ['⭐','🏈','🏆','🔥','💪','🎯','👏','🦁','🛡️','🚩','⚡','🎉'];
+  const m = state.culture.moments[i];
+  const cur = emojis.indexOf(m.emoji||'⭐');
+  m.emoji = emojis[(cur+1) % emojis.length];
   save(); renderToolContent();
 }
 
@@ -4422,6 +4512,10 @@ function removeMoment(i) {
     state.culture.moments.splice(i,1); save(); renderToolContent();
   }
 }
+
+function addMoment() { openAddMoment(); }
+
+
 
 // ════════════════════════════════════════════
 // GAME DAY SIDELINE MODE
@@ -4576,95 +4670,156 @@ function useTimeout(side) {
 // FDM PLAYER ASSESSMENT
 // ════════════════════════════════════════════
 function showFDMAssessment() {
+  showFDMAssessmentForPlayer(null);
+}
+
+function showFDMAssessmentForPlayer(selectedPlayerIdx) {
   const is56 = state.division === '56';
+  const roster = activeRoster();
+  if(!roster.length) {
+    alert('Add players to your roster first.');
+    return;
+  }
+
+  // Default to first player if none selected
+  if(selectedPlayerIdx === null) selectedPlayerIdx = 0;
+  const player = roster[selectedPlayerIdx];
+
+  // Load saved assessment or empty
+  if(!state.fdmAssessments) state.fdmAssessments = {};
+  const key = `${state.division}_${player.id}`;
+  const saved = state.fdmAssessments[key] || {};
 
   const assess56 = {
-    title: 'USA Football FDM Player Assessment — Ages 5+',
-    note: 'Rate each skill: 1 = unable to perform, 2 = can perform but not consistently, 3 = can perform consistently',
+    title: 'FDM Assessment — Ages 5+',
     sections: [
-      {name:'Passing Skill Assessment', items:[
-        'Throw a ball with an overarm motion while stepping forward with the opposite foot',
-        'Throw a ball overhand with proper hip and shoulder rotation',
-        'Throw for distance with accuracy to a stationary target (5+ yards)'
+      {name:'Passing', color:'#3b82f6', items:[
+        'Throws with overarm motion, stepping forward with opposite foot',
+        'Throws overhand with proper hip and shoulder rotation',
+        'Throws for distance with accuracy to a stationary target (5+ yards)'
       ]},
-      {name:'Running and Receiving Skill Assessment', items:[
-        'Toss and catch a ball to themselves',
-        'Catch a ball thrown from 5 yards away',
-        'Catch a ball thrown from 5 yards away with hands only (no body trap)'
+      {name:'Running & Receiving', color:'#22c55e', items:[
+        'Can toss and catch a ball to themselves',
+        'Can catch a ball thrown from 5 yards away',
+        'Can catch from 5 yards using hands only (no body trap)'
       ]},
-      {name:'Fundamental Movement Skill Assessment', items:[
+      {name:'Movement', color:'#f5a623', items:[
         'Can skip and march with contralateral arm movement',
-        'Can demonstrate the ability to change speeds on command while running',
-        'From stationary position, can jump upward with two feet and land with balance',
-        'Can maintain balance and body control while running, skipping, and hopping',
+        'Can change speeds on command while running',
+        'Can jump upward on two feet and land with balance',
+        'Maintains balance and body control while running, skipping, hopping',
         'Can shuffle laterally without feet touching',
-        'Can run in general space with others while maintaining personal space'
+        'Can run in general space while maintaining personal space'
       ]}
     ]
   };
 
   const assess78 = {
-    title: 'USA Football FDM Player Assessment — Ages 8+',
-    note: 'Rate each skill: 1 = unable to perform, 2 = can perform but not consistently, 3 = can perform consistently',
+    title: 'FDM Assessment — Ages 8+',
     sections: [
-      {name:'Passing Skill Assessment', items:[
-        'Can throw a football 10-15 yards with proper mechanics (step, hip rotate, follow-through)',
-        'Can accurately throw a football 10 yards to a stationary target',
-        'Can accurately throw a football to a moving target 5-10 yards away'
+      {name:'Passing', color:'#3b82f6', items:[
+        'Can throw 10-15 yards with proper mechanics (step, rotate hip, follow-through)',
+        'Can accurately throw 10 yards to a stationary target',
+        'Can accurately throw to a moving target 5-10 yards away'
       ]},
-      {name:'Running and Receiving Skill Assessment', items:[
-        'Can catch a football with hands only from 10 yards away',
-        'Can catch a football thrown above the head and below the waist while stationary',
-        'Can catch a football while running a prescribed route at 5-10 yards distance',
-        'Can maintain balance and body control during deceleration (stop and go)',
-        'Can demonstrate evasive movement skills while maintaining ball security'
+      {name:'Running & Receiving', color:'#22c55e', items:[
+        'Can catch with hands only from 10 yards away',
+        'Can catch a ball thrown above the head and below the waist while stationary',
+        'Can catch while running a prescribed route at 5-10 yards distance',
+        'Maintains balance and body control during deceleration',
+        'Can demonstrate evasive movement while maintaining ball security'
       ]},
-      {name:'Athletic Foundations', items:[
-        'Can perform running actions using proper foot strike and appropriate body lean',
-        'Can gallop and shuffle in various directions without feet touching',
-        'Can jump and hop in different directions with varying degrees of force',
-        'Can perform backpedal movement while maintaining balance and body control',
-        'Can demonstrate movement transitions (run-shuffle-run, run-skip-run)'
+      {name:'Athletic Foundations', color:'#f5a623', items:[
+        'Runs with proper foot strike and appropriate body lean',
+        'Can gallop and shuffle without feet touching',
+        'Can jump and hop in various directions with varying force',
+        'Can perform backpedal while maintaining balance',
+        'Can demonstrate movement transitions (run-shuffle, run-skip, run-roll)'
       ]}
     ]
   };
 
   const assess = is56 ? assess56 : assess78;
-  const roster = activeRoster();
 
-  let h = `<div style="font-size:16px;font-weight:700;margin-bottom:6px;">${assess.title}</div>
-    <div style="font-size:11px;color:var(--g3);margin-bottom:12px;">${assess.note}</div>`;
+  // Build all item keys for this assessment
+  const allKeys = [];
+  assess.sections.forEach((sec, si) => sec.items.forEach((_, ii) => allKeys.push(`${si}_${ii}`)));
 
-  if(!roster.length) {
-    h += '<div style="font-size:13px;color:var(--g3);">Add players to roster first.</div>';
-  } else {
-    // Show assessment grid for first player (can be extended)
-    h += `<div style="font-size:12px;color:var(--g3);margin-bottom:8px;">Tap a player to assess. Use this at Week 1 and Week 8 to track development.</div>`;
-    h += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">`;
-    roster.forEach((p,pi) => {
-      const ini = p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-      h += `<div style="padding:6px 12px;border-radius:20px;background:var(--navy3);font-size:12px;">${ini} ${p.name.split(' ')[0]}</div>`;
+  // Calculate score
+  const rated = allKeys.filter(k => saved[k]);
+  const score = rated.length > 0 ? Math.round(rated.reduce((s,k) => s + (saved[k]||0), 0) / allKeys.length * 10) / 10 : 0;
+  const maxScore = 3;
+  const pct = Math.round(score / maxScore * 100);
+
+  const ini = player.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+
+  let h = `
+    <div class="modal-title" style="margin-bottom:4px;">${assess.title}</div>
+
+    <!-- Player selector -->
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      ${roster.map((p,pi) => {
+        const pini = p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        const isSelected = pi === selectedPlayerIdx;
+        return `<button onclick="showFDMAssessmentForPlayer(${pi})" style="padding:5px 10px;border-radius:20px;border:1px solid ${isSelected?'var(--gold)':'var(--navy3)'};background:${isSelected?'rgba(245,166,35,.15)':'var(--navy3)'};color:${isSelected?'var(--gold)':'var(--g3)'};font-size:11px;font-weight:${isSelected?700:400};cursor:pointer;">${pini} ${p.name.split(' ')[0]}</button>`;
+      }).join('')}
+    </div>
+
+    <!-- Player header + score -->
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--navy3);border-radius:10px;margin-bottom:12px;">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--navy);flex-shrink:0;">${ini}</div>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:700;">${player.name}</div>
+        <div style="font-size:11px;color:var(--g3);margin-top:1px;">${rated.length}/${allKeys.length} skills rated · Avg ${score > 0 ? score : '—'}/3</div>
+      </div>
+      ${score > 0 ? `<div style="text-align:center;">
+        <div style="font-size:22px;font-weight:800;color:${pct>=75?'var(--green)':pct>=50?'var(--gold)':'var(--red)'};">${pct}%</div>
+        <div style="font-size:9px;color:var(--g3);">overall</div>
+      </div>` : ''}
+    </div>
+
+    <div style="font-size:10px;color:var(--g3);margin-bottom:10px;">1 = cannot perform &nbsp;·&nbsp; 2 = inconsistent &nbsp;·&nbsp; 3 = consistent</div>`;
+
+  // Sections with ratable items
+  assess.sections.forEach((sec, si) => {
+    h += `<div style="font-size:12px;font-weight:700;color:${sec.color};margin:10px 0 6px;letter-spacing:.5px;text-transform:uppercase;">${sec.name}</div>`;
+    sec.items.forEach((item, ii) => {
+      const k = `${si}_${ii}`;
+      const val = saved[k] || 0;
+      h += `<div style="padding:8px 0;border-bottom:0.5px solid var(--navy3);">
+        <div style="font-size:12px;margin-bottom:6px;line-height:1.4;">${item}</div>
+        <div style="display:flex;gap:6px;">
+          ${[1,2,3].map(n => `<button onclick="saveFDMRating('${key}',${selectedPlayerIdx},'${k}',${n})" style="flex:1;padding:8px 4px;border-radius:8px;border:2px solid ${val===n?sec.color:'var(--navy3)'};background:${val===n?sec.color+'22':'var(--navy3)'};color:${val===n?sec.color:'var(--g3)'};font-size:13px;font-weight:700;cursor:pointer;min-height:40px;touch-action:manipulation;">${n}</button>`).join('')}
+          ${val ? `<button onclick="saveFDMRating('${key}',${selectedPlayerIdx},'${k}',0)" style="padding:8px;border-radius:8px;border:1px solid var(--navy3);background:transparent;color:var(--g3);font-size:11px;cursor:pointer;touch-action:manipulation;">✕</button>` : ''}
+        </div>
+      </div>`;
     });
-    h += '</div>';
+  });
 
-    assess.sections.forEach(sec => {
-      h += `<div style="font-size:12px;font-weight:700;color:var(--gold);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px;">${sec.name}</div>`;
-      sec.items.forEach(item => {
-        h += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--navy3);">
-          <div style="flex:1;font-size:11px;">${item}</div>
-          <div style="display:flex;gap:4px;">
-            ${[1,2,3].map(n=>`<button style="width:26px;height:26px;border-radius:6px;border:1px solid var(--navy3);background:var(--navy3);color:var(--g3);font-size:11px;font-weight:700;cursor:pointer;">${n}</button>`).join('')}
-          </div>
-        </div>`;
-      });
-    });
-
-    h += `<div style="margin-top:12px;padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:11px;color:var(--g3);">Source: USA Football Football Development Model (FDM) Player Assessment. Visit usafootball.com/fdm for full resources.</div>`;
+  // Save date
+  if(saved._date) {
+    h += `<div style="margin-top:10px;font-size:11px;color:var(--g3);text-align:center;">Last saved: ${saved._date}</div>`;
   }
+
+  h += `<div style="margin-top:12px;padding:8px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:10px;color:var(--g3);">USA Football FDM official assessment. Rate at Week 1 and Week 8 to track growth.</div>`;
 
   document.getElementById('slot-picker-content').innerHTML = h;
   document.getElementById('slot-picker-pos').value = 'fdmassess';
   openModal('modal-slot-picker');
+}
+
+function saveFDMRating(key, playerIdx, itemKey, value) {
+  if(!state.fdmAssessments) state.fdmAssessments = {};
+  if(!state.fdmAssessments[key]) state.fdmAssessments[key] = {};
+  if(value === 0) {
+    delete state.fdmAssessments[key][itemKey];
+  } else {
+    state.fdmAssessments[key][itemKey] = value;
+    state.fdmAssessments[key]._date = new Date().toLocaleDateString();
+  }
+  save();
+  // Re-render the modal in place (keeps it open)
+  showFDMAssessmentForPlayer(playerIdx);
 }
 
 // ════════════════════════════════════════════
@@ -5645,6 +5800,7 @@ function exportRoster() {
     activePlays56: state.activePlays56,
     depthChart: state.depthChart,
     depthChart56: state.depthChart56,
+    fdmAssessments: state.fdmAssessments,
     exportDate: new Date().toISOString()
   };
   const json = JSON.stringify(data, null, 2);
