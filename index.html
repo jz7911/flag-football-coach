@@ -59,7 +59,7 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 .b-gray{background:rgba(148,163,184,.1);color:var(--g3);border:1px solid rgba(148,163,184,.2);}
 
 /* BUTTONS */
-.btn{padding:9px 16px;border-radius:9px;border:1px solid var(--navy3);background:var(--navy3);cursor:pointer;font-size:13px;font-family:'Barlow',sans-serif;color:var(--white);font-weight:500;}
+.btn{padding:11px 16px;border-radius:9px;border:1px solid var(--navy3);background:var(--navy3);cursor:pointer;font-size:13px;font-family:'Barlow',sans-serif;color:var(--white);font-weight:500;min-height:44px;}
 .btn:active{opacity:.75;}
 .btn-gold{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600;}
 .btn-outline{background:transparent;border-color:var(--navy3);}
@@ -79,7 +79,7 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 /* TABS */
 .tab-row{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
 .tab-row::-webkit-scrollbar{display:none;}
-.tab{padding:7px 14px;border-radius:20px;border:1px solid var(--navy3);background:transparent;cursor:pointer;font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.3px;color:var(--g3);white-space:nowrap;}
+.tab{padding:9px 16px;border-radius:20px;border:1px solid var(--navy3);background:transparent;cursor:pointer;font-size:13px;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.3px;color:var(--g3);white-space:nowrap;min-height:38px;display:flex;align-items:center;}
 .tab.active{background:var(--gold);color:var(--navy);border-color:var(--gold);}
 
 /* SKILL PIPS */
@@ -130,7 +130,7 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--navy2);border-radius:20px 20px 0 0;padding:20px 16px calc(20px + var(--safe-bottom));width:100%;max-height:85vh;overflow-y:auto;}
-.modal-handle{width:36px;height:4px;background:var(--navy3);border-radius:2px;margin:0 auto 16px;}
+.modal-handle{width:36px;height:4px;background:var(--navy3);border-radius:2px;margin:0 auto 16px;cursor:pointer;}
 .modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;margin-bottom:14px;}
 
 /* INPUTS */
@@ -145,7 +145,7 @@ textarea{min-height:80px;resize:none;}
 /* WEEK SCROLLER */
 .week-scroller{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px;}
 .week-scroller::-webkit-scrollbar{display:none;}
-.week-btn{min-width:40px;height:40px;border-radius:10px;border:1px solid var(--navy3);background:var(--navy3);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--g3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.week-btn{min-width:46px;height:46px;border-radius:10px;border:1px solid var(--navy3);background:var(--navy3);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--g3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .week-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);}
 
 /* DRAG HIGHLIGHT */
@@ -182,6 +182,8 @@ textarea{min-height:80px;resize:none;}
 /* DRAG STATE */
 .dragging{opacity:.5;}
 .drag-handle{color:var(--g3);font-size:16px;cursor:grab;padding:0 4px;}
+.toast{position:fixed;bottom:calc(70px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy2);color:var(--white);border:1px solid var(--navy3);padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;max-width:85vw;overflow:hidden;text-overflow:ellipsis;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -189,12 +191,13 @@ textarea{min-height:80px;resize:none;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-logo">FC</div>
-  <div class="hdr-text">
-    <div class="hdr-title">Flag Football Coach</div>
+  <button id="back-btn" onclick="goBack()" style="display:none;background:none;border:none;color:var(--gold);cursor:pointer;padding:4px 8px 4px 0;font-size:22px;line-height:1;flex-shrink:0;">‹</button>
+  <div class="hdr-logo" id="hdr-logo">FC</div>
+  <div class="hdr-text" style="flex:1;min-width:0;">
+    <div class="hdr-title" id="hdr-title">Flag Football Coach</div>
     <div id="div-badge" style="font-size:11px;color:var(--gold);font-weight:600;margin-top:1px;">7/8 Division</div>
   </div>
-  <div style="display:flex;gap:5px;align-items:center;">
+  <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">
     <button class="div-switch-btn active" data-div="78" onclick="switchDivision('78')" style="padding:4px 9px;border-radius:7px;border:1px solid rgba(245,166,35,.4);background:rgba(245,166,35,.15);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;">7/8</button>
     <button class="div-switch-btn" data-div="56" onclick="switchDivision('56')" style="padding:4px 9px;border-radius:7px;border:1px solid var(--navy3);background:transparent;color:var(--g3);font-size:11px;font-weight:700;cursor:pointer;">5/6</button>
     <div class="hdr-badge" id="hdr-badge" style="margin-left:4px;">Wk 1</div>
@@ -206,6 +209,7 @@ textarea{min-height:80px;resize:none;}
 
 <!-- ══ DASHBOARD ══ -->
 <div class="page active" id="pg-home">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:12px;padding-top:2px;">Season Overview</div>
   <div class="metrics">
     <div class="metric"><div class="metric-val" id="d-players">0</div><div class="metric-lbl">Players</div></div>
     <div class="metric"><div class="metric-val" id="d-games">0</div><div class="metric-lbl">Games</div></div>
@@ -213,10 +217,10 @@ textarea{min-height:80px;resize:none;}
     <div class="metric"><div class="metric-val">14</div><div class="metric-lbl">Plays</div></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <button class="btn btn-gold" onclick="showPage('pg-gameday',document.querySelectorAll('.nav-item')[4])" style="padding:10px;">🏟️ Game Day</button>
-    <button class="btn btn-outline" onclick="showPage('pg-depth',document.querySelectorAll('.nav-item')[3])" style="padding:10px;">📊 Depth Chart</button>
-    <button class="btn btn-outline" onclick="showPage('pg-practices')" style="padding:10px;">📋 Practices</button>
-    <button class="btn btn-outline" onclick="showPage('pg-tools')" style="padding:10px;">🛠️ Tools</button>
+    <button class="btn btn-gold" onclick="showPage('pg-gameday',null,true)" style="padding:10px;font-size:13px;">🏟️ Game Day</button>
+    <button class="btn btn-outline" onclick="showPage('pg-depth',null,true)" style="padding:10px;font-size:13px;">📊 Depth Chart</button>
+    <button class="btn btn-outline" onclick="showPage('pg-practices',null,true)" style="padding:10px;font-size:13px;">📋 Practices</button>
+    <button class="btn btn-outline" onclick="showPage('pg-tools',null,true)" style="padding:10px;font-size:13px;">🛠️ Tools</button>
   </div>
 
   <div class="card card-gold">
@@ -264,20 +268,23 @@ textarea{min-height:80px;resize:none;}
     </div>
   </div>
   <div class="card" id="rules-56" style="display:none;">
-    <div class="card-title">Quick rules reminder — 5/6</div>
+    <div class="card-title">Rules reminder — 5/6 (Mount Prospect)</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px;font-size:11px;color:var(--g3);line-height:1.7;">
-      <div>✓ 6v6, 2 coaches/side on field</div><div>✓ 2 DL must engage OL first</div>
-      <div>✓ 4 LBs at 5 yds, no blitz</div><div>✓ C, G, G are ineligible</div>
+      <div>✓ 6v6, coaches on field</div><div>✓ No blocking (screening only)</div>
+      <div>✓ No blitz — defenders at LOS</div><div>✓ QB no run or delayed run</div>
       <div>✓ No fumbles — dead on drop</div><div>✓ Punt = 20 yds free</div>
-      <div>✓ Possessions start at 20</div><div>✓ No timeouts either half</div>
-      <div>✓ Every player carries EVERY game</div><div>✓ No playoffs in 5/6</div>
-      <div>✓ 2 × 24-min halves</div><div>✓ Safety = flag in own end zone</div>
+      <div>✓ Possessions start at 20</div><div>✓ No official timeouts</div>
+      <div>✓ Every player carries EVERY game</div><div>✓ No playoffs — all games equal</div>
+      <div>✓ Running clock, 2 halves</div><div>✓ Safety = flag in own end zone</div>
+      <div>✓ Equal playing time for all</div><div>✓ Development over competition</div>
     </div>
+    <div style="margin-top:8px;padding:6px 8px;background:rgba(245,166,35,.08);border-radius:6px;font-size:10px;color:var(--gold);">Mount Prospect treats 5/6 as an instructional, in-house league. Development first. Every kid touches the ball every game.</div>
   </div>
 </div>
 
 <!-- ══ ROSTER ══ -->
 <div class="page" id="pg-roster">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:12px;">Team Roster</div>
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
     <button class="btn btn-gold" onclick="openAddPlayer()" style="flex:2;">+ Add Player</button>
     <button class="btn btn-outline" onclick="exportRoster()">💾 Backup</button>
@@ -286,6 +293,7 @@ textarea{min-height:80px;resize:none;}
   <div style="display:flex;gap:8px;margin-bottom:8px;">
     <button class="btn btn-outline" onclick="snapshotRatings()" style="flex:1;font-size:11px;">📸 Snapshot ratings</button>
     <button class="btn btn-outline" onclick="showRatingHistory()" style="flex:1;font-size:11px;">📈 Progress</button>
+    <button class="btn btn-outline" onclick="showFDMAssessment()" style="flex:1;font-size:11px;">📋 FDM Assessment</button>
   </div>
   <div style="font-size:11px;color:var(--g3);margin-bottom:12px;padding:7px 10px;background:var(--navy3);border-radius:8px;">Your roster saves automatically to this browser. Tap <strong style="color:var(--white);">Backup</strong> to download a file you can restore anytime — even after clearing your browser.</div>
   <div id="roster-list"><div class="empty"><div class="empty-icon">👥</div><div class="empty-text">No players yet.<br>Add your roster to get position suggestions.</div></div></div>
@@ -293,6 +301,7 @@ textarea{min-height:80px;resize:none;}
 
 <!-- ══ PRACTICES ══ -->
 <div class="page" id="pg-practices">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px;">Practice Plans</div>
   <div class="tab-row">
     <div class="tab active" onclick="pracTab('plans',this)">Plans</div>
     <div class="tab" onclick="pracTab('builder',this)">Practice Builder</div>
@@ -304,6 +313,7 @@ textarea{min-height:80px;resize:none;}
 
 <!-- ══ PLAYBOOK ══ -->
 <div class="page" id="pg-playbook">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px;">Playbook</div>
   <div class="pb-switch">
     <div class="pb-sys active" onclick="selectSystem('wingt',this)" id="sys-wingt">
       <div class="pb-sys-name">Wing-T</div>
@@ -327,6 +337,7 @@ textarea{min-height:80px;resize:none;}
 
 <!-- ══ TOOLS ══ -->
 <div class="page" id="pg-tools">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px;">Tools & Resources</div>
   <div class="tab-row">
     <div class="tab active" onclick="toolTab('situations',this)">Situations</div>
     <div class="tab" onclick="toolTab('touches',this)">Touches</div>
@@ -345,6 +356,7 @@ textarea{min-height:80px;resize:none;}
 
 <!-- ══ DEPTH CHART ══ -->
 <div class="page" id="pg-depth">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px;">Depth Chart</div>
   <div class="tab-row">
     <div class="tab active" onclick="depthTab('chart',this)">Depth Chart</div>
     <div class="tab" onclick="depthTab('autoroster',this)">Game Roster</div>
@@ -375,9 +387,10 @@ textarea{min-height:80px;resize:none;}
 </nav>
 
 <!-- ADD PLAYER MODAL -->
-<div class="modal-overlay" id="modal-player">
+<div class="modal-overlay" id="modal-player" onclick="if(event.target===this)closeModal('modal-player')">
   <div class="modal">
-    <div class="modal-handle"></div>
+    <div class="modal-handle" onclick="closeModal('modal-player')" title="Tap to close"></div>
+    <div style="font-size:11px;color:var(--g3);text-align:center;margin-bottom:12px;margin-top:-8px;">Tap above to close</div>
     <div class="modal-title">Add Player</div>
     <label>Full name</label>
     <input type="text" id="p-name" placeholder="e.g. Jake Smith">
@@ -402,7 +415,7 @@ textarea{min-height:80px;resize:none;}
 </div>
 
 <!-- ADD DRILL TO PLAN MODAL -->
-<div class="modal-overlay" id="modal-drill-detail">
+<div class="modal-overlay" id="modal-drill-detail" onclick="if(event.target===this)closeModal('modal-drill-detail')">
   <div class="modal">
     <div class="modal-handle"></div>
     <div id="drill-detail-content"></div>
@@ -414,7 +427,7 @@ textarea{min-height:80px;resize:none;}
 </div>
 
 <!-- ADD PLAY TO PLAYBOOK MODAL -->
-<div class="modal-overlay" id="modal-play-detail">
+<div class="modal-overlay" id="modal-play-detail" onclick="if(event.target===this)closeModal('modal-play-detail')">
   <div class="modal">
     <div class="modal-handle"></div>
     <div id="play-detail-content"></div>
@@ -425,8 +438,10 @@ textarea{min-height:80px;resize:none;}
   </div>
 </div>
 
+<div class="toast" id="toast-msg"></div>
+
 <!-- SLOT PICKER MODAL -->
-<div class="modal-overlay" id="modal-slot-picker">
+<div class="modal-overlay" id="modal-slot-picker" onclick="if(event.target===this)closeModal('modal-slot-picker')">
   <div class="modal">
     <div class="modal-handle"></div>
     <input type="hidden" id="slot-picker-pos">
@@ -576,24 +591,78 @@ function activePlaysMap()   { return state.division==='56' ? state.activePlays56
 // ════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════
-function showPage(id, btn) {
+const PAGE_TITLES = {
+  'pg-home':'Home','pg-roster':'Roster','pg-playbook':'Playbook',
+  'pg-practices':'Practice Plans','pg-depth':'Depth Chart',
+  'pg-gameday':'Game Day','pg-tools':'Tools'
+};
+const NAV_PAGES = new Set(['pg-home','pg-roster','pg-playbook','pg-depth','pg-gameday']);
+const NAV_MAP = {'pg-home':0,'pg-roster':1,'pg-playbook':2,'pg-depth':3,'pg-gameday':4};
+let navStack = [];
+let currentPage = 'pg-home';
+
+function showPage(id, btn, addToHistory) {
+  // Add current page to history unless it's a nav-level jump or explicit skip
+  if(addToHistory !== false && currentPage && currentPage !== id) {
+    navStack.push(currentPage);
+    if(navStack.length > 20) navStack.shift();
+  }
+  if(addToHistory === false) navStack = []; // nav tap clears history
+
+  currentPage = id;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+
+  // Update nav highlight
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(btn) btn.classList.add('active');
-  else {
-    const navMap = {'pg-home':0,'pg-roster':1,'pg-playbook':2,'pg-depth':3,'pg-gameday':4};
-    const idx = navMap[id];
+  if(btn && btn.classList && btn.classList.contains('nav-item')) {
+    btn.classList.add('active');
+  } else {
+    const idx = NAV_MAP[id];
     if(idx !== undefined) document.querySelectorAll('.nav-item')[idx].classList.add('active');
   }
+
+  // Update header: back button + page title
+  updateHeader(id);
+
+  // Render page content
   if(id==='pg-practices') renderPracContent();
-  if(id==='pg-playbook') renderPbContent();
-  if(id==='pg-roster') renderRoster();
-  if(id==='pg-tools') renderToolContent();
-  if(id==='pg-depth') renderDepthContent();
-  if(id==='pg-gameday') renderGameDay();
-  if(id==='pg-tools') renderToolContent();
+  else if(id==='pg-playbook') renderPbContent();
+  else if(id==='pg-roster') renderRoster();
+  else if(id==='pg-tools') renderToolContent();
+  else if(id==='pg-depth') renderDepthContent();
+  else if(id==='pg-gameday') renderGameDay();
 }
+
+function updateHeader(id) {
+  const backBtn = document.getElementById('back-btn');
+  const logo = document.getElementById('hdr-logo');
+  const title = document.getElementById('hdr-title');
+  const isHome = id === 'pg-home';
+  const hasHistory = navStack.length > 0 && !NAV_PAGES.has(id) || (navStack.length > 0 && !isHome);
+
+  if(backBtn) backBtn.style.display = hasHistory ? 'block' : 'none';
+  if(logo) logo.style.display = hasHistory ? 'none' : 'flex';
+  if(title) title.textContent = PAGE_TITLES[id] || 'Flag Football Coach';
+}
+
+function goBack() {
+  if(navStack.length > 0) {
+    const prev = navStack.pop();
+    showPage(prev, null, false);
+  }
+}
+
+// Override nav buttons to clear history on direct nav tap
+document.querySelectorAll && setTimeout(()=>{
+  document.querySelectorAll('.nav-item').forEach((btn,i)=>{
+    const pages = ['pg-home','pg-roster','pg-playbook','pg-depth','pg-gameday'];
+    if(pages[i]) {
+      btn.onclick = (e) => { e.stopPropagation(); showPage(pages[i], btn, false); };
+    }
+  });
+},100);
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -647,7 +716,7 @@ function savePlayer() {
     playtime:{}, touchGames:[]
   };
   activeRoster().push(player);
-  save(); closeModal('modal-player'); renderRoster();
+  save(); closeModal('modal-player'); renderRoster(); showToast('Player saved!');
 }
 
 function renderRoster() {
@@ -690,9 +759,9 @@ function renderRoster() {
 }
 
 function updSkill(pi,si,v){activeRoster()[pi].skills[si]=v;save();renderRoster();}
-function togglePrimary(pi){
-  activeRoster()[pi].primary = !activeRoster()[pi].primary;
-  save(); renderRoster();
+function togglePrimary(pi){ 
+  const p=activeRoster()[pi]; p.primary=!p.primary;
+  save(); renderRoster(); showToast(p.name+' set to '+(p.primary?'Primary':'Developmental'));
 }
 function cycleAvail(pi){
   const p = activeRoster()[pi];
@@ -891,6 +960,266 @@ const DRILLS = [
    desc:'1pt from 3-yard line (quick route or edge). 2pt from 5-yard line (designed play). 5 reps of each. Pick your go-to options.',
    cue:'Know your 1pt and 2pt play before the game. No decisions under pressure.',
    type:'sk'},
+  // ── From USA Football FDM & Drill Bank PDFs ──
+  {id:'d43',cat:'Flag Pulling',name:'1v1 Mirror and Pull',time:6,group:'Pairs',equip:'Flags',level:'All',
+   desc:'Two kids face each other one arms length apart. Offense wiggles side to side; defense mirrors and tries to pull. Count how many flags pulled in 10 seconds. Rotate roles.',
+   cue:'Watch the belly button not the ball or arms. Break down with choppy feet before the pull.',
+   type:'sk'},
+  {id:'d44',cat:'Flag Pulling',name:'Angle Tag',time:8,group:'4-6',equip:'Flags,Cones',level:'All',
+   desc:'Ball carrier starts at one cone running toward end zone. Defender starts behind and to the side -- must take a diagonal cutoff path. Teaches pursuit angles without abstract explanation.',
+   cue:'Run where they are GOING, not where they ARE. Run to the spot, not at the player.',
+   type:'sk'},
+  {id:'d45',cat:'Flag Pulling',name:'Sideline Cutoff Drill',time:8,group:'Pairs',equip:'Flags,Cones',level:'All',
+   desc:'Ball carrier starts near middle running toward sideline. Defender starts behind but toward middle -- must cut them off before they reach the sideline. Teaches contain and angles.',
+   cue:'Force them to the sideline. The sideline is your teammate.',
+   type:'sk'},
+  {id:'d46',cat:'Flag Pulling',name:'Rabbit Pursuit Drill',time:8,group:'3-4',equip:'Flags',level:'All',
+   desc:'One ball carrier (rabbit) runs across the field. Two defenders must pursue at an angle to catch the rabbit. No chasing from behind -- must cut off. Also called the "Angle of Pursuit Drill."',
+   cue:'The rabbit is on a bike. Run to where the bike will be, not where it is now.',
+   type:'sk'},
+  {id:'d47',cat:'Routes & Receiving',name:'Clockwork Hands',time:8,group:'Pairs',equip:'Ball',level:'All',
+   desc:'QB throws to receiver at 12, 3, 6, and 9 oclock positions around the receiver. Receiver must adjust hands to each position without moving feet. Builds hand adjustment and catch radius.',
+   cue:'Hands up and away from the body. Make a diamond shape. Track the tip of the ball.',
+   type:'sk'},
+  {id:'d48',cat:'Routes & Receiving',name:'Mesh Drill',time:10,group:'4',equip:'Ball',level:'Intermediate',
+   desc:'Two receivers cross at 5 yards simultaneously -- one runs a shallow cross left-to-right, other right-to-left. QB throws to open crosser. Rubs off man coverage and creates natural picks.',
+   cue:'Run through the mesh -- do not slow down or stop. Trust your route.',
+   type:'tm'},
+  {id:'d49',cat:'Routes & Receiving',name:'Mesh with Step-Over',time:10,group:'4',equip:'Ball',level:'Advanced',
+   desc:'Same as Mesh drill but one receiver must step over the other as they cross. Adds physical coordination challenge and trains receivers to focus through contact.',
+   cue:'Eyes on the ball through the step-over. Do not look at feet.',
+   type:'sk'},
+  {id:'d50',cat:'Routes & Receiving',name:'YAC Yards After Catch',time:8,group:'3',equip:'Ball,Flags',level:'All',
+   desc:'WR catches a short pass and immediately must avoid two flag pullers. Focus is on what happens after the catch: tuck the ball, accelerate, make one cut. Builds complete receiver skills.',
+   cue:'Catch. Tuck. Go. Three words, one motion. Do not admire the catch.',
+   type:'sk'},
+  {id:'d51',cat:'Routes & Receiving',name:'Over-the-Shoulder Deep Ball',time:8,group:'Pairs',equip:'Ball',level:'Intermediate',
+   desc:'WR runs a deep go route at full speed. QB throws the ball over the shoulder for a tracking catch. WR must locate ball mid-stride without slowing down.',
+   cue:'Get your head around early. Find the tip of the ball. Run to where it will be.',
+   type:'sk'},
+  {id:'d52',cat:'Snapping',name:'Snap Relay Race',time:6,group:'Teams of 4',equip:'Ball',level:'All',
+   desc:'Teams race to complete 10 clean snaps (under center or shotgun). First team to complete 10 wins. Makes snapping competitive and builds urgency. Great for practicing in game-like pace.',
+   cue:'Low and fast. Clean snap is more important than fast snap. Clean first, then fast.',
+   type:'gm'},
+  {id:'d53',cat:'QB Skills',name:'Cross Plant and Throw',time:8,group:'3',equip:'Ball,Cones',level:'Intermediate',
+   desc:'QB drops back, then must cross-step (plant opposite foot) and throw to a receiver running a crossing route. Builds footwork for throws on the run and across the body.',
+   cue:'Plant the opposite foot. Shoulder points at target. Follow through to the target.',
+   type:'sk'},
+  {id:'d54',cat:'QB Skills',name:'Trunk Rotation Throws',time:6,group:'Pairs',equip:'Ball',level:'All',
+   desc:'QB stands with feet parallel to target and throws using only trunk rotation (no lower body). Builds rotational power and feel for shoulder-to-target alignment. 10 reps each.',
+   cue:'Feet stay parallel. Rotate the shoulders. Follow through with the chest pointing at target.',
+   type:'sk'},
+  {id:'d55',cat:'QB Skills',name:'1-Step Drop and Throw',time:8,group:'3',equip:'Ball',level:'All',
+   desc:'QB takes exactly one step back and immediately throws. No extra footwork. Builds quick release and decision speed. Works from both under center and shotgun.',
+   cue:'One step. Find the target. Release. Do not hold the ball.',
+   type:'sk'},
+  {id:'d56',cat:'Agility',name:'Gear Runs',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players run 20 yards going through 4 gears: slow jog (1st), steady run (2nd), 75 percent (3rd), full sprint (4th). On command they shift gears. Builds acceleration and speed transitions.',
+   cue:'1st gear is slow; 4th gear is as fast as you can go. Feel the difference in each gear.',
+   type:'wu'},
+  {id:'d57',cat:'Agility',name:'Stop and Go Flow',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players sprint to cone, stop completely on two feet (athletic stance), then sprint again. Teaches deceleration mechanics and body control at speed. 8 reps.',
+   cue:'Stop with balance -- knees bent, weight forward. Go as soon as balanced.',
+   type:'wu'},
+  {id:'d58',cat:'Agility',name:'Zig-Zag Tag',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'Cones set in zig-zag pattern. Players must run through touching each cone, then a tagger tries to tag them before they finish. Builds change of direction and competitive movement.',
+   cue:'Plant on the outside foot at each cone. Low body position = faster cuts.',
+   type:'wu'},
+  {id:'d59',cat:'Agility',name:'Scatter Run',time:5,group:'Full team',equip:'Cones',level:'All',
+   desc:'All players move freely in the space. On whistle, they must freeze in an athletic stance and demonstrate balance. On second whistle, move again. Builds spatial awareness and body control.',
+   cue:'Athletic stance: feet shoulder-width, knees bent, weight forward. Instant freeze.',
+   type:'wu'},
+  {id:'d60',cat:'Agility',name:'4-Way Balance',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Stand on one leg. Coach calls direction: front, back, left, right. Players reach that direction while maintaining single-leg balance. Builds balance and proprioception.',
+   cue:'Eyes forward. Reach and return. Find your balance point before reaching.',
+   type:'wu'},
+  {id:'d61',cat:'Team Concepts',name:'Handoff Relay',time:8,group:'Teams of 4',equip:'Ball',level:'All',
+   desc:'Player runs to cone (10 yards), hands ball to next player who runs back. Repeat. Focuses on clean handoff mechanics: belly button exchange, soft hands, no fumbles. Race format.',
+   cue:'Make a pocket with your arms. Squeeze when you feel the ball. Go before you fully have it.',
+   type:'gm'},
+  {id:'d62',cat:'Team Concepts',name:'Snake Run',time:6,group:'Full team',equip:'Ball',level:'All',
+   desc:'Players line up single file. Lead player runs a weaving path (like a snake); all others follow in line while the lead player carries the ball. Good for ball security while navigating.',
+   cue:'Protect the ball. High and tight. Look where you are going, not at the ball.',
+   type:'wu'},
+  {id:'d63',cat:'Defense',name:'Team Angle Pursuit',time:10,group:'Full team',equip:'Flags,Cones',level:'Intermediate',
+   desc:'RB takes a wide run to the sideline. Three defenders must all pursue at angles to converge on the ball carrier before they reach the end zone. Nobody chases from behind.',
+   cue:'Every defender takes their own angle. The ball has one path -- cut it off.',
+   type:'tm'},
+  {id:'d64',cat:'Defense',name:'Sideline Contain Drill',time:8,group:'Pairs',equip:'Flags,Cones',level:'All',
+   desc:'RB runs along the sideline. Edge defender must force ball carrier inside using body positioning -- no diving or over-pursuing. Teaches contain technique for edge defenders.',
+   cue:'Outside shoulder. Force them inside. Do not let them turn the corner.',
+   type:'sk'},
+  {id:'d65',cat:'Ball Carrier',name:'Catch and Wrap and Step',time:8,group:'3',equip:'Ball,Flags',level:'All',
+   desc:'Receiver catches pass, immediately wraps ball (tucks it high and tight), and takes 3 large steps to finish the movement pattern. Builds transition from catch to carry in one fluid motion.',
+   cue:'Catch. Wrap. Step. Three things. Tuck before you run.',
+   type:'sk'},
+  {id:'d66',cat:'Special Teams',name:'Punt Mechanics',time:8,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Player drops ball (do not toss) and kicks. Partner retrieves. Focus on drop consistency and foot contact point (shoelaces). Not about distance -- about repeatable mechanics.',
+   cue:'Drop the ball, do not toss it. Watch your foot meet the ball. Follow through.',
+   type:'sk'},
+  // ── USA Football FDM Athletic Foundations drills ──
+  {id:'d67',cat:'Agility',name:'Log Roll Bonanza',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players roll sideways down the field (log roll). Teach smooth transitions from standing to rolling and back. Great pre-contact prep drill. Fun and gets kids comfortable going to the ground.',
+   cue:'Keep the body straight. Protect the head. Roll in a straight line.',
+   type:'wu'},
+  {id:'d68',cat:'Agility',name:'Animal Relay',time:6,group:'Teams of 4',equip:'Cones',level:'All',
+   desc:'Teams race using animal movements: bear crawl, crab walk, seal crawl, frog hop. Each player picks an animal or coach assigns. Builds strength and coordination in a fun competitive format.',
+   cue:'Stay low. Move all four limbs. Have fun picking the animal.',
+   type:'gm'},
+  {id:'d69',cat:'Agility',name:'Position Tag',time:6,group:'Full team',equip:'None',level:'All',
+   desc:'Regular tag but every time someone is tagged they must hold a football position stance (QB stance, WR stance, etc.) until unfrozen by a teammate who calls out the correct position name.',
+   cue:'Athletic stance until someone unfreezes you. Know your positions.',
+   type:'gm'},
+  {id:'d70',cat:'Agility',name:'Blob Tag',time:6,group:'Full team',equip:'None',level:'All',
+   desc:'Two taggers link hands and chase others. When tagged, join the blob. The blob gets bigger until everyone is caught. Blob cannot split apart. Builds teamwork and spatial awareness.',
+   cue:'Try to stay together when the blob moves. Split the field -- do not all go the same way.',
+   type:'gm'},
+  {id:'d71',cat:'Routes & Receiving',name:'Hot Potato',time:6,group:'Groups of 4',equip:'Ball',level:'All',
+   desc:'Players stand in a small circle and must toss the ball quickly and continuously without holding it more than 1 second. If ball hits ground, restart. Builds quick hands and catching focus.',
+   cue:'Hands up. Do not wait for the ball to come to you. Catch it at the highest point.',
+   type:'wu'},
+  {id:'d72',cat:'QB Skills',name:'5-Yard Quick Game',time:10,group:'3',equip:'Ball,Cones',level:'All',
+   desc:'QB throws to receivers running short routes (hitch, slant, in, out) all within 5 yards. Fast decisions, quick release. Runs as a competition: score if catch made, QB scores if incompletion.',
+   cue:'Quick release. Do not hold the ball. Throw to where receiver will be.',
+   type:'gm'},
+
+  // ── FDM Official Drill Library — Passing ──
+  {id:'d73',cat:'QB Skills',name:'Meet in the Middle Grip Drill',time:5,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Two players face each other. Both grip the ball at chest level with fingertips on laces. They slowly bring ball to center, each feeling proper grip. Release and repeat. Teaches ball placement at chest level.',
+   cue:'Fingers on laces. One finger of space between palm and ball. Relax the arms.',
+   type:'sk',fdm:true,fdmDiv:'both'},
+  {id:'d74',cat:'QB Skills',name:'Partner Step and Throw',time:8,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Partners 5 yards apart. Thrower steps with the opposite foot as they throw — every rep, one step forward with the lead foot, then throw. Focus on the step, not the distance. Switch after 10 reps.',
+   cue:'Lead foot steps toward the target. Smooth, fluid motion. Not about distance yet.',
+   type:'sk',fdm:true,fdmDiv:'both'},
+  {id:'d75',cat:'QB Skills',name:'Throw and Catch Relay',time:8,group:'Groups of 4',equip:'Ball',level:'All',
+   desc:'Players in a line 5 yards apart. Ball starts at one end. Each player catches and throws to the next in sequence. Continuous loop. Try to catch with hands only, not body. Competitive: count drops.',
+   cue:'Try catching with the hands and not the body. Hands up before the ball gets there.',
+   type:'gm',fdm:true,fdmDiv:'56'},
+  {id:'d76',cat:'QB Skills',name:'Toss Drill',time:8,group:'Pairs',equip:'Ball',level:'All',
+   desc:'QB tosses pitch-out (soft underhanded lateral) to a running back sweeping 3-5 yards away. Focus on leading the back with the toss — not to where they are but where they will be. 5 reps each side.',
+   cue:'Lead the running back with the toss. Soft hands on the receive.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+  {id:'d77',cat:'QB Skills',name:'QB Open-Steps Handoff',time:8,group:'3',equip:'Ball',level:'All',
+   desc:'QB opens hips (open step toward the play side) and then hands off to RB at the mesh point. Emphasize: make a pocket with arms (RB), clean exchange. 5 reps to each back.',
+   cue:'RB: make a pocket with your arms. QB: step and extend. Clean exchange.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+
+  // ── FDM Official Drill Library — Running & Receiving ──
+  {id:'d78',cat:'Routes & Receiving',name:'Self-Catch',time:5,group:'Individual',equip:'Ball',level:'All',
+   desc:'Player holds ball at chest, tosses it gently upward (2-3 feet) and catches it using hands only. Progress: toss higher. Progress again: toss and catch while moving. Builds pure hand-eye coordination.',
+   cue:'Hands up. Make a diamond shape. Eyes on the ball all the way into the hands.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+  {id:'d79',cat:'Routes & Receiving',name:'Catch and Step with Partner',time:8,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Partner throws from 5 yards. Receiver catches and immediately takes two big steps forward (simulate YAC) before stopping. Builds catch-to-carry transition. Focus on footwork after the catch.',
+   cue:'Catch first. Then step. Do not start stepping before the ball is in your hands.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+  {id:'d80',cat:'Routes & Receiving',name:'Clockwork Hands',time:6,group:'Pairs',equip:'Ball',level:'All',
+   desc:'QB throws to receiver at 12, 3, 6, and 9 oclock around their body. Receiver must adjust hands to each position without moving feet. Builds hand adjustment and full catch radius.',
+   cue:'Hands always meet the ball. Do not let the ball come to your body.',
+   type:'sk',fdm:true,fdmDiv:'both'},
+  {id:'d81',cat:'Routes & Receiving',name:'Progressive Turn and Catch',time:8,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Receiver starts with back to QB. On QB command, receiver turns and immediately finds the ball in the air and catches it. Progress: turn 90 degrees, then 135, then full 180. Builds vision recovery.',
+   cue:'Get the head around fast. Find the tip of the ball. Track it all the way in.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d82',cat:'Routes & Receiving',name:'Colored Ball Drill',time:8,group:'Pairs',equip:'Balls (multi-color)',level:'All',
+   desc:'Use balls of different colors or put colored dots on balls. QB calls the color as they throw. Receiver must find and confirm the correct color at catch point. Trains vision focus and tracking.',
+   cue:'Find the color. Track it. Eyes on the ball, not the defender.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d83',cat:'Routes & Receiving',name:'Catch Wrap and Step',time:8,group:'3',equip:'Ball',level:'All',
+   desc:'Receiver catches a short pass, immediately wraps the ball (tucks it high and tight at 5 points of pressure: palm, fingertips, forearm, bicep, ribs), then takes 3 big running steps. One fluid motion.',
+   cue:'Catch. Wrap. Step. Three things in one motion. Tuck before you run.',
+   type:'sk',fdm:true,fdmDiv:'both'},
+  {id:'d84',cat:'Routes & Receiving',name:'Coach Knockout',time:8,group:'4-6',equip:'Ball,Flags',level:'All',
+   desc:'Coach throws to a receiver who must catch, secure ball, and run through a zone while 2 defenders try to knock ball out (tap the arm). If ball stays secured for 5 yards, player scores. Builds toughness with ball.',
+   cue:'High and tight. 5 points of pressure. Carry the ball in the outside arm.',
+   type:'gm',fdm:true,fdmDiv:'78'},
+
+  // ── FDM Official Drill Library — Athletic Foundations ──
+  {id:'d85',cat:'Agility',name:'Red Light Green Light',time:6,group:'Full team',equip:'None',level:'All',
+   desc:'Classic game. Coach calls red (freeze), green (run), yellow (slow). Builds change of speed on command. Start with straight line, progress to open field. Teaches deceleration mechanics naturally.',
+   cue:'Freeze with balance on red -- knees bent, weight forward. Instant, controlled stop.',
+   type:'gm',fdm:true,fdmDiv:'56'},
+  {id:'d86',cat:'Agility',name:'Stepovers Half Rounds',time:5,group:'Full team',equip:'Half-round hurdles or cones',level:'All',
+   desc:'Players step over a series of low obstacles (half rounds or cones) with alternating feet. Builds hip flexibility, foot awareness, and general coordination. Walk through first, then faster.',
+   cue:'Eyes up, not looking at feet. Trust the footwork.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d87',cat:'Agility',name:'Stance and Start',time:6,group:'Full team',equip:'Cones',level:'All',
+   desc:'Players set in a 2-point athletic stance. On signal, explode off the front leg with a drive step (no false steps). 10-yard sprint. Focus on the first step, not the whole run.',
+   cue:'No false steps. Push off the front leg. Hip drive from the back leg.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d88',cat:'Agility',name:'Multi-Directional Get Up and Go',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players start lying flat on the ground face-up. Coach points a direction: left, right, forward, backward. Players get up as fast as possible and sprint that direction. Builds body control and transition speed.',
+   cue:'Make sure players can see the direction being pointed. React immediately.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d89',cat:'Agility',name:'Learning to Fall Forward Backward',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players practice controlled falls: forward (tuck chin, land on forearms), backward (tuck chin, roll back). Teaching kids to fall safely is essential before any contact or flag pulling drill.',
+   cue:'Start in athletic stance. Tuck the chin before contact. Never fall with straight arms.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d90',cat:'Agility',name:'Jump Hop Relay',time:6,group:'Teams of 4',equip:'Cones',level:'All',
+   desc:'Teams race using alternating jumps (2-foot) and hops (1-foot). Each player must complete the sequence correctly before the next goes. Builds balance, landing mechanics, and explosive leg power.',
+   cue:'Jump: two feet together. Hop: one foot. Land with balance. Control before power.',
+   type:'gm',fdm:true,fdmDiv:'56'},
+  {id:'d91',cat:'Agility',name:'Three-Player Roll and Weave',time:6,group:'Threes',equip:'None',level:'All',
+   desc:'Three players line up 3 yards apart. Player A rolls laterally on the ground while B and C step over. Once past, each player who stepped over becomes the next to roll. Continuous motion for 30 seconds.',
+   cue:'Stay under control. Quick transitions from rolling to upright position.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d92',cat:'Agility',name:'Forward Backward Shoulder Rolls',time:5,group:'Full team',equip:'None',level:'All',
+   desc:'Players tuck and roll over either shoulder (left or right), first forward then backward. Progress: increase pace. Builds body control and comfort going to the ground in all directions.',
+   cue:'Tuck and roll over the shoulder, not the head. Stay round through the roll.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d93',cat:'Defense',name:'Hand Fighting',time:8,group:'Pairs',equip:'None',level:'Intermediate',
+   desc:'Two players face each other at close range. Goal: gain control of the other player wrists without moving the feet. First to control both wrists wins. Builds hand strength and OL/DL technique.',
+   cue:'Try to gain wrist control without moving the feet. Balance and leverage beat strength.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d94',cat:'Agility',name:'Flying 20 or 30',time:6,group:'Full team',equip:'Cones',level:'Intermediate',
+   desc:'Players accelerate through a 10-yard buildup zone and then sprint through a 20 or 30 yard timed zone at top speed. Measures true max velocity. The buildup eliminates reaction time from the measurement.',
+   cue:'Be at full speed when you hit the first timing cone. Do not still be accelerating.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d95',cat:'Special Teams',name:'Punt Return Tag',time:8,group:'Full team',equip:'Ball,Flags',level:'All',
+   desc:'Coach punts or throws ball high. Returner catches and tries to return as far as possible while the rest of the team converges to pull the flag. Teaches punt return basics in a fun competitive format.',
+   cue:'Fielder: call for the ball early. Returner: protect the ball and run north-south.',
+   type:'gm',fdm:true,fdmDiv:'78'},
+  {id:'d96',cat:'Defense',name:'Flag Hip Tag Corners',time:8,group:'4',equip:'Flags',level:'All',
+   desc:'Ball carrier runs corners (zig-zag path) trying to elude a defender who must tag near-hip flags only. Defender learns hip tracking -- follow the hip, not the upper body. Teaches man coverage.',
+   cue:'Track the near hip. The upper body will fake you. The hip does not lie.',
+   type:'sk',fdm:true,fdmDiv:'78'},
+  {id:'d97',cat:'QB Skills',name:'10-Yard Intermediate Game',time:10,group:'3-4',equip:'Ball,Cones',level:'Intermediate',
+   desc:'QB throws short routes (out, curl, slant) to receivers who run prescribed routes within 10 yards. Competitive: receiver scores a point for each catch. QB scores for each incompletion. 5 min then switch.',
+   cue:'Review the concept of leading the receiver. Throw to where they will be, not where they are.',
+   type:'gm',fdm:true,fdmDiv:'78'},
+  {id:'d98',cat:'Agility',name:'Arm Flaps and Arm Circles',time:4,group:'Full team',equip:'None',level:'All',
+   desc:'Players perform arm flaps (internal/external rotation at shoulder), arm circles (small to large, both directions), and arm slaps/hugs. Full shoulder warm-up sequence. Required before any throwing.',
+   cue:'Get a good warm-up. Never throw with a cold arm at any age.',
+   type:'wu',fdm:true,fdmDiv:'both'},
+  {id:'d99',cat:'Team Concepts',name:'Ultimate Football',time:10,group:'Full team',equip:'Ball',level:'All',
+   desc:'Like Ultimate Frisbee but with a football. No running with ball -- catch, stop, throw. Defender has 5 seconds. Score by catching in end zone. No contact. Builds passing/catching, field awareness, and teamwork simultaneously.',
+   cue:'Divide into two teams 10 yards apart. Spread out -- football is a spacing game.',
+   type:'gm',fdm:true,fdmDiv:'78'},
+  {id:'d100',cat:'Flag Pulling',name:'Pull the Tail',time:5,group:'Full team',equip:'Flags',level:'All',
+   desc:'Every kid tucks ONE flag in the back like a tail. On whistle, kids try to pull others tails while protecting their own. Last one with their tail wins. Short bursts of 20-30 seconds, then restart. Great 5/6 opener.',
+   cue:'Stay low, not diving. Protect your own tail while going for others.',
+   type:'gm',fdm:true,fdmDiv:'56'},
+  {id:'d101',cat:'Flag Pulling',name:'Tunnel Flag Pull',time:6,group:'3-4',equip:'Flags,Cones',level:'All',
+   desc:'Two cones make a tunnel (3 yards wide). Runner goes through; defender waits inside and must pull when they pass -- no lunging too early. Runner earns a silly celebration if defender misses.',
+   cue:'Defender: wait, chop feet, then grab at the hip. Not too early.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+  {id:'d102',cat:'Flag Pulling',name:'Relay Races With Flags',time:6,group:'Teams of 3',equip:'Flags,Cones',level:'All',
+   desc:'Runner from one team goes 10-15 yards; one defender chases and tries to pull flag before runner reaches end cone. Score for each successful pull and each successful run. Builds competitive flag pulling.',
+   cue:'Keep it short: 10-15 yards. Award points for fastest pull and biggest runner celebration.',
+   type:'gm',fdm:true,fdmDiv:'56'},
+  {id:'d103',cat:'Flag Pulling',name:'Angle Chase (6yo)',time:6,group:'Pairs',equip:'Flags,Cones',level:'All',
+   desc:'Runner starts 5 yards ahead; defender starts at an angle. Runner jogs; defender must take a diagonal cutoff path -- not chasing from behind. Cones mark the finish line for the runner.',
+   cue:'Do not chase the back. Cut across to the belly. Run diagonally to where they are going.',
+   type:'sk',fdm:true,fdmDiv:'56'},
+  {id:'d104',cat:'Special Teams',name:'Acceleration and Deceleration Drill',time:8,group:'Full team',equip:'Cones',level:'Intermediate',
+   desc:'Players sprint at full speed to a cone 15 yards away, decelerate to a controlled stop, then sprint again on command. Builds top-end speed AND the ability to stop and change direction without losing balance.',
+   cue:'Throw the ball at the back shoulder of the receiver. Deceleration: sink hips, chop feet.',
+   type:'wu',fdm:true,fdmDiv:'78'},
+  {id:'d105',cat:'Special Teams',name:'2-Step Kicks',time:6,group:'Pairs',equip:'Ball',level:'All',
+   desc:'Kicker takes exactly 2 steps before kicking (no long approach). Partner receives the kick. Builds consistent, compact kick mechanics. Walk through the approach steps before going at full pace.',
+   cue:'Have players walk through the approach steps before going at a faster pace.',
+   type:'sk',fdm:true,fdmDiv:'both'},
 ];
 
 // ════════════════════════════════════════════
@@ -1266,6 +1595,23 @@ const TIPS = [
 const WU_BLOCK = {t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed — ends the warm-up, launches into practice energy). Same every day. Never skip or abbreviate.'};
 const SM_BLOCK = {t:'gm',min:'63–75',name:'Sharks & Minnows — end every practice here',desc:'Every practice ends with Sharks & Minnows. Minnows cross end zone to end zone without flag pulled. Sharks start in the middle. Pulled minnows become sharks. Last minnow standing wins. This is the reward for a hard practice — end on a high every time.'};
 
+// USA Football FDM character themes (rotate through the season)
+const CHARACTER_THEMES = [
+  {theme:'Teamwork',tip:'Use TrueSport Teamwork resources. Ask: what does your teammate need from you to succeed?'},
+  {theme:'Teamwork',tip:'Reinforce: one team, one goal. Every block and every route matters even if you do not touch the ball.'},
+  {theme:'Hydration',tip:'Use TrueSport Hydration resources. Teach kids to drink water BEFORE they are thirsty.'},
+  {theme:'Hydration',tip:'Hydration makes you faster and smarter. Dehydrated athletes make bad decisions.'},
+  {theme:'Sportsmanship',tip:'Use TrueSport Sportsmanship resources. Win with class, lose with grace -- both matter.'},
+  {theme:'Sportsmanship',tip:'Reinforce: celebrate your teammates MORE than yourself. Their success is your success.'},
+  {theme:'Nutrition',tip:'Use TrueSport Nutrition resources. Fuel your body like a car -- put in good fuel to go fast.'},
+  {theme:'Nutrition',tip:'Reinforce: sleep + food + water = performance. All three matter equally.'},
+  {theme:'Leadership',tip:'Use TrueSport Leadership resources. Leaders encourage before they criticize.'},
+  {theme:'Leadership',tip:'Ask: who showed leadership today -- not just the QB but on the line, on defense, on the sideline.'},
+  {theme:'Recovery',tip:'Use TrueSport Recovery resources. Rest is when you get better -- not during practice.'},
+  {theme:'Recovery',tip:'Reinforce: taking care of your body between practices is part of being an athlete.'},
+  {theme:'Teamwork',tip:'Season close: revisit teamwork. What has this team built together? Name specific moments.'},
+];
+
 const PRACTICE_PLANS = [
 {w:1,phase:'Foundation',theme:'First day: flags, Wing-T stance, discover',prac:[
   {lbl:'1A',blocks:[WU_BLOCK,
@@ -1433,23 +1779,186 @@ let curDrillCat = 'All';
 let activeDrillForPlan = null;
 let activePlayForBook = null;
 
+const PRAC_TAB_NAMES = {plans:'Practice Plans',builder:'Practice Builder',drills:'Drill Bank',games:'Games & Activities'};
 function pracTab(tab, el) {
   curPracTab = tab;
   document.querySelectorAll('#pg-practices .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
+  const title = document.getElementById('hdr-title');
+  if(title && currentPage==='pg-practices') title.textContent = 'Practice › ' + (PRAC_TAB_NAMES[tab]||tab);
   renderPracContent();
 }
 
 function renderPracContent() {
   const el = document.getElementById('prac-content');
   if(curPracTab === 'plans') renderPracPlans(el);
+  else if(curPracTab === 'pregame') renderPregameWU(el);
   else if(curPracTab === 'builder') renderPracBuilder(el);
   else if(curPracTab === 'drills') renderDrillBank(el);
   else if(curPracTab === 'games') renderActivities(el);
 }
 
+// ════════════════════════════════════════════
+// PREGAME WARMUP ROUTINE
+// ════════════════════════════════════════════
+function renderPregameWU(el) {
+  const is56 = state.division === '56';
+
+  const wu78 = {
+    title: '7/8 Pregame Warmup Routine',
+    subtitle: '12-15 minutes · Same routine every game · Builds ritual focus',
+    phases: [
+      {
+        name: 'Dynamic Warmup',
+        time: '3-4 min',
+        color: 'var(--green)',
+        steps: [
+          'High knees (10 yards down and back)',
+          'Butt kicks (10 yards down and back)',
+          'Side shuffles both ways',
+          'Quick skips or bounding',
+          'Fast feet in place (5 seconds on your count)',
+          'Tip: Make it a race to the cone and back -- keeps them engaged'
+        ]
+      },
+      {
+        name: 'Arm Warmup (QBs and Receivers)',
+        time: '2 min',
+        color: 'var(--blue)',
+        steps: [
+          'Arm Flaps and Arm Circles (both directions, small to large)',
+          'Arm Slaps and Hugs (internal/external rotation)',
+          'Never throw with a cold arm -- even at 7/8',
+          '5 partner passes at 5 yards, just to warm up'
+        ]
+      },
+      {
+        name: 'Skill Refreshers',
+        time: '4-5 min',
+        color: 'var(--gold)',
+        steps: [
+          'Snap Line Reps: 5 UC snaps, 5 shotgun snaps (all centers rotate)',
+          'QB/RB Handoff Relay: every back takes 2 handoffs each',
+          '1v1 Flag Pull: 3 quick reps per pair, full speed',
+          'Route Line: 2 reps of your first-call play at half speed'
+        ]
+      },
+      {
+        name: 'Team Focus',
+        time: '2-3 min',
+        color: 'var(--red)',
+        steps: [
+          'Walk through your first 3 plays as a full team at walking speed',
+          'Quick talk: effort, fast play clock, have fun',
+          'Team cheer: use your season cheer -- loud and together',
+          'Same cheer every game -- makes it a ritual, not a routine'
+        ]
+      }
+    ]
+  };
+
+  const wu56 = {
+    title: '5/6 Pregame Warmup Routine',
+    subtitle: '10-12 minutes · Short and fun · Attention spans are short at this age',
+    phases: [
+      {
+        name: 'Dynamic Warmup',
+        time: '3-4 min',
+        color: 'var(--green)',
+        steps: [
+          'High knees (10 yards) -- make it a race!',
+          'Butt kicks (10 yards)',
+          'Side shuffles both ways',
+          'Quick skips or bounding (silly is good)',
+          'Fast feet in place (5 seconds on your count)',
+          'Keep everything fast-paced -- no waiting in long lines'
+        ]
+      },
+      {
+        name: 'Flag and Movement Drills',
+        time: '3-4 min',
+        color: 'var(--gold)',
+        steps: [
+          'Gauntlet Drill: run through short lane, 2 coaches try to pull flags',
+          '1v1 Flag Pull: pairs, practice staying low and grabbing at the hip',
+          'Handoff Relay: QB hands off, runner goes 10 yards, back in line',
+          'Every kid gets 2-3 reps of each -- keep it moving'
+        ]
+      },
+      {
+        name: 'Team Ball Drills',
+        time: '3-4 min',
+        color: 'var(--blue)',
+        steps: [
+          'Snap and Handoff Reps: QB practices 3-4 handoffs with each RB',
+          'Run one or two of your simplest plays at half speed for alignment',
+          'Quick walk-through of your first play as a team',
+          'End with a snap count rep so everyone knows the signal'
+        ]
+      },
+      {
+        name: 'Huddle and Focus',
+        time: '1-2 min',
+        color: 'var(--red)',
+        steps: [
+          'Call team together -- brief, energy-focused talk',
+          'Talk about: playing fast, having fun, effort not outcome',
+          'Team cheer: same one every game -- it becomes their ritual',
+          'Tip: build routine -- same warmup every game builds automatic focus'
+        ]
+      }
+    ]
+  };
+
+  const wu = is56 ? wu56 : wu78;
+
+  let h = `<div class="card card-gold" style="margin-bottom:10px;">
+    <div class="card-title">${wu.title}</div>
+    <div class="card-sub">${wu.subtitle}</div>
+  </div>
+  <div style="padding:8px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;margin-bottom:12px;font-size:11px;color:var(--g3);">
+    <strong style="color:var(--green);">Key principle:</strong> Same routine every game. Kids who know what to expect are calmer, more focused, and ready to play. Do not change the order.
+  </div>`;
+
+  wu.phases.forEach((phase, i) => {
+    h += `<div class="card" style="margin-bottom:10px;border-left:3px solid ${phase.color};">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:14px;font-weight:700;">${i+1}. ${phase.name}</div>
+        <span class="badge b-gray">${phase.time}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${phase.steps.map(s => `<div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;">
+          <div style="color:${phase.color};font-size:14px;flex-shrink:0;margin-top:-1px;">▸</div>
+          <div>${s}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  const cheer = state.culture && state.culture.cheer;
+  if(cheer) {
+    h += `<div style="padding:14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;text-align:center;margin-top:6px;">
+      <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px;">YOUR TEAM CHEER</div>
+      <div style="font-size:20px;font-weight:700;">📣 ${cheer}</div>
+    </div>`;
+  } else {
+    h += `<div style="padding:12px;background:var(--navy3);border-radius:10px;text-align:center;margin-top:6px;font-size:12px;color:var(--g3);">
+      Set your team cheer in Tools → Culture to display it here.
+    </div>`;
+  }
+
+  el.innerHTML = h;
+}
+
 function getActivePracticePlans() {
   return state.division === '56' ? PRACTICE_PLANS_56 : PRACTICE_PLANS;
+}
+
+function getFDMStructureNote() {
+  if(state.division === '56') {
+    return 'USA Football FDM 5+ Format: Character Dev (3) → Dynamic WU (5) → Athletic Foundations (5) → Hydration (2) → Skills (20-24) → Hydration (2) → Team Offense (9) → Team Defense (9) → Cool Down + Flag Pull + Sharks and Minnows';
+  }
+  return 'USA Football FDM 8+ Format: Character Dev (5) → Dynamic WU (7) → Athletic Foundations (10) → Hydration (2) → Individual Skills (28-34) → Hydration (2) → Team Offense (15) → Team Defense (15) → Cool Down + Flag Pull + Sharks and Minnows';
 }
 
 function sharePracticePlan() {
@@ -1515,7 +2024,7 @@ function renderPracBuilder(el) {
   const tl = {wu:'Warm-up',sk:'Skill',tm:'Team',gm:'Game'};
   let h = `<div class="card" style="margin-bottom:8px;">
     <div class="card-title">Custom practice builder</div>
-    <div class="card-sub">Add drills from the Drill Bank tab. Drag to reorder. 75 min target.</div>
+    <div class="card-sub">Tap the <strong>Drill Bank</strong> tab to browse and add drills. Drag blocks to reorder.</div>
     <div style="font-size:12px;color:var(--gold);font-weight:600;margin-top:6px;">Total time: ${plan.reduce((s,d)=>s+d.time,0)} min</div>
   </div>`;
   if(!plan.length) {
@@ -1618,9 +2127,14 @@ function addDrillToPlan() {
   state.customPractice.push({...selectedDrill});
   save();
   closeModal('modal-drill-detail');
+  // Switch to builder tab with a visual confirmation
   curPracTab = 'builder';
   document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
+  const title = document.getElementById('hdr-title');
+  if(title) title.textContent = 'Practice › Practice Builder';
   renderPracContent();
+  // Show a brief toast
+  showToast(selectedDrill.name + ' added to plan');
 }
 
 function renderActivities(el) {
@@ -1676,10 +2190,13 @@ function selectSystem(sys, el) {
   renderPbContent();
 }
 
+const PB_TAB_NAMES = {active:'Active Playbook',bank:'Play Bank',defense:'Defense',formation:'Formations',playlog:'Play Log',callsheet:'Call Sheet'};
 function pbTab(tab, el) {
   curPbSub = tab;
   document.querySelectorAll('#pg-playbook .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
+  const title = document.getElementById('hdr-title');
+  if(title && currentPage==='pg-playbook') title.textContent = 'Playbook › ' + (PB_TAB_NAMES[tab]||tab);
   renderPbContent();
 }
 
@@ -1998,10 +2515,13 @@ function renderFormations(el) {
 // ════════════════════════════════════════════
 // TOOLS
 // ════════════════════════════════════════════
+const TOOL_TAB_NAMES = {situations:'Situations',touches:'Touch Tracker',games:'Game Log',scouting:'Scouting',culture:'Team Culture',tips:'Coaching Tips'};
 function toolTab(tab, el) {
   curToolTab = tab;
   document.querySelectorAll('#pg-tools .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
+  const title = document.getElementById('hdr-title');
+  if(title && currentPage==='pg-tools') title.textContent = 'Tools › ' + (TOOL_TAB_NAMES[tab]||tab);
   renderToolContent();
 }
 
@@ -2088,8 +2608,10 @@ function logCarry(pi) { if(!state.roster[pi].touchGames)state.roster[pi].touchGa
 
 function renderGames(el) {
   const games = activeGames();
+  const is56 = state.division === '56';
   let h = `<div style="display:flex;gap:8px;margin-bottom:12px;">
     <button class="btn btn-gold" onclick="addGame()" style="flex:1;">+ Add game</button>
+    ${is56?`<button class="btn btn-outline" onclick="showScrimmageFormat()" style="font-size:11px;">📋 Scrimmage format</button>`:''}
   </div>`;
   if(!games.length) h += '<div class="empty"><div class="empty-icon">🏟️</div><div class="empty-text">No games yet.<br>No official score kept — focus on execution.</div></div>';
   games.forEach((g,gi) => {
@@ -2223,10 +2745,43 @@ const SINGLEWING_BANK = [
    desc:'Mirror of QB Bootleg Right. Fake inside, QB rolls left.',
    note:'Run both bootleg directions. Alternate based on which edge opens.',
    formation:'Under center, inside fake, QB rolls left'},
+  // ── Double Wing core plays (from PDF source) ──
+  {id:'sw21',n:'Power Dive Right',tier:'Core',wk:2,mis:'Med',pass:false,
+   desc:'Fake sweep motion away (left RB goes left). Play-side RB takes quick handoff and dives inside right guard. Short yardage weapon -- best on 4th and 1 or inside the 5.',
+   note:'Fake the sweep first -- defense must respect the outside. Then hit inside.',
+   formation:'Under center, sweep fake left, right back dives inside'},
+  {id:'sw22',n:'Power Dive Left',tier:'Core',wk:2,mis:'Med',pass:false,
+   desc:'Mirror of Power Dive Right. Sweep fake right, left back dives inside left guard.',
+   note:'Run both dives. Mix with sweeps to attack both inside and outside.',
+   formation:'Under center, sweep fake right, left back dives inside'},
+  {id:'sw23',n:'Reverse with Lead Block',tier:'Advanced',wk:5,mis:'High',pass:false,
+   desc:'One RB goes in pre-snap motion right (reverse look). QB hands to that RB going left. The other RB leads as a blocker on the edge for the reverse runner.',
+   note:'The blocker makes this play. Practice the lead block -- body position between defender and ball carrier.',
+   formation:'Pre-snap motion, reverse hand, lead blocker'},
+  {id:'sw24',n:'Halfback Pass',tier:'Trick',wk:8,mis:'Very High',pass:true,
+   desc:'Sweep fake to RB. RB takes the handoff and runs the sweep -- but instead of running, stops and throws back to the QB who leaked out to the flat. QB must sell staying in the pocket.',
+   note:'Once per season. Walk-through 8x. QB sells pocket presence. RB must be able to throw.',
+   formation:'Under center, sweep hand, RB throws back to QB in flat'},
+  {id:'sw25',n:'Inside Trap (Power)',tier:'Advanced',wk:6,mis:'High',pass:false,
+   desc:'Both RBs show sweep action outside. Guard lets one DL through intentionally (trap block). RB hits the gap right behind the DL who is now trapped out of position. Defense gets confused.',
+   note:'Advanced concept but kids love the idea of letting a defender through on purpose. Walk-through slowly.',
+   formation:'Under center, both backs outside fake, guard trap block'},
+  {id:'sw26',n:'Spin Move Keeper',tier:'Trick',wk:7,mis:'Very High',pass:false,
+   desc:'QB takes snap, fakes inside to one RB, then executes a 180-degree spin move and keeps on the opposite edge. The spin is the misdirection. Works when defense crashes hard inside.',
+   note:'Practice the spin without defenders first. QB must not lose the ball during the spin.',
+   formation:'Under center, inside fake, QB spin and keep outside'},
+  {id:'sw27',n:'Flea Flicker',tier:'Trick',wk:9,mis:'Very High',pass:true,
+   desc:'QB hands to RB who runs a sweep (defense commits). RB tosses ball back to QB. QB throws deep to a receiver who has been left wide open by the defense chasing the run. Once per season.',
+   note:'Once per season. The toss back must be clean and QB must be in position to throw. Save for the right moment.',
+   formation:'Under center, sweep hand, lateral back to QB, deep throw'},
+  {id:'sw28',n:'Pop Pass to Center',tier:'Core',wk:3,mis:'Med',pass:true,
+   desc:'Fake the sweep in either direction. Center immediately releases 3-4 yards downfield and plants. QB throws a quick short pass to the center. Super high percentage -- defense never accounts for the center.',
+   note:'The simplest pass play in your playbook. High percentage because the center is always open. Walk-through: snap, center releases, QB throws immediately. No hesitation.',
+   formation:'Under center, sweep fake, center releases 3-4 yards, QB quick throw'},
 ];
 
 const WU_BLOCK_56 = {t:'wu',min:'0-12',name:'Daily warm-up (5/6 edition)',desc:'5 under-center snaps · 5 partner passes · 10 stalk blocks · 5 fake handoff drills · Every man for himself flag pull (2 min full speed — ends the warm-up). Same every day. Motor memory builds through repetition.'};
-const SM_BLOCK_56 = {t:'gm',min:'63-75',name:'Sharks and Minnows -- end every practice',desc:'Every practice ends here. Last minnow standing wins. Increase to 3-4 sharks as season progresses. This is the reward. Never skip it.'};
+const SM_BLOCK_56 = {t:'gm',min:'65-75',name:'Cool Down + Every Man Flag Pull + Sharks and Minnows',desc:'[2 min] Cool Down: reinforce the character theme from the start of practice. Ask one kid: what did we learn today about [theme]? [3 min] Every man for himself flag pull -- full speed, celebrate big plays. [5 min] Sharks and Minnows to close every practice. Last minnow is the champion. This sequence ends EVERY practice without exception.'};
 
 const PRACTICE_PLANS_56 = [
 {w:1,phase:'Foundation',theme:'First day: flags, single wing, everyone touches',prac:[
@@ -2416,6 +2971,10 @@ const SITUATIONS_56 = [
    a:'The honest answer: Every player carries every game -- that is our rule and we track it. Show them your touch tracker. If a player missed a carry, acknowledge it and commit to a specific plan for the next game.'},
   {q:'It is the last play of the game and a player has not carried yet. What do you call?',
    a:'You call a play for that player. Period. No matter the situation. In 5/6, every player carries every game. If you reached the last play without getting someone a carry, check your touch tracker every 3 plays. Regardless: give them the ball on the last play.'},
+  {q:'How do you structure a scrimmage against another 5/6 team?',
+   a:'10 min warm-up: dynamic movement plus quick handoff relay, snap exchange, and 1v1 flag pulls. 20 min teaching phase: coaches on field, stop plays to teach, rotate everyone. 20 min game-like phase: continuous clock, 4 downs to midfield then 4 downs to score, quick subs every 3-4 plays. 5 min red zone: each team gets 2-3 chances from the 10. 5 min fun finish: Sharks and Minnows, high-five line, highlight one great thing each team did. Script your first 6-8 plays so kids are never waiting.'},
+  {q:'Your center cannot shotgun snap consistently. How do you teach it to a 6-year-old?',
+   a:'Step 1: teach the why (1 min). Step 2: stance -- feet shoulder-width, knees bent, hips back, laces up. Step 3: say "throw the ball into a bucket behind you" -- push backward fast and low with two hands. Cues: butt down back flat, laces up, fire straight back not high. Start at 2-3 yards, work back to 5-7. Give points for bucket hits. It is normal for only 1-2 kids to snap consistently at 5/6. Rotate who practices. Under-center is easier -- build shotgun into practice first, then introduce in games slowly.'},
 ];
 
 const TIPS_56 = [
@@ -2437,6 +2996,14 @@ const TIPS_56 = [
    body:'5/6 defenders react to where the ball LOOKS like it is going, not where it actually is. A convincing fake at this age works almost every time. Misdirection is not just fun -- it is genuinely the best offensive strategy for 5/6.'},
   {cat:'Misdirection',icon:'🔄',title:'The three-play sequence is your entire offense',
    body:'Sweep, then Counter, then QB Keep Middle. Run sweep until defense cheats. Run counter until defense adjusts. Run QB Keep when they adjust back. Then start over. Every play fits this pattern.'},
+  {cat:'USA Football FDM',icon:'📋',title:'5+ athlete skill checklist (what to develop)',
+   body:'By end of season, athletes should: throw overhand with basic accuracy (5+ yards), catch a ball thrown from 5 yards using hands only, adjust hand position for high/low balls, run with ball maintaining body and ball control, and demonstrate ability to change speeds on command. These are the FDM checkpoints for 5+ athletes.'},
+  {cat:'USA Football FDM',icon:'🏃',title:'Athletic foundations come before football skills',
+   body:'The USA Football Development Model says: at 5+, everything is cross training. Running, jumping, shuffling, and changing direction are more important than learning plays. A kid who can move well will learn plays fast. A kid who cannot move will struggle with plays regardless.'},
+  {cat:'USA Football FDM',icon:'⚽',title:'Use any ball -- not just footballs',
+   body:'The FDM recommends using foam balls, soft balls, or any ball for throwing and catching drills at 5/6. The shape of the football is a barrier. If a kid can catch a tennis ball thrown from 5 yards, they are developing the skill. Start with easier-to-catch objects if needed.'},
+  {cat:'USA Football FDM',icon:'🎯',title:'FDM practice structure for 5+ athletes',
+   body:'Official USA Football FDM structure: Character Dev (3 min) → Dynamic Warm-Up (5 min) → Athletic Foundations (6 min) → Hydration Break (2 min) → Individual Skills: Passing, Running and Receiving, Kicking, Contact Prep (20-24 min) → Hydration Break (2 min) → Team Offense (9-10 min) → Team Defense (9-10 min) → Cool Down and Character Reinforcement. Total: about 60 minutes.'},
 ];
 
 
@@ -3447,9 +4014,11 @@ function renderGameDay() {
       </div>
     </div>`;
   } else {
-    h += `<div style="background:var(--navy3);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;">
-      <div style="font-size:14px;color:var(--g3);">No call sheet loaded.</div>
-      <button onclick="showPage('pg-playbook')" class="btn btn-gold" style="margin-top:8px;font-size:12px;">Build call sheet →</button>
+    h += `<div style="background:var(--navy3);border-radius:12px;padding:20px 16px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:22px;margin-bottom:8px;">📋</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">No call sheet yet</div>
+      <div style="font-size:12px;color:var(--g3);margin-bottom:12px;">Go to Playbook → Call Sheet to pick your plays for this game.</div>
+      <button onclick="showPage('pg-playbook',null,true);pbTab('callsheet',document.querySelector('#pg-playbook .tab:last-child'))" class="btn btn-gold" style="font-size:13px;">Build call sheet →</button>
     </div>`;
   }
 
@@ -3530,11 +4099,200 @@ function useTimeout(side) {
   if(gamedayTimeouts[side] > 0) { gamedayTimeouts[side]--; renderGameDay(); }
 }
 
+// ════════════════════════════════════════════
+// FDM PLAYER ASSESSMENT
+// ════════════════════════════════════════════
+function showFDMAssessment() {
+  const is56 = state.division === '56';
+
+  const assess56 = {
+    title: 'USA Football FDM Player Assessment — Ages 5+',
+    note: 'Rate each skill: 1 = unable to perform, 2 = can perform but not consistently, 3 = can perform consistently',
+    sections: [
+      {name:'Passing Skill Assessment', items:[
+        'Throw a ball with an overarm motion while stepping forward with the opposite foot',
+        'Throw a ball overhand with proper hip and shoulder rotation',
+        'Throw for distance with accuracy to a stationary target (5+ yards)'
+      ]},
+      {name:'Running and Receiving Skill Assessment', items:[
+        'Toss and catch a ball to themselves',
+        'Catch a ball thrown from 5 yards away',
+        'Catch a ball thrown from 5 yards away with hands only (no body trap)'
+      ]},
+      {name:'Fundamental Movement Skill Assessment', items:[
+        'Can skip and march with contralateral arm movement',
+        'Can demonstrate the ability to change speeds on command while running',
+        'From stationary position, can jump upward with two feet and land with balance',
+        'Can maintain balance and body control while running, skipping, and hopping',
+        'Can shuffle laterally without feet touching',
+        'Can run in general space with others while maintaining personal space'
+      ]}
+    ]
+  };
+
+  const assess78 = {
+    title: 'USA Football FDM Player Assessment — Ages 8+',
+    note: 'Rate each skill: 1 = unable to perform, 2 = can perform but not consistently, 3 = can perform consistently',
+    sections: [
+      {name:'Passing Skill Assessment', items:[
+        'Can throw a football 10-15 yards with proper mechanics (step, hip rotate, follow-through)',
+        'Can accurately throw a football 10 yards to a stationary target',
+        'Can accurately throw a football to a moving target 5-10 yards away'
+      ]},
+      {name:'Running and Receiving Skill Assessment', items:[
+        'Can catch a football with hands only from 10 yards away',
+        'Can catch a football thrown above the head and below the waist while stationary',
+        'Can catch a football while running a prescribed route at 5-10 yards distance',
+        'Can maintain balance and body control during deceleration (stop and go)',
+        'Can demonstrate evasive movement skills while maintaining ball security'
+      ]},
+      {name:'Athletic Foundations', items:[
+        'Can perform running actions using proper foot strike and appropriate body lean',
+        'Can gallop and shuffle in various directions without feet touching',
+        'Can jump and hop in different directions with varying degrees of force',
+        'Can perform backpedal movement while maintaining balance and body control',
+        'Can demonstrate movement transitions (run-shuffle-run, run-skip-run)'
+      ]}
+    ]
+  };
+
+  const assess = is56 ? assess56 : assess78;
+  const roster = activeRoster();
+
+  let h = `<div style="font-size:16px;font-weight:700;margin-bottom:6px;">${assess.title}</div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:12px;">${assess.note}</div>`;
+
+  if(!roster.length) {
+    h += '<div style="font-size:13px;color:var(--g3);">Add players to roster first.</div>';
+  } else {
+    // Show assessment grid for first player (can be extended)
+    h += `<div style="font-size:12px;color:var(--g3);margin-bottom:8px;">Tap a player to assess. Use this at Week 1 and Week 8 to track development.</div>`;
+    h += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">`;
+    roster.forEach((p,pi) => {
+      const ini = p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      h += `<div style="padding:6px 12px;border-radius:20px;background:var(--navy3);font-size:12px;">${ini} ${p.name.split(' ')[0]}</div>`;
+    });
+    h += '</div>';
+
+    assess.sections.forEach(sec => {
+      h += `<div style="font-size:12px;font-weight:700;color:var(--gold);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px;">${sec.name}</div>`;
+      sec.items.forEach(item => {
+        h += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--navy3);">
+          <div style="flex:1;font-size:11px;">${item}</div>
+          <div style="display:flex;gap:4px;">
+            ${[1,2,3].map(n=>`<button style="width:26px;height:26px;border-radius:6px;border:1px solid var(--navy3);background:var(--navy3);color:var(--g3);font-size:11px;font-weight:700;cursor:pointer;">${n}</button>`).join('')}
+          </div>
+        </div>`;
+      });
+    });
+
+    h += `<div style="margin-top:12px;padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:11px;color:var(--g3);">Source: USA Football Football Development Model (FDM) Player Assessment. Visit usafootball.com/fdm for full resources.</div>`;
+  }
+
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'fdmassess';
+  openModal('modal-slot-picker');
+}
+
+// ════════════════════════════════════════════
+// SCRIMMAGE FORMAT + SNAP GUIDE
+// used in coaching tips and practice builder
+// ════════════════════════════════════════════
+const SCRIMMAGE_FORMAT = {
+  title: '1-hour scrimmage vs another 5/6 team',
+  phases: [
+    {name:'Warm-Up and Organization', time:'10 min', desc:'Dynamic warmup (high knees, skips, backpedals, shuffles, short sprints). Quick skill refreshers: handoff relay (2-3 reps/kid), snap exchange with QB, 1v1 flag pull races.'},
+    {name:'Controlled Scrimmage — Teaching Phase', time:'20 min', desc:'Mini-games of 5-6 minutes each. Each possession starts at midfield. Coaches on field behind players. Stop plays often to teach: spacing, flag pulling technique, staying home on defense. Rotate players through all positions.'},
+    {name:'Game-Like Scrimmage — Free Play Phase', time:'20 min', desc:'Run it like a real game: continuous clock, 4 downs to midfield then 4 downs to score, quick subs every 3-4 plays, coaches on sideline only. Emphasize hustle: spot ball quickly, line up fast.'},
+    {name:'Situational Play — Red Zone and Defense', time:'5 min', desc:'Each team gets 2-3 chances starting at the 10-yard line. Run short-yardage plays and defensive goal-line setups. Builds confidence in pressure situations.'},
+    {name:'Fun Finish and Wrap-Up', time:'5 min', desc:'Quick Sharks and Minnows with flags, or a fun relay race. High-five line with the other team. Coach calls out 1-2 things each side did well. End on high energy.'}
+  ],
+  tips: [
+    'Keep play clock moving to maximize reps',
+    'Script your first 6-8 offensive plays ahead of time so kids are not waiting around',
+    'Agree with the other coach beforehand: more teaching vs more game-like',
+    'Prioritize equal playing time and positive experience over score'
+  ]
+};
+
+const SHOTGUN_SNAP_GUIDE = {
+  title: 'Teaching Shotgun Snaps to 6-Year-Olds',
+  steps: [
+    {name:'Teach the Why (1 min)', desc:'Tell them: this helps the quarterback stand back and still get the ball. Use phrases like "shoot the ball backwards" or "toss the ball under your legs."'},
+    {name:'Starting Position', desc:'Feet: shoulder-width apart. Knees: slightly bent. Hips: back (like sitting on an invisible chair). Ball: pointing longways toward QB, laces up. Grip: both hands on the ball, fingers curled under the nose. Say: "Hold the ball like a water balloon you will toss backward between your legs."'},
+    {name:'Snap Mechanics', desc:'Look backward between your legs (do not stand straight). Keep your head down and eyes on the target. Push the ball backward fast and low with two hands in a smooth motion. Say: "Pretend you are throwing the ball into a bucket behind you." Use cones or a bucket 5-7 yards back to aim at.'},
+    {name:'Key Cues', desc:'"Butt down, back flat" / "Laces up" / "Fire the ball straight back, not high" / "Follow through" (end pointing behind with arms)'},
+    {name:'Repetition with Partner', desc:'Start short: 2-3 yards. Gradually work back to 5-7 yards. Let QB squat and catch the snap. Praise accuracy and effort (not just success). Game: give points for "bucket hits" or successful QB catches.'},
+    {name:'Progression', desc:'Once they are comfortable: Snap and block drill (snap the ball, then shuffle left or right to simulate blocking). Then add Shotgun Snap and QB Handoff timing in play install. Normal: only 1-2 kids can consistently shotgun snap. Rotate who practices it each week.'}
+  ]
+};
+
+function showScrimmageFormat() {
+  const fmt = SCRIMMAGE_FORMAT;
+  let h = `<div style="font-size:16px;font-weight:700;margin-bottom:4px;">${fmt.title}</div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:12px;">Reference this when scheduling a scrimmage game against another team.</div>`;
+
+  fmt.phases.forEach((phase,i) => {
+    h += `<div style="padding:10px;background:var(--navy3);border-radius:8px;margin-bottom:7px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+        <div style="font-size:12px;font-weight:700;">${i+1}. ${phase.name}</div>
+        <span class="badge b-gold">${phase.time}</span>
+      </div>
+      <div style="font-size:11px;color:var(--g3);line-height:1.5;">${phase.desc}</div>
+    </div>`;
+  });
+
+  h += `<div style="margin-top:10px;padding:10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:8px;">
+    <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:6px;">TIPS</div>
+    ${fmt.tips.map(t=>`<div style="font-size:11px;color:var(--g3);margin-bottom:4px;">▸ ${t}</div>`).join('')}
+  </div>`;
+
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'scrimmage';
+  openModal('modal-slot-picker');
+}
+
+function showSnapGuide() {
+  const guide = SHOTGUN_SNAP_GUIDE;
+  let h = `<div style="font-size:16px;font-weight:700;margin-bottom:4px;">${guide.title}</div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:12px;">Step-by-step guide for teaching a 6-year-old to shotgun snap. Patience, repetition, and confidence-building.</div>`;
+
+  guide.steps.forEach((step,i) => {
+    h += `<div style="padding:10px;background:var(--navy3);border-radius:8px;margin-bottom:7px;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px;">${i+1}. ${step.name}</div>
+      <div style="font-size:11px;color:var(--g3);line-height:1.5;">${step.desc}</div>
+    </div>`;
+  });
+
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'snapguide';
+  openModal('modal-slot-picker');
+}
+
+function showToast(msg, duration) {
+  const t = document.getElementById('toast-msg');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), duration||2000);
+}
+
 function initApp() {
+  currentPage = 'pg-home';
+  navStack = [];
   save();
   renderHome();
   renderPbContent();
   renderToolContent();
+  updateHeader('pg-home');
+  // Wire nav buttons after DOM is ready
+  document.querySelectorAll('.nav-item').forEach((btn,i)=>{
+    const pages = ['pg-home','pg-roster','pg-playbook','pg-depth','pg-gameday'];
+    if(pages[i]) {
+      btn.onclick = () => showPage(pages[i], btn, false);
+    }
+  });
 }
 // Use setTimeout 0 to ensure all functions are defined before calling init
 setTimeout(initApp, 0);
@@ -3581,10 +4339,13 @@ function autoDepthChart() {
   save();
 }
 
+const DEPTH_TAB_NAMES = {chart:'Depth Chart',autoroster:'Game Roster',history:'Touch History',gameplan:'Carry Tracker'};
 function depthTab(tab, el) {
   curDepthTab = tab;
   document.querySelectorAll('#pg-depth .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
+  const title = document.getElementById('hdr-title');
+  if(title && currentPage==='pg-depth') title.textContent = 'Depth › ' + (DEPTH_TAB_NAMES[tab]||tab);
   renderDepthContent();
 }
 
@@ -3725,6 +4486,7 @@ function assignSlot(pos, stringIdx, playerIdx) {
   save();
   closeModal('modal-slot-picker');
   renderDepthContent();
+  showToast('Player assigned');
 }
 
 function clearSlot(pos, stringIdx) {
