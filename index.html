@@ -747,7 +747,7 @@ function renderRoster() {
     el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">No players yet.<br>Add your roster to get position suggestions.</div></div>';
     return;
   }
-  el.innerHTML = state.roster.map((p,pi)=>{
+  el.innerHTML = roster.map((p,pi)=>{
     const t = topPos(p);
     const ini = p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
     const expC = p.yrs>=3?'b-green':p.yrs==2?'b-amber':'b-red';
@@ -4359,84 +4359,122 @@ function renderCulture(el) {
 
   // Player of the Week
   h += `<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">⭐ Player of the week</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <input type="text" id="potw-input" placeholder="Player name + what they did" value="${c.potw||''}" style="flex:1;margin:0;">
-      <button onclick="savePotw()" class="btn btn-gold btn-sm">Save</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:600;">⭐ Player of the week</div>
+      <button onclick="openCultureEdit('potw')" class="btn btn-gold btn-sm">${c.potw?'Edit':'+ Set'}</button>
     </div>
-    ${c.potw?`<div style="margin-top:8px;padding:10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:8px;font-size:13px;">⭐ ${c.potw}</div>`:''}
+    ${c.potw
+      ? `<div style="padding:12px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:8px;font-size:13px;">⭐ ${c.potw}</div>`
+      : `<div style="font-size:12px;color:var(--g3);">Tap + Set to name this week's standout player.</div>`}
   </div>`;
 
-  // Blocker of the Week — new
+  // Blocker of the Week
   h += `<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:13px;font-weight:600;margin-bottom:4px;">🛡️ Blocker of the week</div>
-    <div style="font-size:11px;color:var(--g3);margin-bottom:8px;">The block that sprung the run. The screen that nobody saw. Recognize it out loud every week.</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <input type="text" id="block-input" placeholder="Player name + the block they made" value="${c.blocker||''}" style="flex:1;margin:0;">
-      <button onclick="saveBlocker()" class="btn btn-gold btn-sm">Save</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div style="font-size:13px;font-weight:600;">🛡️ Blocker of the week</div>
+      <button onclick="openCultureEdit('blocker')" class="btn btn-gold btn-sm">${c.blocker?'Edit':'+ Set'}</button>
     </div>
-    ${c.blocker?`<div style="margin-top:8px;padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:13px;">🛡️ ${c.blocker}</div>`:''}
+    <div style="font-size:11px;color:var(--g3);margin-bottom:6px;">The block that sprung the run. Name it every week.</div>
+    ${c.blocker
+      ? `<div style="padding:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:13px;">🛡️ ${c.blocker}</div>`
+      : `<div style="font-size:12px;color:var(--g3);">Tap + Set to name this week's best block.</div>`}
   </div>`;
 
   // Team cheer
   h += `<div class="card" style="margin-bottom:10px;">
-    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📣 Team cheer</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <input type="text" id="cheer-input" placeholder="e.g. 1-2-3 RUSH!" value="${c.cheer||''}" style="flex:1;margin:0;">
-      <button onclick="saveCheer()" class="btn btn-gold btn-sm">Save</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:600;">📣 Team cheer</div>
+      <button onclick="openCultureEdit('cheer')" class="btn btn-gold btn-sm">${c.cheer?'Edit':'+ Set'}</button>
     </div>
-    ${c.cheer?`<div style="margin-top:8px;padding:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:18px;font-weight:700;text-align:center;">📣 ${c.cheer}</div>`:''}
+    ${c.cheer
+      ? `<div style="padding:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:18px;font-weight:700;text-align:center;">📣 ${c.cheer}</div>`
+      : `<div style="font-size:12px;color:var(--g3);">Tap + Set to enter your team cheer (shown on game day).</div>`}
   </div>`;
 
-  // Season moments wall — now fully editable
+  // Season moments wall
   h += `<div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div style="font-size:13px;font-weight:600;">🏆 Season moments wall</div>
       <button onclick="openAddMoment()" class="btn btn-gold btn-sm">+ Add</button>
     </div>
-    ${!c.moments||!c.moments.length?
-      `<div style="font-size:12px;color:var(--g3);text-align:center;padding:16px 0;">No moments yet.<br>Add the first great play, the first block that sprung a TD, the first flag pull that saved the game.</div>`:
-      `<div style="display:flex;flex-direction:column;gap:6px;">
-        ${c.moments.map((m,i)=>`<div style="padding:10px 12px;background:var(--navy3);border-radius:8px;">
-          <div style="display:flex;gap:8px;align-items:flex-start;">
-            <div style="font-size:18px;flex-shrink:0;cursor:pointer;" onclick="cycleMomentEmoji(${i})">${m.emoji||'⭐'}</div>
-            <div style="flex:1;min-width:0;">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-                <span style="font-size:12px;font-weight:600;">${m.player}</span>
-                <span style="font-size:10px;color:var(--g3);">Game ${m.game||'?'}</span>
+    ${!c.moments||!c.moments.length
+      ? `<div style="font-size:12px;color:var(--g3);text-align:center;padding:16px 0;">No moments yet.<br>Add the first great play, the first block that sprung a TD, the first flag pull that saved the game.</div>`
+      : `<div style="display:flex;flex-direction:column;gap:6px;">
+          ${c.moments.map((m,i)=>`<div style="padding:10px 12px;background:var(--navy3);border-radius:8px;">
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <div style="font-size:18px;flex-shrink:0;cursor:pointer;" onclick="cycleMomentEmoji(${i})">${m.emoji||'⭐'}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+                  <span style="font-size:12px;font-weight:600;">${m.player}</span>
+                  <span style="font-size:10px;color:var(--g3);">Game ${m.game||'?'}</span>
+                </div>
+                <div style="font-size:11px;color:var(--g3);line-height:1.4;">${m.moment}</div>
               </div>
-              <div style="font-size:11px;color:var(--g3);line-height:1.4;">${m.moment}</div>
+              <div style="display:flex;gap:4px;flex-shrink:0;">
+                <button onclick="editMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:13px;padding:4px 6px;min-height:36px;touch-action:manipulation;">✏️</button>
+                <button onclick="removeMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:16px;padding:4px 6px;min-height:36px;touch-action:manipulation;">×</button>
+              </div>
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0;">
-              <button onclick="editMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:13px;padding:2px 4px;">✏️</button>
-              <button onclick="removeMoment(${i})" style="background:none;border:none;color:var(--g3);cursor:pointer;font-size:16px;padding:2px 4px;">×</button>
-            </div>
-          </div>
-        </div>`).join('')}
-      </div>`
+          </div>`).join('')}
+        </div>`
     }
   </div>`;
 
   el.innerHTML = h;
 }
 
-function savePotw() {
-  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
-  state.culture.potw = document.getElementById('potw-input').value;
-  save(); renderToolContent();
+function openCultureEdit(field) {
+  if(!state.culture) state.culture = {potw:'',cheer:'',moments:[]};
+  const labels = {
+    potw:    {title:'Player of the week',    placeholder:'Player name + what they did',         hint:''},
+    blocker: {title:'Blocker of the week',   placeholder:'Player name + the block they made',   hint:'The block that sprung the run. Name it every week.'},
+    cheer:   {title:'Team cheer',            placeholder:'e.g. 1-2-3 RUSH!',                   hint:'Shown on the Game Day screen. Same cheer every game builds ritual.'},
+  };
+  const cfg = labels[field];
+  const current = state.culture[field] || '';
+
+  let h = `<div class="modal-title">${cfg.title}</div>
+    ${cfg.hint ? `<div style="font-size:12px;color:var(--g3);margin-bottom:10px;">${cfg.hint}</div>` : ''}
+    <input type="text" id="culture-edit-input" placeholder="${cfg.placeholder}" value="${current.replace(/"/g,'&quot;')}" style="width:100%;font-size:16px;">
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      ${current ? `<button onclick="clearCultureField('${field}')" class="btn btn-danger" style="flex:1;">Clear</button>` : ''}
+      <button onclick="saveCultureField('${field}')" class="btn btn-gold" style="flex:2;min-height:48px;font-size:15px;">Save</button>
+    </div>`;
+
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'cultureedit';
+  openModal('modal-slot-picker');
+
+  // Focus the input after modal opens
+  setTimeout(() => {
+    const inp = document.getElementById('culture-edit-input');
+    if(inp) inp.focus();
+  }, 150);
 }
 
-function saveBlocker() {
-  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
-  state.culture.blocker = document.getElementById('block-input').value;
-  save(); renderToolContent();
+function saveCultureField(field) {
+  if(!state.culture) state.culture = {potw:'',cheer:'',moments:[]};
+  const val = (document.getElementById('culture-edit-input').value || '').trim();
+  state.culture[field] = val;
+  save();
+  closeModal('modal-slot-picker');
+  renderToolContent();
+  showToast('Saved!');
 }
 
-function saveCheer() {
-  if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
-  state.culture.cheer = document.getElementById('cheer-input').value;
-  save(); renderToolContent();
+function clearCultureField(field) {
+  if(!state.culture) return;
+  state.culture[field] = '';
+  save();
+  closeModal('modal-slot-picker');
+  renderToolContent();
 }
+
+function savePotw()    { saveCultureField('potw'); }
+function saveBlocker() { saveCultureField('blocker'); }
+function saveCheer()   { saveCultureField('cheer'); }
+
+
 
 function openAddMoment(editIdx) {
   if(!state.culture) state.culture={potw:'',cheer:'',moments:[]};
