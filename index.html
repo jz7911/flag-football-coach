@@ -4958,6 +4958,151 @@ function showSnapGuide() {
   openModal('modal-slot-picker');
 }
 
+
+// ════════════════════════════════════════════
+// PRINT FUNCTIONS
+// ════════════════════════════════════════════
+function printPracticePlan() {
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===curPracWeek);
+  if(!wk) return;
+  const charTheme = CHARACTER_THEMES[(curPracWeek-1) % CHARACTER_THEMES.length];
+  const divLabel = state.division==='56' ? '5/6 Division' : '7/8 Division';
+  const tl = {wu:'WARM-UP',sk:'SKILL WORK',tm:'TEAM',gm:'GAME/SCRIMMAGE'};
+  const tc = {wu:'#16a34a',sk:'#2563eb',tm:'#9333ea',gm:'#dc2626'};
+
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Practice Plan Week ${wk.w}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;color:#000;background:#fff;padding:20px;font-size:12px;}
+    .header{border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:16px;}
+    .header h1{font-size:20px;font-weight:800;}
+    .header .sub{font-size:13px;color:#444;margin-top:3px;}
+    .theme-box{background:#f5f5f5;border-left:4px solid #333;padding:8px 10px;margin-bottom:14px;font-size:11px;}
+    .practice{margin-bottom:20px;page-break-inside:avoid;}
+    .practice-hdr{background:#222;color:#fff;padding:6px 10px;font-size:13px;font-weight:700;margin-bottom:8px;}
+    .block{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #eee;align-items:flex-start;}
+    .block-type{min-width:80px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;text-align:center;margin-top:2px;}
+    .block-time{min-width:60px;font-size:10px;color:#666;margin-top:4px;}
+    .block-content{flex:1;}
+    .block-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+    .block-desc{font-size:11px;color:#333;line-height:1.5;}
+    .footer{margin-top:20px;padding-top:10px;border-top:1px solid #ccc;font-size:10px;color:#666;text-align:center;}
+    @media print{body{padding:10px;}@page{margin:15mm;}}
+  </style></head>
+  <body onload="window.print()">
+  <div class="header">
+    <h1>Practice Plan — Week ${wk.w}: ${wk.theme}</h1>
+    <div class="sub">${divLabel} · ${new Date().toLocaleDateString()} · Buffalo Grove Park District Flag Football</div>
+  </div>
+  <div class="theme-box">
+    <strong>Character Theme: ${charTheme.theme}</strong> — ${charTheme.tip}
+  </div>`;
+
+  wk.prac.forEach(pr => {
+    html += `<div class="practice"><div class="practice-hdr">Practice ${pr.lbl}</div>`;
+    pr.blocks.forEach(b => {
+      const color = tc[b.t] || '#666';
+      html += `<div class="block">
+        <div class="block-type" style="background:${color};color:#fff;">${tl[b.t]||b.t.toUpperCase()}</div>
+        <div class="block-time">${b.min} min</div>
+        <div class="block-content">
+          <div class="block-name">${b.name}</div>
+          <div class="block-desc">${b.desc}</div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  html += `<div class="footer">Flag Football Coach App · ${divLabel} · Season Practice Plan</div>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=800,height=900');
+  if(w){w.document.write(html);w.document.close();}
+  else alert('Allow pop-ups to print.');
+}
+
+function printGameRoster(gameNum) {
+  const roster = activeRoster();
+  const rosters = activeGameRosters();
+  const gameRoster = rosters.find(r=>r.gameNum===gameNum);
+  if(!roster.length){alert('No roster yet.');return;}
+  const is56 = state.division==='56';
+  const positions = is56 ? DEPTH_POSITIONS_56 : DEPTH_POSITIONS;
+  const divLabel = is56 ? '5/6 Division' : '7/8 Division';
+
+  const getP = (side, pos, str) => {
+    const keys = {0:side, 1:side+'2', 2:side+'3'};
+    const section = gameRoster ? (gameRoster[keys[str]] || gameRoster[side] || {}) : {};
+    const idx = section[pos];
+    return idx !== undefined ? roster[idx] : null;
+  };
+
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Game ${gameNum} Roster</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;color:#000;background:#fff;padding:20px;font-size:12px;}
+    h1{font-size:18px;font-weight:800;border-bottom:3px solid #000;padding-bottom:8px;margin-bottom:14px;}
+    .sub{font-size:12px;color:#444;margin-top:3px;}
+    .section{margin-bottom:16px;}
+    .section-hdr{font-size:13px;font-weight:700;background:#222;color:#fff;padding:5px 10px;margin-bottom:6px;}
+    table{width:100%;border-collapse:collapse;font-size:11px;}
+    th{background:#f0f0f0;border:1px solid #ccc;padding:5px 8px;text-align:left;font-weight:700;}
+    td{border:1px solid #ddd;padding:5px 8px;}
+    .pos{font-weight:600;color:#333;}
+    .skill-pos{background:#fffbeb;}
+    .notes{margin-top:16px;padding:10px;border:1px solid #ccc;min-height:60px;}
+    .footer{margin-top:16px;font-size:10px;color:#666;text-align:center;border-top:1px solid #ccc;padding-top:8px;}
+    @media print{body{padding:10px;}@page{margin:15mm;}}
+  </style></head>
+  <body onload="window.print()">
+  <h1>Game ${gameNum} Roster — ${divLabel}
+    <div class="sub">Buffalo Grove Park District Flag Football · ${new Date().toLocaleDateString()}</div>
+  </h1>`;
+
+  ['offense','defense'].forEach(side => {
+    html += `<div class="section"><div class="section-hdr">${side.charAt(0).toUpperCase()+side.slice(1)}</div>
+    <table><tr><th>Position</th><th>1st String</th><th>2nd String</th><th>3rd String</th></tr>`;
+    positions[side].forEach(pos => {
+      const skillSet = is56 ? SKILL_POSITIONS_56 : SKILL_POSITIONS_78;
+      const isSkill = side==='offense' && skillSet.includes(pos);
+      const p1=getP(side,pos,0), p2=getP(side,pos,1), p3=getP(side,pos,2);
+      html += `<tr class="${isSkill?'skill-pos':''}">
+        <td class="pos">${pos}${isSkill?' ★':''}</td>
+        <td><strong>${p1?p1.name:'—'}</strong></td>
+        <td>${p2?p2.name:'—'}</td>
+        <td>${p3?p3.name:'—'}</td>
+      </tr>`;
+    });
+    html += '</table></div>';
+  });
+
+  // Touch tracker
+  html += `<div class="section"><div class="section-hdr">Touch tracker — everyone carries</div>
+  <table><tr><th>Player</th><th>Total carries</th><th>Last carried</th><th>Status</th></tr>`;
+  roster.forEach(p => {
+    const carries = (p.touchGames||[]).length;
+    const last = (p.touchGames||[]).length ? Math.max(...p.touchGames) : null;
+    const ago = last !== null ? (activeGames().length - last) : activeGames().length;
+    const overdue = is56 ? ago>=1 : ago>=3;
+    html += `<tr>
+      <td>${p.name} ${p.primary?'★':''}</td>
+      <td>${carries}</td>
+      <td>${last ? 'Game '+last : 'Never'}</td>
+      <td style="color:${overdue?'#dc2626':'#16a34a'};font-weight:600;">${overdue?'NEEDS CARRY':'OK'}</td>
+    </tr>`;
+  });
+  html += '</table></div>';
+
+  html += `<div class="notes"><strong>Game notes:</strong></div>
+  <div class="footer">Flag Football Coach App · ${divLabel} · Game ${gameNum}</div>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=800,height=900');
+  if(w){w.document.write(html);w.document.close();}
+  else alert('Allow pop-ups to print.');
+}
 function showToast(msg, duration) {
   const t = document.getElementById('toast-msg');
   if(!t) return;
@@ -5780,6 +5925,7 @@ function renderAutoRoster(el) {
         <div style="display:flex;gap:6px;">
           ${!locked?`<button onclick="regenerateRoster(${g})" class="btn btn-sm" style="font-size:10px;">↺ Regen</button>`:''}
           <button onclick="lockRoster(${g})" class="btn btn-sm ${locked?'btn-danger':'btn-gold'}" style="font-size:10px;">${locked?'🔓 Unlock':'🔒 Lock'}</button>
+          <button onclick="printGameRoster(${g})" class="btn btn-sm" style="font-size:10px;">🖨️</button>
         </div>
       </div>`;
 
