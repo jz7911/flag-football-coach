@@ -2588,7 +2588,7 @@ function _openDrillPicker() {
     h += `<div style="display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">`;
     filtered.forEach(d => {
       const isSelected = _addDrillSelected && _addDrillSelected.id === d.id;
-      h += `<div onclick="_addDrillSelected=${JSON.stringify(JSON.stringify(d))};_selectDrillInPicker('${d.id}')"
+      h += `<div onclick="_selectDrillInPicker('${d.id}')"
           id="dp-${d.id}"
           style="padding:10px 12px;border-radius:10px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};
           background:${isSelected?'rgba(245,166,35,.1)':'var(--navy2)'};cursor:pointer;touch-action:manipulation;">
@@ -2634,8 +2634,12 @@ function _openDrillPicker() {
 }
 
 function _selectDrillInPicker(id) {
-  // _addDrillSelected was already set via onclick JSON trick — just refresh UI
-  _addDrillSelected = DRILLS.concat(state.customDrills||[]).find(d=>d.id===id) || null;
+  // Toggle: if already selected, deselect. Otherwise select.
+  if(_addDrillSelected && _addDrillSelected.id === id) {
+    _addDrillSelected = null;
+  } else {
+    _addDrillSelected = DRILLS.concat(state.customDrills||[]).find(d=>d.id===id) || null;
+  }
   _openDrillPicker();
 }
 
@@ -4805,57 +4809,269 @@ function renderCallSheet(el) {
   const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
   const activePlays = bank.filter(p=>activeIds.includes(p.id));
   const sheet = getCallSheet();
+  const gameNum = activeGames().length + 1;
 
   let h = `<div class="card card-gold" style="margin-bottom:10px;">
-    <div class="card-title">Game call sheet</div>
-    <div class="card-sub">Pick up to 8 plays in priority order. Tap Print to generate a wristband-style card you can bring to the sideline.</div>
+    <div class="card-title">Game ${gameNum} call sheet</div>
+    <div class="card-sub">Tap <strong>Auto-Script</strong> to generate a smart sequence, or build manually below.</div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+    <button onclick="autoScriptCallSheet()" class="btn btn-gold" style="flex:1;font-size:13px;min-height:48px;">⚡ Auto-Script</button>
+    ${sheet.length?`<button onclick="printCallSheet()" class="btn btn-sm" style="min-height:48px;">🖨️ Print</button>
+    <button onclick="clearCallSheet()" class="btn btn-danger btn-sm" style="min-height:48px;">Clear</button>`:''}
   </div>`;
 
-  // Current call sheet
-  h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Call sheet (drag to reorder)</div>`;
-
   if(!sheet.length) {
-    h += `<div style="font-size:12px;color:var(--g3);padding:12px;background:var(--navy3);border-radius:8px;margin-bottom:12px;">Select plays from the list below to build your call sheet.</div>`;
-  } else {
-    sheet.forEach((id, idx) => {
-      const p = bank.find(x=>x.id===id);
-      if(!p) return;
-      const stats = getPlayStats(id);
-      h += `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--navy3);border-radius:8px;margin-bottom:5px;">
-        <div style="font-size:16px;font-weight:700;color:var(--gold);min-width:22px;">${idx+1}</div>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:600;">${p.n}</div>
-          <div style="font-size:10px;color:var(--g3);">${p.formation} ${stats?` · ${stats.pct}% works (${stats.total} uses)`:''}</div>
-        </div>
-        <div style="display:flex;gap:4px;">
-          ${idx>0?`<button onclick="moveCallSheet(${idx},-1)" class="btn btn-sm" style="padding:3px 7px;">↑</button>`:''}
-          ${idx<sheet.length-1?`<button onclick="moveCallSheet(${idx},1)" class="btn btn-sm" style="padding:3px 7px;">↓</button>`:''}
-          <button onclick="removeCallSheet('${id}')" class="btn btn-danger btn-sm" style="padding:3px 7px;">×</button>
-        </div>
-      </div>`;
-    });
-    h += `<div style="display:flex;gap:8px;margin:10px 0 16px;">
-      <button onclick="printCallSheet()" class="btn btn-gold" style="flex:1;">🖨️ Print call sheet</button>
-      <button onclick="clearCallSheet()" class="btn btn-danger btn-sm">Clear</button>
+    h += `<div style="padding:20px;text-align:center;background:var(--navy3);border-radius:10px;margin-bottom:14px;">
+      <div style="font-size:22px;margin-bottom:6px;">📋</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">No plays scripted yet</div>
+      <div style="font-size:12px;color:var(--g3);">Tap <strong style="color:var(--gold);">⚡ Auto-Script</strong> to generate an optimized sequence, or add plays manually below.</div>
     </div>`;
+  } else {
+    const plays = sheet.map(id=>bank.find(p=>p.id===id)).filter(Boolean);
+    const posSize = 4;
+    const possessions = [];
+    for(let i=0;i<plays.length;i+=posSize) possessions.push(plays.slice(i,i+posSize));
+
+    possessions.forEach((poss, pi) => {
+      h += `<div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">
+          Possession ${pi+1} script
+        </div>`;
+      poss.forEach((p, i) => {
+        const globalIdx = pi * posSize + i;
+        const stats = getPlayStats(p.id);
+        const roleLabel = _getPlayRole(p, i, poss);
+        const roleColor = i===0 ? 'var(--green)' : p.pass ? 'var(--blue)' : p.mis==='Very High' ? '#a855f7' : 'var(--gold)';
+        h += `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--navy3);border-radius:10px;margin-bottom:5px;border-left:3px solid ${roleColor};">
+          <div style="font-size:18px;font-weight:800;color:${roleColor};min-width:26px;text-align:center;">${globalIdx+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:700;">${p.n}</span>
+              <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.07);color:${roleColor};font-weight:600;">${roleLabel}</span>
+            </div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;">${p.pass?'Pass':'Run'} · ${p.mis} mis.${stats&&stats.total?' · '+stats.pct+'% ('+stats.total+' uses)':''}</div>
+            <div style="font-size:11px;color:var(--g3);margin-top:3px;font-style:italic;line-height:1.3;">${_getPlayCallCue(p, i, poss)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            ${globalIdx>0?`<button onclick="moveCallSheet(${globalIdx},-1)" class="btn btn-sm" style="padding:3px 8px;">↑</button>`:''}
+            ${globalIdx<sheet.length-1?`<button onclick="moveCallSheet(${globalIdx},1)" class="btn btn-sm" style="padding:3px 8px;">↓</button>`:''}
+            <button onclick="removeCallSheet('${p.id}')" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:6px;color:var(--red);cursor:pointer;padding:3px 8px;font-size:12px;touch-action:manipulation;">×</button>
+          </div>
+        </div>`;
+      });
+      h += '</div>';
+    });
+    h += `<button onclick="printCallSheet()" class="btn btn-gold" style="width:100%;margin-bottom:14px;">🖨️ Print wristband</button>`;
   }
 
-  // Available plays to add
-  h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Add plays</div>`;
-  activePlays.filter(p=>!sheet.includes(p.id)).forEach(p => {
-    const stats = getPlayStats(p.id);
-    h += `<div onclick="addToCallSheet('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--navy2);border:1px solid var(--navy3);border-radius:8px;margin-bottom:5px;cursor:pointer;">
-      <div style="font-size:11px;color:var(--gold);">+</div>
-      <div style="flex:1;">
-        <div style="font-size:12px;font-weight:500;">${p.n}</div>
-        <div style="font-size:10px;color:var(--g3);">${p.mis} misdirection · ${p.pass?'Pass':'Run'}${stats?` · ${stats.pct}% works`:''}</div>
-      </div>
-      <span class="badge b-${p.tier==='Core'?'green':'amber'}">${p.tier}</span>
-    </div>`;
-  });
+  const remaining = activePlays.filter(p=>!sheet.includes(p.id));
+  if(remaining.length) {
+    h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Add plays manually</div>`;
+    remaining.forEach(p => {
+      const stats = getPlayStats(p.id);
+      h += `<div onclick="addToCallSheet('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--navy2);border:1px solid var(--navy3);border-radius:8px;margin-bottom:5px;cursor:pointer;touch-action:manipulation;">
+        <div style="color:var(--gold);font-size:14px;flex-shrink:0;">+</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:600;">${p.n}</div>
+          <div style="font-size:10px;color:var(--g3);">${p.mis} mis. · ${p.pass?'Pass':'Run'}${stats&&stats.total?' · '+stats.pct+'% works':''}</div>
+        </div>
+        <span class="badge b-${p.tier==='Core'?'green':p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
+      </div>`;
+    });
+  }
 
   el.innerHTML = h;
 }
+
+function _getPlayRole(p, posInPoss, poss) {
+  // Use auto-script metadata if available
+  if(state._scriptMeta && state._scriptMeta[p.id] && state._scriptMeta[p.id].role) {
+    return state._scriptMeta[p.id].role;
+  }
+  if(posInPoss === 0) return 'ESTABLISH';
+  if(p.pass) return 'PASS SHOT';
+  if(p.mis === 'Very High') return 'TRICK';
+  if(p.mis === 'High') return 'COUNTER';
+  if(posInPoss === poss.length-1) return 'CLOSER';
+  return 'BUILD';
+}
+
+function _getPlayCallCue(p, posInPoss, poss) {
+  // Use auto-script metadata if available
+  if(state._scriptMeta && state._scriptMeta[p.id] && state._scriptMeta[p.id].cue) {
+    return state._scriptMeta[p.id].cue;
+  }
+  const prev = posInPoss > 0 ? poss[posInPoss-1] : null;
+  if(posInPoss === 0) return 'Establish this. Run it until they stop it. Everything else builds on this.';
+  if(p.pass) return 'Defense is set on the run. They have not adjusted. Hit them over the top.';
+  if(prev && p.mis === 'High') return `They sold out to stop ${prev.n.split(' ')[0]}. They are out of position — hit behind them.`;
+  if(p.mis === 'Very High') return 'Trick play. Call it while they are still figuring out your system.';
+  if(posInPoss === poss.length-1) return 'Your best closing play. No hesitation. Call this when you need a score.';
+  return `${prev?prev.n.split(' ')[0]+' drew their attention. ':''} Hit what they gave you.`;
+}
+
+function autoScriptCallSheet() {
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
+  const activePlays = bank.filter(p=>activeIds.includes(p.id));
+  const gameNum = activeGames().length + 1;
+  const scouting = state.scouting && state.scouting.find(s=>s.gameNum===gameNum&&s.division===division);
+
+  if(!activePlays.length) {
+    alert('Add plays to your Active Playbook first.');
+    return;
+  }
+
+  // ── RESEARCH-BACKED PRINCIPLES ──
+  // 1. Bill Walsh: script to think clearly before the game, not during it
+  // 2. Constraint theory: base plays work on sound defense; constraint plays punish cheating
+  // 3. Series principle: every sweep must have a counter; every counter must have a constraint
+  // 4. Punch/counterpunch: run until they stop it, then hit what they opened up
+  // 5. Special plays early: use tricks while defense is still figuring you out
+  // 6. Self-scout: avoid run-run-pass-pass tendencies; stay unpredictable
+
+  // Score each play for current context
+  function playScore(p) {
+    let score = 0;
+    const stats = getPlayStats(p.id);
+
+    // Effectiveness data (heavily weighted if 3+ uses)
+    if(stats && stats.total >= 3) {
+      score += stats.pct * 0.7;
+    } else if(stats && stats.total >= 1) {
+      score += stats.pct * 0.3; // less weight with small sample
+    } else {
+      // No data: use tier
+      score += p.tier==='Core'?45:p.tier==='Intermediate'?32:p.tier==='Advanced'?20:10;
+    }
+
+    // Misdirection value for this offense (High > Med > Low; Very High saved for right moment)
+    const misVal = {'Low':8,'Med':14,'High':18,'Very High':10};
+    score += misVal[p.mis] || 8;
+
+    // Game maturity: plays installed too early get penalized
+    if(gameNum < (p.wk||1)) score -= 25;
+
+    // Scouting adjustment: if we know they crash on sweeps, counters score higher
+    if(scouting) {
+      const tend = (scouting.tendencies||'').toLowerCase();
+      if((tend.includes('crash')||tend.includes('aggressive'))&&p.mis==='High') score += 12;
+      if((tend.includes('zone')||tend.includes('soft'))&&(p.mis==='Low'||p.mis==='Med')) score += 8;
+    }
+
+    return score;
+  }
+
+  const byScore = arr => [...arr].sort((a,b)=>playScore(b)-playScore(a));
+
+  // Categorize by function, not just misdirection level
+  // BASE PLAYS: establish the threat (sweeps, dives — what you run until they stop it)
+  const base = byScore(activePlays.filter(p=>
+    !p.pass && (p.mis==='Low'||p.mis==='Med') && p.tier==='Core'
+  ));
+  // COUNTERS: constraint plays that punish over-pursuit on base plays
+  const counters = byScore(activePlays.filter(p=>
+    !p.pass && p.mis==='High' && (p.tier==='Core'||p.tier==='Intermediate') &&
+    !p.n.toLowerCase().includes('boot') && !p.n.toLowerCase().includes('keep')
+  ));
+  // QB KEEPERS / BOOTLEGS: third dimension — punish LBs who ignore the QB
+  const keepers = byScore(activePlays.filter(p=>
+    !p.pass && (p.n.toLowerCase().includes('keep')||p.n.toLowerCase().includes('boot')||p.n.toLowerCase().includes('sneak'))
+  ));
+  // CONSTRAINT PASSES: punish safeties cheating up to stop the run
+  const passes = byScore(activePlays.filter(p=>p.pass));
+  // TRICK / VERY HIGH: run early while defense is still figuring you out (Walsh: use specials early)
+  const tricks = byScore(activePlays.filter(p=>p.mis==='Very High'&&!p.pass));
+  // OTHER: anything not categorized
+  const other = byScore(activePlays.filter(p=>
+    !base.includes(p)&&!counters.includes(p)&&!keepers.includes(p)&&!passes.includes(p)&&!tricks.includes(p)
+  ));
+
+  const used = new Set();
+  const pick = (...arrs) => {
+    for(const arr of arrs){
+      const p = arr.find(x=>!used.has(x.id));
+      if(p){used.add(p.id);return p;}
+    }
+    return null;
+  };
+
+  // ── BUILD THE SCRIPT ──
+  // Walsh principle: script to exploit a weakness, build confidence, set up later plays
+  // Series principle: each play sets up the next one
+  // Self-scout: alternate directions, avoid patterns
+
+  const script = [];
+
+  // SLOT 1 — Base play right (establish threat)
+  // Goal: show defense your bread-and-butter. Force them to respect it.
+  const s1 = base[0] ? (used.add(base[0].id), base[0]) : pick(other);
+  if(s1) { script.push({...s1, _role:'ESTABLISH', _cue:'Run this until they stop it. This is the foundation everything else builds on.'}); }
+
+  // SLOT 2 — Base play LEFT or second base (force defense to respect both sides)
+  // Key insight: misdirection only works if defense is committed to stopping the base
+  const s2opposite = base.find(p=>!used.has(p.id)&&s1&&p.n!==s1.n) || null;
+  const s2 = s2opposite || pick(base, other);
+  if(s2) { used.add(s2.id); script.push({...s2, _role:'OPPOSITE SIDE', _cue:`Defense cheated to stop ${s1?s1.n.split(' ')[0]:'the sweep'}. Hit the other side before they adjust.`}); }
+
+  // SLOT 3 — Counter (constraint play): defense is now committing hard to base plays
+  // Constraint theory: punish defenders who cheat to stop slot 1 and 2
+  const s3 = pick(counters, other);
+  if(s3) { script.push({...s3, _role:'COUNTER', _cue:`They are crashing on the ${s1?s1.n.split(' ')[0]:'sweep'}. They just moved out of position. Hit behind them.`}); }
+
+  // SLOT 4 — QB keeper / bootleg (third threat): defense now must account for QB
+  // Walsh principle: vary the threat so defense cannot single-mindedly key on one player
+  const s4 = pick(keepers, counters, other);
+  if(s4) { script.push({...s4, _role:'QB THREAT', _cue:`LBs are selling out on the backs. QB is uncovered. This is the third option they forgot about.`}); }
+
+  // SLOT 5 — Walsh special/trick (use while defense is still figuring you out)
+  // Walsh principle: if you have a trick play you want to run, you HAD to run it FIRST
+  // We put it at slot 5 because they need to have seen the base plays for the trick to work
+  const s5 = pick(tricks, passes, other);
+  if(s5) { script.push({...s5,
+    _role: s5.pass ? 'PASS SHOT' : 'TRICK',
+    _cue: s5.pass
+      ? `Defense is completely run-focused. They have not adjusted to the pass yet. This is the window.`
+      : `Run the trick while the defense is still figuring out your system. They will not see it coming.`
+  }); }
+
+  // SLOT 6 — Counter second direction or constraint play
+  // Punch/counterpunch: after trick or pass, go back to run to stay unpredictable
+  const s6 = pick(counters, base, other);
+  if(s6) { script.push({...s6, _role:'COUNTER 2', _cue:`Back to the run after that surprise. Defense adjusted for the pass — hit the counter while they reset.`}); }
+
+  // SLOT 7 — Best pass (if not yet called) or best remaining constraint
+  // If pass already used, get the second-best constraint; keep defense guessing
+  const s7 = pick(passes, keepers, tricks, other);
+  if(s7) { script.push({...s7,
+    _role: s7.pass ? 'PASS SHOT' : 'CONSTRAINT',
+    _cue: s7.pass
+      ? `Second pass threat. Defense thought you were done throwing. Catch them again.`
+      : `Defense has seen your base plays. Time for a wrinkle they have not prepped for.`
+  }); }
+
+  // SLOT 8 — Highest-percentage close (best play for when you need a score)
+  // Walsh: know your closer before the game — no decisions under pressure
+  const best = [...activePlays].filter(x=>!used.has(x.id)).sort((a,b)=>playScore(b)-playScore(a))[0];
+  if(best) { script.push({...best, _role:'CLOSER', _cue:`Your best high-percentage play. Call this when you need a score. No hesitation.`}); }
+
+  // Store custom roles and cues in a sidecar (not in the play bank)
+  state._scriptMeta = {};
+  script.forEach(p => {
+    state._scriptMeta[p.id] = {role:p._role, cue:p._cue};
+  });
+
+  if(!state.callSheet) state.callSheet={'78':[],'56':[]};
+  state.callSheet[division] = script.map(p=>p.id);
+  save();
+  renderPbContent();
+  showToast('Scripted ' + script.length + ' plays — optimized sequence');
+}
+
+
 
 function addToCallSheet(id) {
   if(!state.callSheet) state.callSheet={'78':[],'56':[]};
