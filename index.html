@@ -2471,7 +2471,7 @@ ${'='.repeat(50)}
     text += `
 --- ${pr.lbl} (75 min) ---
 `;
-    pr.blocks.forEach(b => {
+    getPracBlocks(wk, pr).forEach(b => {
       text += `
 [${tl[b.t]||b.t.toUpperCase()}] min ${b.min}
 ${b.name}
@@ -5777,7 +5777,7 @@ function printPracticePlan() {
 
   wk.prac.forEach(pr => {
     html += `<div class="practice"><div class="practice-hdr">Practice ${pr.lbl}</div>`;
-    pr.blocks.forEach(b => {
+    getPracBlocks(wk, pr).forEach(b => {
       const color = tc[b.t] || '#666';
       html += `<div class="block">
         <div class="block-type" style="background:${color};color:#fff;">${tl[b.t]||b.t.toUpperCase()}</div>
