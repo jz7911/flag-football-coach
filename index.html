@@ -2538,10 +2538,10 @@ function movePracBlock(wkNum, pracLbl, blockIdx, dir) {
 }
 
 // ── temp state for add-block flow ──
-let _addBlockCtx = null;     // {wkNum, pracLbl} for Plans tab, or null for Builder
+let _addBlockCtx = null;
 let _addDrillFilter = '';
 let _addDrillCat = 'All';
-let _addDrillSelected = null; // the drill object chosen from bank
+let _pickerSelected = new Set(); // IDs of drills selected in the picker
 
 function openEditBlock(wkNum, pracLbl, blockIdx) {
   // blockIdx >= 0  → editing existing block (show form)
@@ -2550,7 +2550,7 @@ function openEditBlock(wkNum, pracLbl, blockIdx) {
     _openEditBlockForm(wkNum, pracLbl, blockIdx);
   } else {
     _addBlockCtx = (wkNum === -1) ? null : {wkNum, pracLbl};
-    _addDrillSelected = null;
+    _pickerSelected.clear();
     _addDrillFilter = '';
     _addDrillCat = 'All';
     _openDrillPicker();
@@ -2570,33 +2570,45 @@ function _openDrillPicker() {
   const ctxLabel = _addBlockCtx
     ? `Week ${_addBlockCtx.wkNum} · Practice ${_addBlockCtx.pracLbl}`
     : 'Practice Builder';
+  const count = _pickerSelected.size;
 
-  let h = `<div class="modal-title">Add block — ${ctxLabel}</div>
+  let h = `<div class="modal-title">Add drills — ${ctxLabel}</div>
     <div style="display:flex;gap:6px;margin-bottom:8px;">
       <input type="text" id="drill-picker-search" placeholder="Search drills…"
         oninput="_addDrillFilter=this.value;_openDrillPicker()"
         value="${_addDrillFilter}" style="flex:1;margin:0;font-size:14px;">
       <button onclick="openAddCustomDrill()" class="btn btn-sm" style="flex-shrink:0;font-size:11px;white-space:nowrap;">＋ Custom</button>
     </div>
-    <div class="tab-row" style="margin-bottom:10px;">
+    <div class="tab-row" style="margin-bottom:8px;">
       ${cats.map(c=>`<div class="tab ${c===_addDrillCat?'active':''}"
           onclick="_addDrillCat='${c}';_openDrillPicker()" style="font-size:11px;padding:6px 10px;">${c}</div>`).join('')}
-    </div>`;
+    </div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:8px;">Tap drills to select. Tap again to deselect.</div>`;
+
+  // Sticky confirm bar
+  h += `<div style="position:sticky;top:0;z-index:10;margin-bottom:8px;">
+    <button onclick="_confirmAddDrill()"
+      style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;
+      background:${count>0?'var(--gold)':'var(--navy3)'};
+      color:${count>0?'var(--navy)':'var(--g3)'};
+      font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">
+      ${count>0 ? `✓ Add ${count} drill${count>1?'s':''} to practice` : 'Select drills below'}
+    </button>
+  </div>`;
 
   if(!filtered.length) {
-    h += `<div style="padding:20px;text-align:center;color:var(--g3);font-size:13px;">No drills match — try a different filter or add a custom drill.</div>`;
+    h += `<div style="padding:20px;text-align:center;color:var(--g3);font-size:13px;">No drills match.</div>`;
   } else {
-    h += `<div style="display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">`;
+    h += `<div style="display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">`;
     filtered.forEach(d => {
-      const isSelected = _addDrillSelected && _addDrillSelected.id === d.id;
+      const isSel = _pickerSelected.has(d.id);
       h += `<div onclick="_selectDrillInPicker('${d.id}')"
-          id="dp-${d.id}"
-          style="padding:10px 12px;border-radius:10px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};
-          background:${isSelected?'rgba(245,166,35,.1)':'var(--navy2)'};cursor:pointer;touch-action:manipulation;">
+          style="padding:10px 12px;border-radius:10px;border:2px solid ${isSel?'var(--gold)':'var(--navy3)'};
+          background:${isSel?'rgba(245,166,35,.1)':'var(--navy2)'};cursor:pointer;touch-action:manipulation;transition:border-color .1s,background .1s;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:20px;height:20px;border-radius:5px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};
-            background:${isSelected?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;
-            font-size:11px;color:var(--navy);flex-shrink:0;">${isSelected?'✓':''}</div>
+          <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${isSel?'var(--gold)':'var(--navy3)'};
+            background:${isSel?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;
+            font-size:13px;color:var(--navy);font-weight:700;flex-shrink:0;">${isSel?'✓':''}</div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
               <span style="font-size:12px;font-weight:600;">${d.name}</span>
@@ -2605,7 +2617,7 @@ function _openDrillPicker() {
               ${d.fdm?'<span style="font-size:9px;color:var(--gold);">FDM</span>':''}
               ${d.custom?'<span style="font-size:9px;color:#a855f7;">Custom</span>':''}
             </div>
-            <div style="font-size:10px;color:var(--g3);margin-top:2px;line-height:1.3;">${(d.desc||'').substring(0,80)}…</div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;line-height:1.3;">${(d.desc||'').substring(0,80)}${(d.desc||'').length>80?'…':''}</div>
           </div>
         </div>
       </div>`;
@@ -2613,21 +2625,9 @@ function _openDrillPicker() {
     h += '</div>';
   }
 
-  h += `<div style="margin-top:10px;">
-    <button onclick="_confirmAddDrill()"
-      style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;
-      background:${_addDrillSelected?'var(--gold)':'var(--navy3)'};
-      color:${_addDrillSelected?'var(--navy)':'var(--g3)'};
-      font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;"
-      id="drill-picker-confirm">
-      ${_addDrillSelected ? `Add "${_addDrillSelected.name}"` : 'Select a drill above'}
-    </button>
-  </div>`;
-
   document.getElementById('slot-picker-content').innerHTML = h;
   document.getElementById('slot-picker-pos').value = 'drillpicker';
   openModal('modal-slot-picker');
-  // Re-focus search if already open (filter/category change)
   setTimeout(() => {
     const s = document.getElementById('drill-picker-search');
     if(s && _addDrillFilter) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
@@ -2635,45 +2635,57 @@ function _openDrillPicker() {
 }
 
 function _selectDrillInPicker(id) {
-  // Toggle: if already selected, deselect. Otherwise select.
-  if(_addDrillSelected && _addDrillSelected.id === id) {
-    _addDrillSelected = null;
+  // Toggle selection — keep modal open, just re-render
+  if(_pickerSelected.has(id)) {
+    _pickerSelected.delete(id);
   } else {
-    _addDrillSelected = DRILLS.concat(state.customDrills||[]).find(d=>d.id===id) || null;
+    _pickerSelected.add(id);
   }
   _openDrillPicker();
 }
 
 function _confirmAddDrill() {
-  if(!_addDrillSelected) return;
-  const d = _addDrillSelected;
+  if(!_pickerSelected.size) return;
+  const allDrills = DRILLS.concat(state.customDrills||[]);
+  const selected = [..._pickerSelected].map(id=>allDrills.find(d=>d.id===id)).filter(Boolean);
 
   if(_addBlockCtx) {
-    // Adding to a plan week
+    // Adding to a plan week — append all selected as blocks
     const {wkNum, pracLbl} = _addBlockCtx;
     const plans = getActivePracticePlans();
     const wk = plans.find(p=>p.w===wkNum);
     const pr = wk.prac.find(p=>p.lbl===pracLbl);
     const blocks = [...getPracBlocks(wk, pr)];
-    blocks.push({t:d.type||d.t||'sk', type:d.type||d.t||'sk', name:d.name,
-      min:String(d.time||10), time:d.time||10, desc:d.desc||d.name, cue:d.cue||''});
+    selected.forEach(d => {
+      blocks.push({
+        t: d.type||d.t||'sk',
+        type: d.type||d.t||'sk',
+        name: d.name,
+        min: String(d.time||10),
+        time: d.time||10,
+        desc: d.desc||d.name,
+        cue: d.cue||''
+      });
+    });
     savePracBlocks(wk, pr, blocks);
+    _pickerSelected.clear();
     closeModal('modal-slot-picker');
     const el = document.getElementById('prac-content');
     if(el) renderPracPlans(el);
-    showToast(d.name + ' added to Practice ' + pracLbl);
+    showToast(selected.length + ' drill' + (selected.length>1?'s':'') + ' added to Practice ' + pracLbl);
   } else {
     // Adding to Practice Builder
     const arr = state.division==='56' ? (state.customPractice56||(state.customPractice56=[])) : state.customPractice;
-    arr.push({...d});
+    selected.forEach(d => arr.push({...d, type:d.type||d.t||'sk'}));
     save();
+    _pickerSelected.clear();
     closeModal('modal-slot-picker');
     curPracTab = 'builder';
     document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
     const title = document.getElementById('hdr-title');
     if(title) title.textContent = 'Practice › Builder';
     renderPracContent();
-    showToast(d.name + ' added to builder');
+    showToast(selected.length + ' drill' + (selected.length>1?'s':'') + ' added to builder');
   }
 }
 
@@ -2910,7 +2922,8 @@ function saveCustomDrill() {
   showToast(drill.name + ' added to drill bank!');
   // Go back to the picker so you can immediately select it
   closeModal('modal-slot-picker');
-  _addDrillSelected = drill;
+  _pickerSelected.clear();
+  _pickerSelected.add(drill.id);
   _addDrillCat = drill.cat;
   _openDrillPicker();
 }
