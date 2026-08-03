@@ -2759,7 +2759,88 @@ function saveEditBlock(wkNum, pracLbl, blockIdx) {
   showToast(blockIdx >= 0 ? 'Block updated!' : 'Block added!');
 }
 
-// ── Add custom drill to the permanent drill bank ──
+// ── Play installer picker — add a play install block to a practice ──
+function openPlayPicker(wkNum, pracLbl) {
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
+  const activePlays = bank.filter(p=>activeIds.includes(p.id));
+  const allPlays = bank; // show all, highlight active
+
+  let h = `<div class="modal-title">Add play install block</div>
+    <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">
+      Adds a <strong>Team period block</strong> to Practice ${pracLbl} for installing or repping this play.
+      Active plays shown in gold.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">`;
+
+  const tiers = ['Core','Intermediate','Advanced','Trick'];
+  tiers.forEach(tier => {
+    const tierPlays = allPlays.filter(p=>p.tier===tier);
+    if(!tierPlays.length) return;
+    h += `<div style="font-size:10px;font-weight:700;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;padding:6px 0 2px;">${tier}</div>`;
+    tierPlays.forEach(p => {
+      const isActive = activeIds.includes(p.id);
+      h += `<div onclick="addPlayToPlan(${wkNum},'${pracLbl}','${p.id}')"
+        style="padding:10px 12px;border-radius:10px;border:1px solid ${isActive?'rgba(245,166,35,.4)':'var(--navy3)'};
+        background:${isActive?'rgba(245,166,35,.06)':'var(--navy2)'};cursor:pointer;touch-action:manipulation;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:${isActive?700:500};color:${isActive?'var(--gold)':'var(--white)'};">${p.n}</span>
+              ${isActive?'<span style="font-size:9px;color:var(--gold);font-weight:700;">ACTIVE</span>':''}
+              <span style="font-size:9px;color:var(--g3);">${p.pass?'Pass':'Run'} · ${p.mis} mis.</span>
+            </div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;line-height:1.3;">${(p.desc||p.note||'').substring(0,70)}…</div>
+          </div>
+          <div style="color:var(--gold);font-size:18px;flex-shrink:0;">+</div>
+        </div>
+      </div>`;
+    });
+  });
+
+  h += `</div>`;
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'playpicker';
+  openModal('modal-slot-picker');
+}
+
+function addPlayToPlan(wkNum, pracLbl, playId) {
+  const division = state.division;
+  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const play = bank.find(p=>p.id===playId);
+  if(!play) return;
+
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===wkNum);
+  const pr = wk.prac.find(p=>p.lbl===pracLbl);
+  const blocks = [...getPracBlocks(wk, pr)];
+
+  // Build a team-period block for installing the play
+  const installDesc = [
+    play.formation ? `Formation: ${play.formation}.` : '',
+    play.desc || '',
+    play.note ? `Coach note: ${play.note}` : '',
+  ].filter(Boolean).join(' ');
+
+  blocks.push({
+    t: 'tm',
+    type: 'tm',
+    name: `Play install: ${play.n}`,
+    min: '10-15',
+    time: 12,
+    desc: installDesc || `Walk-through and live reps of ${play.n}. 5 walk-throughs, then 10 live reps at speed.`,
+    cue: play.note || '',
+  });
+
+  savePracBlocks(wk, pr, blocks);
+  closeModal('modal-slot-picker');
+  const el = document.getElementById('prac-content');
+  if(el) renderPracPlans(el);
+  showToast(`${play.n} added to Practice ${pracLbl}`);
+}
+
+
 function openAddCustomDrill() {
   const types = ['wu','sk','tm','gm'];
   const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game/scrimmage'};
@@ -2925,7 +3006,10 @@ function renderPracPlans(el) {
       </div>`;
     });
 
-    h += `<button onclick="openEditBlock(${wk.w},'${pr.lbl}',-1)" style="width:100%;padding:10px;border-radius:8px;border:2px dashed var(--navy3);background:transparent;color:var(--g3);font-size:12px;cursor:pointer;touch-action:manipulation;margin-top:2px;">+ Add block to Practice ${pr.lbl}</button>
+    h += `<div style="display:flex;gap:6px;margin-top:4px;">
+      <button onclick="openEditBlock(${wk.w},'${pr.lbl}',-1)" style="flex:1;padding:10px;border-radius:8px;border:2px dashed var(--navy3);background:transparent;color:var(--g3);font-size:12px;cursor:pointer;touch-action:manipulation;">+ Drill from bank</button>
+      <button onclick="openPlayPicker(${wk.w},'${pr.lbl}')" style="flex:1;padding:10px;border-radius:8px;border:2px dashed rgba(245,166,35,.4);background:transparent;color:var(--gold);font-size:12px;cursor:pointer;touch-action:manipulation;">+ Play install</button>
+    </div>
     </div>`;
   });
 
@@ -3068,33 +3152,28 @@ function savePlanBlockEdit(i) {
   renderPracContent();
   showToast('Block updated!');
 }
-function toggleDrillSelect(id, el) {
+function toggleDrillSelect(id) {
   if(selectedDrillIds.has(id)) {
     selectedDrillIds.delete(id);
-    el.style.borderColor = 'var(--navy3)';
-    el.style.background = 'var(--navy2)';
   } else {
     selectedDrillIds.add(id);
-    el.style.borderColor = 'var(--gold)';
-    el.style.background = 'rgba(245,166,35,.08)';
   }
-  // Update add button
-  const btn = document.getElementById('add-selected-btn');
-  if(btn) {
-    btn.style.display = selectedDrillIds.size > 0 ? '' : 'none';
-    btn.textContent = `+ Add selected (${selectedDrillIds.size})`;
-  }
+  // Re-render the drill bank in place so selection state is accurate
+  const el = document.getElementById('prac-content');
+  if(el && curPracTab === 'drills') renderDrillBank(el);
 }
+
 function addSelectedDrills() {
-  const arr = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
+  if(!selectedDrillIds.size) return;
+  const allDrills = DRILLS.concat(state.customDrills||[]);
+  const arr = state.division==='56' ? (state.customPractice56||(state.customPractice56=[])) : state.customPractice;
   let count = 0;
   selectedDrillIds.forEach(id => {
-    const d = DRILLS.find(dr=>dr.id===id);
-    if(d) { arr.push({...d}); count++; }
+    const d = allDrills.find(dr=>dr.id===id);
+    if(d) { arr.push({...d, type:d.type||d.t||'sk'}); count++; }
   });
   selectedDrillIds.clear();
   save();
-  // Switch to builder tab
   curPracTab = 'builder';
   document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===2));
   const title = document.getElementById('hdr-title');
@@ -3125,13 +3204,13 @@ function renderDrillBank(el) {
   <div class="tab-row" style="margin-bottom:10px;">
     ${cats.map(c=>`<div class="tab ${c===curDrillCat?'active':''}" onclick="setDrillCat('${c}')">${c}</div>`).join('')}
   </div>
-  <!-- Sticky add button — hidden until drills are selected -->
-  <div id="add-selected-btn" onclick="addSelectedDrills()" style="display:none;position:sticky;top:0;z-index:10;background:var(--gold);color:var(--navy);padding:12px;border-radius:10px;text-align:center;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;touch-action:manipulation;box-shadow:0 2px 12px rgba(0,0,0,.3);">+ Add selected (0)</div>
-  <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">Tap a drill to <strong>select</strong> it (checkbox turns gold). Select multiple, then tap <strong>+ Add selected</strong>. Or tap the drill name to view details.</div>`;
+  <!-- Sticky add button — shown when drills are selected -->
+  <div id="add-selected-btn" onclick="addSelectedDrills()" style="display:${selectedDrillIds.size>0?'block':'none'};position:sticky;top:0;z-index:10;background:var(--gold);color:var(--navy);padding:14px;border-radius:10px;text-align:center;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;touch-action:manipulation;box-shadow:0 2px 12px rgba(0,0,0,.3);">+ Add selected (${selectedDrillIds.size}) to builder</div>
+  <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">Tap any drill to select it (turns gold). Select as many as you want, then tap the gold bar above.</div>`;
 
   visible.forEach(d => {
     const isSelected = selectedDrillIds.has(d.id);
-    h += `<div id="dcard-${d.id}" onclick="toggleDrillSelect('${d.id}',this)" style="background:var(--navy2);border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;touch-action:manipulation;${isSelected?'background:rgba(245,166,35,.08);':''}">
+    h += `<div id="dcard-${d.id}" onclick="toggleDrillSelect('${d.id}')" style="background:${isSelected?'rgba(245,166,35,.08)':'var(--navy2)'};border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;touch-action:manipulation;">
       <div style="display:flex;align-items:flex-start;gap:8px;">
         <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};background:${isSelected?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:12px;color:var(--navy);">${isSelected?'✓':''}</div>
         <div style="flex:1;min-width:0;">
