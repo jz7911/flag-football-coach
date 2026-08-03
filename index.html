@@ -2452,7 +2452,7 @@ function loadFDMTemplate(weekIdx) {
 
   // Switch to builder tab
   curPracTab = 'builder';
-  document.querySelectorAll('#pg-practices .tab').forEach((t,i) => t.classList.toggle('active', i===2));
+  document.querySelectorAll('#pg-practices .tab').forEach((t,i) => t.classList.toggle('active', i===1));
   const title = document.getElementById('hdr-title');
   if(title) title.textContent = 'Practice › Practice Builder';
   renderPracContent();
@@ -2669,7 +2669,7 @@ function _confirmAddDrill() {
     save();
     closeModal('modal-slot-picker');
     curPracTab = 'builder';
-    document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===2));
+    document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
     const title = document.getElementById('hdr-title');
     if(title) title.textContent = 'Practice › Builder';
     renderPracContent();
@@ -3158,9 +3158,25 @@ function toggleDrillSelect(id) {
   } else {
     selectedDrillIds.add(id);
   }
-  // Re-render the drill bank in place so selection state is accurate
-  const el = document.getElementById('prac-content');
-  if(el && curPracTab === 'drills') renderDrillBank(el);
+  // Update just the tapped card's visual state — no full re-render
+  const card = document.getElementById('dcard-' + id);
+  if(card) {
+    const sel = selectedDrillIds.has(id);
+    card.style.borderColor = sel ? 'var(--gold)' : 'var(--navy3)';
+    card.style.background  = sel ? 'rgba(245,166,35,.08)' : 'var(--navy2)';
+    const box = card.querySelector('.drill-checkbox');
+    if(box) {
+      box.style.borderColor = sel ? 'var(--gold)' : 'var(--navy3)';
+      box.style.background  = sel ? 'var(--gold)'  : 'transparent';
+      box.textContent = sel ? '✓' : '';
+    }
+  }
+  // Show/hide the sticky bar
+  const btn = document.getElementById('add-selected-btn');
+  if(btn) {
+    btn.style.display = selectedDrillIds.size > 0 ? 'block' : 'none';
+    btn.textContent = `+ Add ${selectedDrillIds.size} drill${selectedDrillIds.size>1?'s':''} to builder`;
+  }
 }
 
 function addSelectedDrills() {
@@ -3174,8 +3190,9 @@ function addSelectedDrills() {
   });
   selectedDrillIds.clear();
   save();
+  // Switch to Builder tab (index 1)
   curPracTab = 'builder';
-  document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===2));
+  document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
   const title = document.getElementById('hdr-title');
   if(title) title.textContent = 'Practice › Builder';
   renderPracContent();
@@ -3212,7 +3229,7 @@ function renderDrillBank(el) {
     const isSelected = selectedDrillIds.has(d.id);
     h += `<div id="dcard-${d.id}" onclick="toggleDrillSelect('${d.id}')" style="background:${isSelected?'rgba(245,166,35,.08)':'var(--navy2)'};border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;touch-action:manipulation;">
       <div style="display:flex;align-items:flex-start;gap:8px;">
-        <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};background:${isSelected?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:12px;color:var(--navy);">${isSelected?'✓':''}</div>
+        <div class="drill-checkbox" style="width:22px;height:22px;border-radius:6px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};background:${isSelected?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:12px;color:var(--navy);">${isSelected?'✓':''}</div>
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
             <span style="font-size:13px;font-weight:600;">${d.name}</span>
@@ -3271,7 +3288,7 @@ function addDrillToPlan() {
   save();
   closeModal('modal-drill-detail');
   curPracTab = 'builder';
-  document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===2));
+  document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
   const title = document.getElementById('hdr-title');
   if(title) title.textContent = 'Practice › Builder';
   renderPracContent();
