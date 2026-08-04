@@ -1575,7 +1575,7 @@ const WINGT_BANK = [
    desc:'Mirror of Bootleg Right. QB boots left. Run both directions so defense can\'t key the boot side.',
    note:'Run against the grain of your power sweep. Defense over-pursues sweep, boot opens.',
    formation:'Under center, boot left'},
-  {id:'wt7',n:'Reverse Right',tier:'Core',mis:'High',pass:false,wk:3,
+  {id:'wt7',n:'Reverse Right',tier:'Core',mis:'Very High',pass:false,wk:3,
    desc:'Eligible T/WR goes in pre-snap motion. QB fakes to wing back going left, hands to T/WR going right. Two fakes.',
    note:'Walk-through 8x before live rep. Clean handoff is critical. Motion man must take the hand decisively.',
    formation:'Pre-snap motion, under center'},
@@ -1595,7 +1595,7 @@ const WINGT_BANK = [
    desc:'Fake HB Sweep Left. QB boots right. Throws deep go route to right eligible T.',
    note:'Run both directions. If defense adjusts to one boot side, the other opens.',
    formation:'Under center, boot opposite sweep'},
-  {id:'wt12',n:'Double Reverse',tier:'Advanced',mis:'Very High',pass:false,wk:2,
+  {id:'wt12',n:'Double Reverse',tier:'Advanced',mis:'Very High',pass:false,wk:5,
    desc:'T1 takes handoff from QB going right. T2 comes from left — T1 hands to T2 going left. Two fakes, maximum confusion.',
    note:'Walk-through 10x before any live rep. 3 consecutive clean reps before using in a game. Once per game max.',
    formation:'Pre-snap motion both sides'},
@@ -5312,6 +5312,7 @@ function autoScriptCallSheet() {
   const s = arr=>[...arr].sort((a,b)=>playScore(b)-playScore(a));
   const base     = s(activePlays.filter(p=>!p.pass&&(p.mis==='Low'||p.mis==='Med')&&(p.tier==='Core'||p.tier==='Intermediate')));
   const counters = s(activePlays.filter(p=>!p.pass&&p.mis==='High'&&p.tier!=='Trick'));
+  const reverses = [];
   const keepers  = s(activePlays.filter(p=>!p.pass&&(p.n.toLowerCase().includes('keep')||p.n.toLowerCase().includes('boot')||p.n.toLowerCase().includes('sneak'))));
   const passes   = s(activePlays.filter(p=>p.pass&&p.mis!=='Very High'));
   const tricks   = s(activePlays.filter(p=>p.mis==='Very High'||p.tier==='Trick'));
