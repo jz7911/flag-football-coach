@@ -1871,6 +1871,7 @@ const TIPS = [
 // ════════════════════════════════════════════
 // PRACTICE PLANS DATA
 // ════════════════════════════════════════════
+const SNAP_BLOCK = {t:'sk',min:'15-22',name:'Daily snap and skill reps',desc:'5 under-center snaps (C and QB, cue: low hips fire the ball). 5 shotgun snaps. 10 partner passes (thumbs-in/out cue). 5 fake handoff reps — both players commit fully. Same every practice. Motor memory through repetition.'};
 const WU_BLOCK = {t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed — ends the warm-up, launches into practice energy). Same every day. Never skip or abbreviate.'};
 const SM_BLOCK = {t:'gm',min:'63–75',name:'Sharks & Minnows — end every practice here',desc:'Every practice ends with Sharks & Minnows. Minnows cross end zone to end zone without flag pulled. Sharks start in the middle. Pulled minnows become sharks. Last minnow standing wins. This is the reward for a hard practice — end on a high every time.'};
 
@@ -5406,7 +5407,7 @@ function printCallSheet() {
   const division = state.division;
   const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
   const sheet = getCallSheet();
-  const plays = sheet.map(id=>bank.find(p=>p.id===id)).filter(Boolean);
+  const plays = sheet.map(s=>bank.find(p=>p.id===(typeof s==='string'?s:s.id))).filter(Boolean);
   const gameNum = activeGames().length+1;
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -5667,7 +5668,7 @@ function renderGameDay() {
   const division = state.division;
   const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
   const sheet = getCallSheet();
-  const plays = sheet.map(id=>bank.find(p=>p.id===id)).filter(Boolean);
+  const plays = sheet.map(s=>bank.find(p=>p.id===(typeof s==='string'?s:s.id))).filter(Boolean);
   const roster = activeRoster();
   const gameNum = activeGames().length+1;
   const gameRoster = activeGameRosters().find(r=>r.gameNum===gameNum);
