@@ -6040,29 +6040,31 @@ let curDepthSide = 'offense';
 function autoDepthChart() {
   const roster = activeRoster();
   if(!roster.length) return;
-  // Map our position scores to depth chart slots
+
   const posMap = {
     'QB':'QB','RB':'RB','RB1':'RB','RB2':'RB',
+    'Left Back':'RB','Right Back':'RB',
     'Left T (WR)':'Receiver','Right T (WR)':'Receiver',
     'Left Guard':'OL','Right Guard':'OL','Center':'Center',
     'Left DE':'DE','Right DE':'DE','Left DT':'DT','Right DT':'DT',
-    'Left ILB':'ILB','Right ILB':'ILB','Left OLB':'OLB','Right OLB':'OLB'
+    'Left ILB':'ILB','Right ILB':'ILB','Left OLB':'OLB','Right OLB':'OLB',
+    'Left DL':'DE','Right DL':'DE',
+    'Left LB':'OLB','Right LB':'OLB','Middle LB':'ILB','Deep LB':'DB'
   };
 
-  if(!activeDepthChart()) { if(state.division==='56') state.depthChart56={}; else state.depthChart={}; }
-
-  const dc = activeDepthChart();
   const is56 = state.division==='56';
-  if(is56) { if(!state.depthChart56) state.depthChart56={}; } else { if(!state.depthChart) state.depthChart={}; }
+  if(is56) { state.depthChart56 = {}; } else { state.depthChart = {}; }
+  const dc = activeDepthChart();
+
   const offPos = is56 ? DEPTH_POSITIONS_56.offense : DEPTH_POSITIONS.offense;
   const defPos = is56 ? DEPTH_POSITIONS_56.defense : DEPTH_POSITIONS.defense;
+
   [...offPos,...defPos].forEach(slot => {
-    if(dc[slot]) return; // don't overwrite manual assignments
-    const basePos = posMap[slot];
+    const basePos = posMap[slot] || 'OL';
     const ranked = [...roster]
-      .map((p,i)=>({idx:i,score:posScore(p.skills, basePos)}))
-      .sort((a,b)=>b.score-a.score);
-    dc[slot] = ranked.slice(0,3).map(r=>r.idx);
+      .map((p,i) => ({idx:i, score:posScore(p.skills, basePos)}))
+      .sort((a,b) => b.score - a.score);
+    dc[slot] = ranked.slice(0,3).map(r => r.idx);
   });
   save();
 }
@@ -6672,6 +6674,29 @@ function lockRoster(gameNum) {
   }
 }
 
+function generateAllRosters() {
+  const roster = activeRoster();
+  if(!roster.length) { alert('Add players to your roster first.'); return; }
+  const rosters = activeGameRosters();
+  // Clear all unlocked rosters and regenerate
+  const totalGames = 10;
+  let generated = 0;
+  for(let g = 1; g <= totalGames; g++) {
+    const existing = rosters.find(r => r.gameNum === g);
+    if(existing && existing.locked) continue; // never touch locked
+    const fresh = generateGameRoster(g);
+    if(fresh) {
+      const idx = rosters.findIndex(r => r.gameNum === g);
+      if(idx > -1) rosters[idx] = fresh;
+      else rosters.push(fresh);
+      generated++;
+    }
+  }
+  save();
+  renderDepthContent();
+  showToast(generated + ' game rosters generated from ratings');
+}
+
 function regenerateRoster(gameNum) {
   const rosters = activeGameRosters();
   const idx = rosters.findIndex(r=>r.gameNum===gameNum);
@@ -6768,6 +6793,9 @@ function renderAutoRoster(el) {
       ${outPlayers.length?`<span style="color:var(--red);margin-right:10px;">✗ Out: ${outPlayers.map(p=>p.name.split(' ')[0]).join(', ')}</span>`:''}
       ${limitedPlayers.length?`<span style="color:var(--amber);">~ Limited: ${limitedPlayers.map(p=>p.name.split(' ')[0]).join(', ')}</span>`:''}
     </div>`:''}
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="generateAllRosters()" class="btn btn-gold" style="flex:1;min-height:44px;">⚡ Generate all rosters from ratings</button>
+    </div>
   </div>`;
 
   // QB rotation overview
