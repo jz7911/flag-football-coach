@@ -2704,8 +2704,11 @@ function sharePracticePlan() {
   let text = 'PRACTICE PLAN -- WEEK ' + wk.w + ': ' + wk.theme.toUpperCase() + '\n' + '='.repeat(50) + '\n\n';
   wk.prac.forEach(pr => {
     text += '\n--- ' + pr.lbl + ' (75 min) ---\n';
-    getPracBlocks(wk, pr).forEach(b => {
-      text += '\n[' + (tl[b.t]||b.t.toUpperCase()) + '] min ' + b.min + '\n' + b.name + '\n';
+    getPracBlocks(wk, pr).filter(Boolean).forEach(b => {
+      const btype = tl[b.t] || (b.t ? String(b.t).toUpperCase() : 'BLOCK');
+      const bmin = b.min || b.time || '';
+      const bname = b.name || '(unnamed)';
+      text += '\n[' + btype + '] min ' + bmin + '\n' + bname + '\n';
       if(b.stations) {
         b.stations.forEach(function(s,i){ text += '  S'+(i+1)+': '+s+'\n'; });
       } else {
@@ -3259,6 +3262,7 @@ function saveCustomDrill() {
 
 
 function renderStations(b) {
+  if(!b) return '';
   if(!b.stations || !b.stations.length) {
     const desc = b.desc || '';
     return '<div style="font-size:11px;color:var(--g3);line-height:1.5;">' + (desc.length>120?desc.substring(0,120)+'…':desc) + '</div>';
@@ -6204,25 +6208,29 @@ function printPracticePlan() {
 
   wk.prac.forEach(pr => {
     html += `<div class="practice"><div class="practice-hdr">Practice ${pr.lbl}</div>`;
-    getPracBlocks(wk, pr).forEach(b => {
+    getPracBlocks(wk, pr).filter(Boolean).forEach(b => {
       const color = tc[b.t] || '#666';
-      html += `<div class="block">
-        <div class="block-type" style="background:${color};color:#fff;">${tl[b.t]||b.t.toUpperCase()}</div>
-        <div class="block-time">${b.min} min</div>
-        <div class="block-content">
-          <div class="block-name">${b.name}</div>
-          ${b.stations
-            ? b.stations.map((s,i)=>{
-                const sc=['#d97706','#16a34a','#2563eb'][i]||'#666';
-                const sl=['S1 — YOU','S2 — ASST 1','S3 — ASST 2'][i]||'S'+(i+1);
-                return `<div style="margin-top:5px;padding:4px 6px;border-left:3px solid ${sc};background:#f9f9f9;">
-                  <div style="font-size:10px;font-weight:700;color:${sc};">${sl}</div>
-                  <div class="block-desc">${s.replace(/^S\d\s*[-—]\s*(YOU|ASST \d)\s*[-—]\s*/i,'')}</div>
-                </div>`;
-              }).join('')
-            : `<div class="block-desc">${b.desc}</div>`}
-        </div>
-      </div>`;
+      const btype = tl[b.t] || (b.t ? String(b.t).toUpperCase() : 'BLOCK');
+      const bmin = b.min || b.time || '';
+      const bname = b.name || '(unnamed)';
+      const bdesc = b.desc || '';
+      html += '<div class="block">'
+        + '<div class="block-type" style="background:'+color+';color:#fff;">'+btype+'</div>'
+        + '<div class="block-time">'+bmin+' min</div>'
+        + '<div class="block-content">'
+        + '<div class="block-name">'+bname+'</div>';
+      if(b.stations && b.stations.length) {
+        const sc=['#d97706','#16a34a','#2563eb'];
+        const sl=['S1 — YOU','S2 — ASST 1','S3 — ASST 2'];
+        b.stations.forEach(function(s,i){
+          html += '<div style="margin-top:5px;padding:4px 6px;border-left:3px solid '+(sc[i]||'#666')+';background:#f9f9f9;">'
+            + '<div style="font-size:10px;font-weight:700;color:'+(sc[i]||'#666')+'">'+(sl[i]||'S'+(i+1))+'</div>'
+            + '<div class="block-desc">'+(s||'')+'</div></div>';
+        });
+      } else {
+        html += '<div class="block-desc">'+bdesc+'</div>';
+      }
+      html += '</div></div>';
     });
     html += '</div>';
   });
