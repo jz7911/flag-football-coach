@@ -2698,8 +2698,9 @@ function sharePracticePlan() {
   try {
   const plans = getActivePracticePlans();
   const wk = plans.find(p=>p.w===curPracWeek);
-  if(!wk) { alert('Week ' + curPracWeek + ' not found in plans.'); return; }
-  const tl={wu:'WARM-UP',sk:'SKILL',tm:'TEAM',gm:'GAME'};
+  if(!wk) { alert('Week ' + curPracWeek + ' not found. Plans has ' + plans.length + ' weeks: ' + plans.map(p=>p.w).join(',')); return; }
+  const theme = wk.theme || wk.phase || ('Week ' + wk.w);
+  if(!theme || theme === ('Week ' + wk.w)) { console.log('Week ' + wk.w + ' object:', JSON.stringify(Object.keys(wk))); }
   let text = 'PRACTICE PLAN -- WEEK ' + wk.w + ': ' + wk.theme.toUpperCase() + '\n' + '='.repeat(50) + '\n\n';
   wk.prac.forEach(pr => {
     text += '\n--- ' + pr.lbl + ' (75 min) ---\n';
@@ -6169,6 +6170,7 @@ function printPracticePlan() {
   if(!wk) return;
   const charTheme = CHARACTER_THEMES[(curPracWeek-1) % CHARACTER_THEMES.length];
   const divLabel = state.division==='56' ? '5/6 Division' : '7/8 Division';
+  const theme = wk.theme || wk.phase || ('Week ' + wk.w);
   const tl = {wu:'WARM-UP',sk:'SKILL WORK',tm:'TEAM',gm:'GAME/SCRIMMAGE'};
   const tc = {wu:'#16a34a',sk:'#2563eb',tm:'#9333ea',gm:'#dc2626'};
 
@@ -6193,7 +6195,7 @@ function printPracticePlan() {
   </style></head>
   <body onload="window.print()">
   <div class="header">
-    <h1>Practice Plan — Week ${wk.w}: ${wk.theme}</h1>
+    <h1>Practice Plan — Week ${wk.w}: ${theme}</h1>
     <div class="sub">${divLabel} · ${new Date().toLocaleDateString()} · Buffalo Grove Park District Flag Football</div>
   </div>
   <div class="theme-box">
