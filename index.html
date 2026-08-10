@@ -2711,7 +2711,7 @@ ${'='.repeat(50)}
       text += `
 [${tl[b.t]||b.t.toUpperCase()}] min ${b.min}
 ${b.name}
-${b.desc}
+${b.stations ? b.stations.map((s,i)=>('  '+s)).join('\n') : b.desc}
 `;
     });
   });
@@ -3283,7 +3283,7 @@ function renderPracPlans(el) {
     </div>
     <div style="padding:7px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;margin-bottom:6px;">
       <div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;">CHARACTER THEME — ${charTheme.theme}</div>
-      <div style="font-size:11px;color:var(--g3);">${charTheme.tip}</div>
+      <div style="font-size:11px;color:var(--g3);">${(charTheme.tip||'').replace(/'/g,'\u2019')}</div>
     </div>
     <div style="font-size:10px;color:var(--g3);font-style:italic;line-height:1.4;">${fdmNote}</div>
   </div>`;
@@ -6189,7 +6189,16 @@ function printPracticePlan() {
         <div class="block-time">${b.min} min</div>
         <div class="block-content">
           <div class="block-name">${b.name}</div>
-          <div class="block-desc">${b.desc}</div>
+          ${b.stations
+            ? b.stations.map((s,i)=>{
+                const sc=['#d97706','#16a34a','#2563eb'][i]||'#666';
+                const sl=['S1 — YOU','S2 — ASST 1','S3 — ASST 2'][i]||'S'+(i+1);
+                return `<div style="margin-top:5px;padding:4px 6px;border-left:3px solid ${sc};background:#f9f9f9;">
+                  <div style="font-size:10px;font-weight:700;color:${sc};">${sl}</div>
+                  <div class="block-desc">${s.replace(/^S\d\s*[-—]\s*(YOU|ASST \d)\s*[-—]\s*/i,'')}</div>
+                </div>`;
+              }).join('')
+            : `<div class="block-desc">${b.desc}</div>`}
         </div>
       </div>`;
     });
