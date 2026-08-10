@@ -2329,7 +2329,7 @@ const PRACTICE_PLANS = [
      cue:'Play fast. Have fun. Everything you need is already in you.'},
     SM_BLOCK]}
 ]},
-{w:4,phase:'Development',theme:'Post-Game 1 fixes + Play-Action unlock',prac:[
+{w:5,phase:'Development',theme:'Post-Game 1 fixes + Play-Action unlock',prac:[
   {lbl:'4A',blocks:[WU_BLOCK,
     {t:'sk',min:'12–24',name:'Fix the top 2 things from Game 1',desc:'Address specific breakdowns. Common: false starts, LBs cheating, QB holding ball too long. 10 targeted reps each fix.'},
     {t:'sk',min:'24–37',name:'Play 9 — Play-Action Deep + QB Draw Keeper',desc:'PA Deep: fake HB Sweep → QB boots → deep go. QB Draw Keeper: drop back like a pass, tuck and run middle. Walk-through 6x each. For experienced players.'},
@@ -2341,7 +2341,7 @@ const PRACTICE_PLANS = [
     {t:'gm',min:'38–63',name:'Pass-heavy scrimmage + celebration culture',desc:'Must throw on 3 of 4 plays. Every TD: full team celebration. Every big defensive stop: team reacts together.'},
     SM_BLOCK]}
 ]},
-{w:5,phase:'Development',theme:'Pistol Spread intro + Double Reverse',prac:[
+{w:6,phase:'Development',theme:'Pistol Spread intro + Double Reverse',prac:[
   {lbl:'5A',blocks:[WU_BLOCK,
     {t:'sk',min:'12–26',name:'Pistol Spread formation intro (8 players)',desc:'QB 2 yards behind C. Both Ts split wide. Slot WR outside left T. RB beside QB. Walk through all 8 positions, alignment, and shotgun snap. This is your second system.'},
     {t:'sk',min:'26–38',name:'Play 10 — Double Reverse (walk-through only)',desc:'T1 gets handoff going right. T2 comes from left — T1 hands to T2. 10 walk-throughs only. 3 clean reps before any live use.'},
@@ -2354,7 +2354,7 @@ const PRACTICE_PLANS = [
     {t:'gm',min:'37–63',name:'Full scrimmage: touch rotation check',desc:'Rotate ball carriers. Check Touch Tracker. Anyone overdue for a carry gets one. No exceptions.'},
     SM_BLOCK]}
 ]},
-{w:6,phase:'Development',theme:'Pass game 50/50 + 2-minute drill',prac:[
+{w:7,phase:'Development',theme:'Pass game 50/50 + 2-minute drill',prac:[
   {lbl:'6A',blocks:[WU_BLOCK,
     {t:'sk',min:'12–26',name:'Pistol pass package + Reverse Fake Bootleg',desc:'Pistol: Out Route and Go Route installs. Wing-T: Reverse Fake Bootleg (fake reverse, QB boots opposite). QB reads safety pre-snap.'},
     {t:'sk',min:'26–38',name:'2-minute drill install',desc:'Down 8, 2 min left. Pistol spread. Fast to LOS. Quick routes. 5 full-pace 4-play series. Urgency is a skill.'},
@@ -2366,7 +2366,7 @@ const PRACTICE_PLANS = [
     {t:'gm',min:'50–63',name:'Full game sim + defensive packages',desc:'Zone then man coverage. Both systems on offense. Full rules.'},
     SM_BLOCK]}
 ]},
-{w:7,phase:'Development',theme:'Wing Seam + full two-system fluency',prac:[
+{w:8,phase:'Development',theme:'Wing Seam + full two-system fluency',prac:[
   {lbl:'7A',blocks:[WU_BLOCK,
     {t:'sk',min:'12–26',name:'Wing Seam + Pistol Mesh + Belly Keep Pass Option',desc:'Wing seam: set up with curls, attack seam. Pistol mesh: crossing routes. Belly Keep Pass Option: fake FB dive, fake keep run, throwback pass. Three plays with max misdirection.'},
     {t:'sk',min:'26–38',name:'Counter to the counter (both systems)',desc:'Wing-T: fake reverse, QB keeps same direction as original sweep. Pistol: fake zone read, QB draws middle. Punishes over-pursuit.'},
@@ -3276,7 +3276,7 @@ function renderPracPlans(el) {
         <span style="font-size:14px;font-weight:600;line-height:1.3;">${wk.theme}</span>
       </div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;">
-        ${hasOverrides?`<button onclick="if(confirm('Reset Week ${wk.w} to the original plan?')){wk.prac.forEach(pr=>resetPracBlocks(wk,pr))}" class="btn btn-sm" style="font-size:10px;color:var(--g3);">↺ Reset</button>`:''}
+        ${hasOverrides?'<button onclick="wk.prac.forEach(function(pr){resetPracBlocks(wk,pr)})" class="btn btn-sm" style="font-size:10px;color:var(--g3);">↺ Reset</button>':''}
         <button onclick="sharePracticePlan()" class="btn btn-sm" style="font-size:11px;">📤</button>
         <button onclick="printPracticePlan()" class="btn btn-sm" style="font-size:11px;">🖨️</button>
       </div>
