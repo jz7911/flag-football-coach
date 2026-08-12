@@ -5283,16 +5283,20 @@ function renderCallSheet(el) {
   };
 
   const possLabels = [
-    'Possession 1 — Introduce your system. Establish the base. Read their response.',
-    'Possession 2 — You know their tendency. Exploit it directly.',
-    'Possession 3 — They have no answers. Finish with conviction.'];
+    'Possession 1 — Establish the base. Read their response. Shanahan: run before you pass.',
+    'Possession 2 — You know their tendency. Johnson: call the constraint that punishes it.',
+    'Possession 3 — Full information. McVay: motion reveals if they adjusted since P1.',
+    'Possession 4 — Double what worked. Abandon what did not. Johnson: never same look twice.',
+    'Possession 5 — Hammer. Walsh: by P5 you know exactly what this defense does.',
+    'Possession 6 — Finish. Walsh: closer decided before kickoff. No decisions under pressure.',
+  ];
 
   let h = `<div class="card card-gold" style="margin-bottom:10px;">
     <div class="card-title">Game ${gameNum} call sheet</div>
-    <div class="card-sub">15 scripted calls. The same play appears multiple times — each for a different reason. Read the cue before each call.</div>
+    <div class="card-sub">30 scripted calls across 6 possessions. Same plays repeat — each for a different reason. Read the cue before every call.</div>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-    <button onclick="autoScriptCallSheet()" class="btn btn-gold" style="flex:1;font-size:13px;min-height:48px;">⚡ Auto-Script 15 plays</button>
+    <button onclick="autoScriptCallSheet()" class="btn btn-gold" style="flex:1;font-size:13px;min-height:48px;">⚡ Auto-Script 30 plays</button>
     ${normalized.length?`<button onclick="printCallSheet()" class="btn btn-sm" style="min-height:48px;">🖨️ Print</button>
     <button onclick="clearCallSheet()" class="btn btn-danger btn-sm" style="min-height:48px;">Clear</button>`:''}
   </div>`;
@@ -5420,6 +5424,7 @@ function autoScriptCallSheet() {
 
   if(!activePlays.length){ alert('Add plays to your Active Playbook first.'); return; }
 
+  // ── SCORING ───────────────────────────────────────────────────
   function playScore(p) {
     let score = 0;
     const stats = getPlayStats(p.id);
@@ -5438,97 +5443,193 @@ function autoScriptCallSheet() {
   }
 
   const s = arr=>[...arr].sort((a,b)=>playScore(b)-playScore(a));
-  const base     = s(activePlays.filter(p=>!p.pass&&(p.mis==='Low'||p.mis==='Med')&&(p.tier==='Core'||p.tier==='Intermediate')));
-  const counters = s(activePlays.filter(p=>!p.pass&&p.mis==='High'&&p.tier!=='Trick'));
-  const reverses = [];
-  const keepers  = s(activePlays.filter(p=>!p.pass&&(p.n.toLowerCase().includes('keep')||p.n.toLowerCase().includes('boot')||p.n.toLowerCase().includes('sneak'))));
-  const passes   = s(activePlays.filter(p=>p.pass&&p.mis!=='Very High'));
-  const tricks   = s(activePlays.filter(p=>p.mis==='Very High'||p.tier==='Trick'));
-  const all      = s(activePlays);
+
+  // ── CATEGORIZATION ────────────────────────────────────────────
+  // Base: sweeps, dives — run until they stop it (Shanahan: commit to the run first)
+  const base    = s(activePlays.filter(p=>!p.pass&&(p.mis==='Low'||p.mis==='Med')&&(p.tier==='Core'||p.tier==='Intermediate')));
+  // Counters: punish over-pursuit on base (constraint theory)
+  const counters= s(activePlays.filter(p=>!p.pass&&p.mis==='High'&&p.tier!=='Trick'&&!p.n.toLowerCase().includes('reverse')));
+  // Keepers: QB as third threat once both backs are accounted for
+  const keepers = s(activePlays.filter(p=>!p.pass&&(p.n.toLowerCase().includes('keep')||p.n.toLowerCase().includes('boot')||p.n.toLowerCase().includes('sneak'))));
+  // Passes: Shanahan rule — never before run is established; Johnson: 30-36% rate
+  const passes  = s(activePlays.filter(p=>p.pass&&p.mis!=='Very High'));
+  // Reverses: motion play, use once per game max — McVay: motion reveals man vs zone
+  const reverses= s(activePlays.filter(p=>p.n.toLowerCase().includes('reverse')||p.mis==='Very High'&&!p.pass));
+  // All sorted
+  const all     = s(activePlays);
 
   const best   = (...arrs) => { for(const a of arrs) if(a.length) return a[0]; return null; };
   const second = (...arrs) => { for(const a of arrs) if(a.length>1) return a[1]; for(const a of arrs) if(a.length) return a[0]; return null; };
-  const notSame = (arr,p) => arr.filter(x=>!p||x.id!==p.id);
+  const notSame= (arr,...excl) => arr.filter(x=>!excl.some(e=>e&&x.id===e.id));
+
+  // ── 30-PLAY SCRIPT: 6 POSSESSIONS × 5 PLAYS ──────────────────
+  //
+  // Research basis:
+  // McVay:    motion reveals defense pre-snap — motion plays go EARLY every possession
+  // Shanahan: run before pass, ALWAYS — no pass until run is proven this possession
+  //           OL blocking must look identical on runs and passes
+  // Johnson:  after each possession, call the constraint that punishes what defense took away
+  //           never let them settle — if they adjusted, you already have the answer
+  // Walsh:    script all 30 before game — think clearly Thursday, execute Saturday
 
   const script = [];
-  const add = (p,role,cue) => { if(p) script.push({id:p.id,role,cue}); };
+  const add = (p, role, cue) => { if(p) script.push({id:p.id, role, cue}); };
 
-  // ── POSSESSION 1: ESTABLISH ──────────────────────────────────
-  // Goal: make them commit to an answer. The same plays return in possessions 2 and 3
-  // to exploit whatever answer they chose.
+  // Track what we called to apply Johnson adjustment principle across possessions
+  let sw1, sw2, ct1, ps1, ps2, ps3, kp1, rv1;
 
-  const sw1 = best(base, all);
+  // ══════════════════════════════════════════════════════════════
+  // POSSESSION 1 — Introduction: establish the base, read the defense
+  // McVay: first motion play reveals man vs zone for the rest of the game
+  // Shanahan: run it until they prove they can stop it
+  // ══════════════════════════════════════════════════════════════
+
+  sw1 = best(base, all);
   add(sw1, 'ESTABLISH',
-    'Run this. Watch how they defend it. Every counter today is built on how they answer this play.');
+    'Run this. Watch how they defend it. Every call today is built on how they answer this play. Note: do defenders follow motion?');
 
-  const sw2 = second(base) || sw1;
+  sw2 = best(notSame(base,sw1), all) || sw1;
   add(sw2, 'OPPOSITE SIDE',
-    `They adjusted to stop ${sw1?sw1.n.split(' ')[0]:'that play'}. Hit the other edge. Force them to defend the whole field.`);
+    'Other edge. Force them to defend the whole field. If they shifted to stop '+( sw1?sw1.n.split(' ')[0]:'that')+' the other side is open.');
 
-  const ct1 = best(counters, keepers, all);
+  ct1 = best(counters, keepers, all);
   add(ct1, 'COUNTER',
-    `They committed to stop the sweep. They are now out of position. Hit directly behind their over-pursuit.`);
+    'They committed to stop the sweep. They moved out of position. Hit directly behind their over-pursuit. This is why you ran the sweep twice first.');
 
-  const ps1 = best(passes, tricks, all);
-  add(ps1, ps1&&ps1.pass?'PASS SHOT':'TRICK',
-    ps1&&ps1.pass
-      ? 'First pass of the game. They are set for the run. Throw before they get into pass coverage.'
-      : 'Walsh: use specials early while the defense is still figuring out your system.');
+  ps1 = best(passes, all);
+  add(ps1, ps1&&ps1.pass?'PASS SHOT':'CONSTRAINT',
+    'Shanahan rule: never throw until the run is proven. You ran it twice and they stopped it. Now they are set for the run — throw before they rotate. First pass of the game.');
 
   add(sw1, 'RE-ESTABLISH',
-    `End possession 1 back on the base sweep. Make them keep respecting it going into possession 2.`);
+    'End possession 1 back on the base. Make them keep respecting the sweep going into possession 2. They just saw a pass — now run it again.');
 
-  // ── POSSESSION 2: EXPLOIT ─────────────────────────────────────
-  // Goal: by now you know their tendency. Call plays that specifically punish it.
+  // ══════════════════════════════════════════════════════════════
+  // POSSESSION 2 — Exploit: you know their tendency now, punish it
+  // Johnson: after possession 1, what did the defense take away?
+  // If they stopped the sweep → counter opens. If they gave sweep → keep running.
+  // ══════════════════════════════════════════════════════════════
 
-  const ct2 = best(counters, keepers, all);
-  add(ct2, 'OPEN WITH COUNTER',
-    'Open possession 2 with the counter NOT the sweep. They expect the sweep. Hit behind their anticipation.');
+  kp1 = best(keepers, all);
+  add(kp1, 'OPEN WITH QB',
+    'Johnson principle: open possession 2 with something they did not see in P1. They expect the sweep. QB keeper — third threat. They forgot about the QB.');
 
   add(sw1, 'PUNCH BACK',
-    `Counter opened the edge. Now come back to ${sw1?sw1.n.split(' ')[0]:'the base'}. They over-corrected. This should go big.`);
+    'Counter opened the edge. Now come back to '+(sw1?sw1.n.split(' ')[0]:'the base')+'. They over-corrected. This should go big.');
 
-  const ps2 = best(notSame(passes,ps1), passes, all);
+  ps2 = best(notSame(passes,ps1), passes, all);
   add(ps2, 'PLAY ACTION',
-    'They sold out to stop the run this possession. Throw it. This is the window you set up with possessions 1 and 2.');
+    'Shanahan: the run sets up the pass. They sold out to stop the run this possession. OL blocked identical to the run — throw behind the LB. This is the window the run created.');
 
-  const ct3 = best(notSame([...counters,...keepers],ct2), counters, keepers, all);
-  add(ct3, 'MISDIRECTION',
-    'Back to the run after the pass. They adjusted for pass — the counter is wide open again.');
+  add(ct1, 'COUNTER 2',
+    'Back to the run after the pass. They adjusted for pass — the counter is open again. Johnson: call the constraint that punishes what they gave up.');
 
-  const kp1 = best(keepers, notSame(counters,ct1), all);
-  add(kp1, 'QB THREAT',
-    'QB keeps. They have been accounting for both backs. They forgot about the QB — that is the third option that unlocks everything.');
+  add(sw2, 'CLOSE POSSESSION',
+    'End on the base. Make them defend both sides again before possession 3. Never let them settle into a single read.');
 
-  // ── POSSESSION 3: FINISH ─────────────────────────────────────
-  // Goal: full information advantage. Call with total conviction.
+  // ══════════════════════════════════════════════════════════════
+  // POSSESSION 3 — Tighten: full information, call with conviction
+  // McVay: motion play here reveals if they adjusted their coverage since P1
+  // ══════════════════════════════════════════════════════════════
 
-  add(sw2, 'OPPOSITE SIDE',
-    `By now they have shifted back to stop ${sw1?sw1.n.split(' ')[0]:'your main sweep'}. The other side is open. Take it.`);
+  const ct2 = best(notSame(counters,ct1), counters, all);
+  add(ct2, 'MISDIRECTION',
+    'Open P3 with a different counter. They have seen ct1 twice — hit them from a new angle. They do not know which counter is coming.');
 
-  add(ct1, 'PUNCH',
-    'Counter again. By possession 3 the defense has seen the sweep 4 times. They are reacting hard. Step behind them.');
+  add(sw1, 'RE-ESTABLISH BASE',
+    'Back to the sweep. After counters and passes they have been reacting to you. Reset. Make them prove they can stop the base again.');
 
-  const tr1 = best(tricks, notSame(passes,ps1,ps2), all);
-  add(tr1, tr1&&(tr1.mis==='Very High'||tr1.tier==='Trick')?'TRICK PLAY':'PASS SHOT',
-    tr1&&tr1.pass
-      ? 'Third pass window. This is the one you have been setting up all game. Call it with full conviction.'
-      : 'Big trick play. Possession 3. Maximum confusion — they do not know what is coming.');
+  ps3 = best(notSame(passes,ps1,ps2), passes, all);
+  add(ps3, ps3&&ps3.pass?'PASS SHOT 3':'MISDIRECTION',
+    ps3&&ps3.pass
+      ? 'Third pass. Different concept from P1 and P2. McVay principle: same motion, different play. Defense adjusted to your first two passes — this one hits behind that adjustment.'
+      : 'Misdirection. By possession 3 the defense has no clean read on you.');
 
-  add(sw1, 'CLOSE OUT',
-    `${sw1?sw1.n:''} again. By play 14 they are chasing counters and passes. The base sweep is open again. Trust it.`);
+  add(ct1, 'EXPLOIT',
+    'They have been adjusting to your passes. The counter is wide open again. Johnson: after every pass adjustment, the counter behind it is automatically available.');
 
-  // Play 15: THE CLOSER — Walsh: decide this before the game. No decisions under pressure.
-  const closer = best(notSame([...counters,...keepers],ct1,ct2), passes, counters, all);
-  add(closer, 'CLOSER',
-    'Pre-decided before the game. When you need a score right now — this is the call. You chose it on Thursday. No hesitation.');
+  rv1 = best(reverses, all);
+  add(rv1, 'REVERSE / TRICK',
+    'McVay: motion reveals man vs zone. If they follow the motion — keep it. If they do not — this goes for big yards. Only call if defense is chasing. Possession 3 is the right moment.');
 
+  // ══════════════════════════════════════════════════════════════
+  // POSSESSION 4 — Adjust: what has worked? Double it. What has not? Abandon it.
+  // Johnson: never call the same look twice. Teams spend prep on concepts they will never see again.
+  // ══════════════════════════════════════════════════════════════
+
+  add(sw2, 'OPPOSITE BASE',
+    'By now they have shifted to your primary sweep. The other side is open. Four possessions in — they cannot cover both edges plus the QB plus the pass.');
+
+  const ct3 = best(notSame(counters,ct1,ct2), counters, keepers, all);
+  add(ct3, 'NEW COUNTER',
+    'Third different counter. Johnson principle: never call the same look twice. They have prepped for your first two — this one they have not seen. Call it with conviction.');
+
+  const kp2 = best(notSame(keepers,kp1), keepers, all);
+  add(kp2, 'QB KEEPER 2',
+    'Back to the QB keeper. In possession 2 this opened the edge. By possession 4 the defense has forgotten about it. Take it again.');
+
+  add(ps1, 'REPEAT PASS 1',
+    'Same pass concept as possession 1. Johnson: if it worked once and defense has not specifically adjusted for it — run it again. They cannot adjust to everything at once.');
+
+  add(sw1, 'CLOSE WITH BASE',
+    'End possession 4 on the base sweep. You own this play. Every defender knows it is coming and you are still getting yards. That is dominance.');
+
+  // ══════════════════════════════════════════════════════════════
+  // POSSESSION 5 — Hammer: most productive plays from P1-P4
+  // Walsh: by possession 5 you have complete information. Call what you know works.
+  // ══════════════════════════════════════════════════════════════
+
+  add(ct1, 'HAMMER',
+    'Walsh principle: by possession 5 you know exactly what this defense does. This counter has worked all game. Call it with zero hesitation. They know it is coming and cannot stop it.');
+
+  add(sw1, 'BASE',
+    'The base sweep. Four possessions of setup have made this play unstoppable. Trust the system.');
+
+  const rv2 = best(notSame(reverses,rv1), reverses, all);
+  add(rv2||rv1, 'TRICK 2',
+    'Second trick play. McVay: you have been setting this up for four possessions. Defense has been watching for your base plays — they forgot this exists.');
+
+  add(ps2, 'PLAY ACTION 2',
+    'Same play action concept as possession 2. They adjusted for it in P3 but relaxed by P5. This is the second window. Shanahan: the run always opens the pass.');
+
+  add(ct2, 'CLOSE STRONG',
+    'The misdirection counter from possession 3. Close possession 5 strong. Defense is tired of chasing. Hit behind their fatigue.');
+
+  // ══════════════════════════════════════════════════════════════
+  // POSSESSION 6 — Finish: every play for a reason, no improvising
+  // Walsh: know your closer before kickoff. No decisions under pressure.
+  // Johnson: the final possession is where preparation beats athleticism.
+  // ══════════════════════════════════════════════════════════════
+
+  add(sw2, 'FINAL OPPOSITE',
+    'Open the final possession on the other edge. By now they are completely focused on your primary sweep. This side is wide open. Take it.');
+
+  add(ct1, 'FINAL COUNTER',
+    'This counter has been your best play all game. Call it one more time. Johnson: the plays that worked in possession 1 still work in possession 6 if you call them right.');
+
+  add(kp1, 'FINAL QB',
+    'QB keeper to close the run game. You have established every run threat. The defense has to account for all of them. The QB keeper is always available because of the setup.');
+
+  ps3 = ps3 || ps1;
+  add(ps3, 'FINAL PASS',
+    'Last pass of the game. Six possessions of run setup have made this throw as open as it will ever be. Throw it on time. Shanahan: you earn the pass by committing to the run.');
+
+  // Play 30: THE CLOSER — decided before the game, called without hesitation
+  const closer = best(
+    notSame(all, sw1, sw2, ct1, ct2, ps1, ps2),
+    notSame(base, sw1, sw2),
+    base, counters, all
+  );
+  add(closer||sw1, 'CLOSER',
+    'Walsh: your closer is decided on Thursday. When you need a score right now — this is the call. No hesitation, no second-guessing. You chose this before the game.');
+
+  // ── SAVE ─────────────────────────────────────────────────────
   if(!state.callSheet) state.callSheet={'78':[],'56':[]};
   state.callSheet[division] = script;
   save();
   renderPbContent();
-  showToast('Scripted ' + script.length + ' plays across 3 possessions');
+  showToast('30-play script — 6 possessions of 5');
 }
+
 
 
 
