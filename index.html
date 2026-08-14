@@ -1865,7 +1865,7 @@ const TIPS = [
 // PRACTICE PLANS DATA
 // ════════════════════════════════════════════
 const SNAP_BLOCK = {t:'sk',min:'15-22',name:'Daily snap and skill reps',desc:'5 under-center snaps (C and QB, cue: low hips fire the ball). 5 shotgun snaps. 10 partner passes (thumbs-in/out cue). 5 fake handoff reps — both players commit fully. Same every practice. Motor memory through repetition.'};
-const WU_BLOCK = {t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed — ends the warm-up, launches into practice energy). Same every day. Never skip or abbreviate.'};
+const WU_BLOCK = {t:'wu',min:'0–15',name:'Daily warm-up',desc:'5 under-center snaps · 5 shotgun snaps · QB-to-RB exchange x5 slow then x5 full speed · Fake handoff x5 both players commit · 10 partner passes · 10 stalk blocks · Every Man flag pull 2 min full speed. Same order every practice. Never skip.',cue:'Clean before fast. Same every day.'};
 const SM_BLOCK = {t:'gm',min:'63–75',name:'Sharks & Minnows — end every practice here',desc:'Every practice ends with Sharks & Minnows. Minnows cross end zone to end zone without flag pulled. Sharks start in the middle. Pulled minnows become sharks. Last minnow standing wins. This is the reward for a hard practice — end on a high every time.'};
 
 // USA Football FDM character themes (rotate through the season)
@@ -2182,270 +2182,163 @@ const FDM_TEMPLATES = {
 };
 
 const PRACTICE_PLANS = [
-{w:1,phase:'Pre-Season',theme:'Mesh mastery and sweep installation',prac:[
-  {lbl:'1A',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-37',name:'Skill stations — handoff / flag pulling / blocking stance',
-     desc:'3 stations, rotate on whistle every 4 min. 3 rotations = 12 min total. Every player hits every station.',
-     stations:[
-       'S1 — YOU — Snap and Hand: C snaps, QB opens hips and hands to RB at belly button. Slow first then game speed. 10 reps each group. Cue: ball to the belly, RB makes a pocket.',
-       'S2 — ASST 1 — 1v1 Flag Pull: carrier runs 10 yards, defender goes for flag only. 5 reps each role. Cue: grab at the hip not the flag itself.',
-       'S3 — ASST 2 — Blocking stance: drive block position — wide base, low pad level, first step on whistle. 5 reps each. Then stalk block — body between defender and cone, hands behind back.'
-     ]},
-    
-    {t:'sk',min:'36-44',name:'Skill stations — ball hide / sweep timing / 1v1 pull',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Ball Hide: QB meshes with both RBs, both sprint toward you. Point at who has ball. Run again if you guess right.',
-       'S2 — ASST 1 — Sweep timing: snap, QB opens hips, hands to RB — full speed, 8 reps each back both directions. Focus: how fast QB gets the ball to the edge.',
-       'S3 — ASST 2 — 1v1 flag pull competitive: carrier vs defender, 10 yards, keep score. Switch after 5 reps each.'
-     ]},
-    {t:'sk',min:'44-52',name:'Skill stations — OL seal / edge lane / catching',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Snap and Hand at speed: full speed exchange, QB opens hips immediately. 10 reps. Any fumble = reset to slow.',
-       'S2 — ASST 1 — OL Seal Drill: cone 3 yards outside last OL. OL must get body between coach and cone before back arrives. 5 reps each.',
-       'S3 — ASST 2 — Edge Running Lane: two cones 4 yards apart at LOS. Back hits the gap at full speed every rep. No going around.'
-     ]},
-    {t:'tm',min:'52-63',name:'Sweep Right and Sweep Left — 20 reps each',
-     desc:'Sweeps only. Full 8v8. Rotate ball carrier every 3-4 reps. After each rep name one blocker who made the play work. Celebrate blocks louder than carries. If the fake RB does not sell the sweep — whistle, run Hunch Walk 3x, then replay.',
-     cue:'Name the block. Every rep. Every time.'},
-    SM_BLOCK]},
-  {lbl:'1B',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-30',name:'Skill stations — three count fake / catching / pursuit',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Three Count Fake: fake carrier runs hard while you count to three out loud. Cannot stop before three. No exceptions. Builds the habit of selling the fake.',
-       'S2 — ASST 1 — Catching fundamentals: 5-yard pass from coach, hands only no body trapping. Progress to 10 yards. Eyes on ball all the way in.',
-       'S3 — ASST 2 — Pursuit angle 2v1: two defenders cut off ball carrier going wide. Must reach the cone first. Not chasing from behind.'
-     ]},
-    {t:'sk',min:'30-42',name:'Eyes Up Drill',
-     desc:'Run Ball Hide but the fake carrier must maintain eye contact with the coach the entire time they sprint. If their eyes drop to their hands or feet blow the whistle. Ball carriers look at defenders not at themselves.',
-     cue:'Eyes on me not on your hands. Ball carriers look at defenders.'},
-    {t:'sk',min:'42-52',name:'Snap and Sweep Timing — QB footwork',
-     desc:'Center and QB only. 10 under-center snaps 10 shotgun snaps. QB catches opens hips immediately and extends to the sweep path in one motion. No RBs yet. The QBs first step after the snap sets everything up.',
-     cue:'Open your hips on the catch not after. One motion: catch and open.'},
-    {t:'tm',min:'52-63',name:'Sweeps and Counters — 4 plays, fake is everything',
-     desc:'Four plays: Sweep R, Sweep L, Counter R, Counter L. After every counter that gains yards — stop and show the defense exactly why. Point at where the defenders went when they bit the fake. Making it educational in the moment locks it in.',
-     cue:'Stop after every counter. Show them: fake went there, gap opened here. That is the point.'},
-    SM_BLOCK]}
+{w:1,phase:'Pre-Season',theme:'First day: learn how we practice, earn every rep',prac:[
+  {lbl:'1A',blocks:[WU_BLOCK,
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull / blocking basics / catching',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 1v1 flag pull lanes, 10 yards, carrier runs straight, defender goes for hip. 6 reps each switch. Cue: grab at the hip not the flag.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: 5-yard catch from coach. Hands only no body trapping. Progress to 10 yards. Eyes on ball all the way in. Cue: make a diamond with thumbs and forefingers.']},
+    {t:'sk',min:'38-50',name:'Skill stations: jukes and agility',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
+    {t:'tm',min:'50-75',name:'Formation walk-through and Sweep Right/Left install',desc:'Place every player by name. Walk through Sweep Right and Sweep Left at walking speed — no defenders. 10 reps each direction. Name one blocker after every rep. No scrimmage today.'},
+    {t:'gm',min:'75-90',name:'Ultimate Football',desc:'Like Ultimate Frisbee but with a football. No running with ball — catch stop throw. Defender has 5 seconds. Score by catching in end zone. 2 complete catches = first down. Builds decision-making and catching under pressure. High fun, high reps, great practice closer.',cue:'Catch it stop throw it. No running.'}]},
+  {lbl:'1B',blocks:[WU_BLOCK,
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull angles / stalk block / catch on the move',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Ball Hide / vision cones / stop-go',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Ball Hide. QB meshes both RBs sprint toward you. Point who has the ball. If you guess right run it again. Cue: if I can tell who has it you failed.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.']},
+    {t:'tm',min:'50-75',name:'Sweep Right/Left live — no defense blitzing yet',desc:'Sweep Right and Sweep Left live 8v8. Defense holds zones no blitzing. 20 reps each direction. Rotate ball carrier every 3 reps. Name the block after every rep. Goal: every player carries.'},
+    {t:'gm',min:'78-90',name:'Sharks and Minnows',desc:'Standard Sharks and Minnows closer. Full speed. Last minnow standing.',cue:'Sharks in the middle. GO.'}]}
 ]},
-{w:2,phase:'Pre-Season',theme:'Counter + bootleg — add the QB as a third threat',prac:[
-  {lbl:'2A',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-30',name:'Skill stations — counter fake / catching on move / flag angles',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Freeze and Point: run sweep fake, fake RB freezes after 3 steps. You walk into the gap silently. No words — just stand there. Then run the counter.',
-       'S2 — ASST 1 — Catch on the move: out route at full speed, catch in stride from coach. No stopping to catch. 5 reps each receiver.',
-       'S3 — ASST 2 — Flag pull with angles: carrier starts at angle, defender cuts across diagonally — not chasing from behind. Teaches containment.'
-     ]},
-    
-    {t:'sk',min:'30-42',name:'Skill stations — bootleg footwork / route timing / stalk block',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Hip Open Footwork: QB only, no snap. Open hips right, 3 steps to edge, stop. Reset, go left. 10 reps each side. Hip opens on step one not step two.',
-       'S2 — ASST 1 — Flat route release timing: RB takes 2 hard steps inside then peels flat. Coach throws before RB turns. Sells the block first every rep.',
-       'S3 — ASST 2 — Stalk block 1v1: WR screens DB for 3 full seconds while carrier sweeps. Body between defender and ball. DB scores for getting past.'
-     ]},
-    {t:'tm',min:'52-63',name:'Sweeps Counters Bootleg Run — 6 plays',
-     desc:'Six plays: Sweep R/L Counter R/L Bootleg Run R/L. First 5 reps: no blitzing or crashing — let QB find the edge. Then open up. After each bootleg QB must name out loud: Keep or Held. If they cannot name it they did not read it.',
-     cue:'QB: what did the defender do? Answer before you come back to the huddle.'},
-    SM_BLOCK]},
-  {lbl:'2B',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-37',name:'Skill stations — bootleg read / catching on the move / flag pull with angles',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Roll and Call: QB fakes the mesh, opens hips, rolls to edge. Must say Keep or Throw out loud before doing either. One defender on edge rotates every 3 reps.',
-       'S2 — ASST 1 — Catching on the move: receiver runs a 5-yard out or flat at full speed, catch in stride. No stopping to catch it. Cue: catch it running not waiting.',
-       'S3 — ASST 2 — 1v1 Flag Pull with angles: carrier gets a 3-yard angle head start, defender must cut across — not chase from behind. Teaches containment. 5 reps each.'
-     ]},
-    {t:'sk',min:'37-49',name:'Skill stations — boot keep or throw / ball security / flag gauntlet',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Boot Keep or Throw: full live rep with one defender on the edge. QB calls Keep or Throw out loud. After every rep: what did the defender do?',
-       'S2 — ASST 1 — Ball security: carrier runs with ball tucked, coach tries to knock it out. 5 points of pressure: palm fingertips forearm bicep ribs. High and tight.',
-       'S3 — ASST 2 — Competitive flag pull gauntlet: carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each defender tries to pull the flag. Score a point for each you beat.'
-     ]},
-    
-    {t:'tm',min:'52-63',name:'Competitive series — run must set up pass',
-     desc:'Rule: runs and passes must alternate in each possession. Forces QB to process and throw under pressure. Defense must cover the flat. Track completions. Every completion: offense celebrates. Every pass stop: defense celebrates. Build both cultures simultaneously.',
-     cue:'Alternate. Run then pass then run then pass. No two runs in a row this period.'},
-    SM_BLOCK]}
+{w:2,phase:'Pre-Season',theme:'Counter and bootleg: the QB becomes a third threat',prac:[
+  {lbl:'2A',blocks:[WU_BLOCK,
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull gauntlet / OL seal / over-shoulder catch',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Freeze and Point / juke mirrors / catch timing',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Freeze and Point. Run sweep fake fake RB freezes after 3 steps. Walk into the gap and stand there silently. No words — just stand in the gap. Then run it again.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'tm',min:'50-75',name:'Sweeps and Counter install — name the gap every rep',desc:'Four plays: Sweep R/L Counter R/L. After every counter stop and show exactly why it worked — point at where defenders went when they bit the fake. This makes the system click.'},
+    {t:'gm',min:'75-90',name:'Ultimate Football',desc:'Like Ultimate Frisbee but with a football. No running with ball — catch stop throw. Defender has 5 seconds. Score by catching in end zone. 2 complete catches = first down. Builds decision-making and catching under pressure. High fun, high reps, great practice closer.',cue:'Catch it stop throw it. No running.'}]},
+  {lbl:'2B',blocks:[WU_BLOCK,
+    {t:'sk',min:'22-38',name:'Skill stations: 2v2 flag pull / OL fire and release / flat route timing',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Roll and Call / stop-go / vision cones',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Roll and Call. QB fakes mesh opens hips rolls to edge. Must say Keep or Throw out loud before doing either. One defender on edge rotates every 3 reps.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.']},
+    {t:'tm',min:'50-75',name:'Sweeps Counters Bootleg Run — 6 plays live defense',desc:'Six plays live. First 5 reps: no blitzing. Let QB find the edge. Then open it up. QB must name out loud what the defender did after every bootleg rep. Every player carries.'},
+    {t:'gm',min:'78-90',name:'Sharks and Minnows',desc:'Standard Sharks and Minnows closer. Full speed. Last minnow standing.',cue:'Sharks in the middle. GO.'}]}
 ]},
-{w:3,phase:'Pre-Season',theme:'Reverse + all passes — full system before scrimmage',prac:[
-  {lbl:'3A',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-37',name:'Skill stations — reverse timing / over-shoulder catch / flag gauntlet',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Motion Timing Count: WR goes in pre-snap motion, everyone counts out loud: motion — one — two — three — cross. Walk speed until clean. The reverse dies if the motion player hits the handoff spot early or late.',
-       'S2 — ASST 1 — Over-the-shoulder catch: receiver runs a go route at full speed, coach throws over the shoulder. Must locate ball mid-stride without slowing. Cue: get head around early, find the tip of the ball.',
-       'S3 — ASST 2 — Flag pull gauntlet: carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each defender tries to pull the flag. Carrier gets a point for each defender beaten. Builds evasion and urgency.'
-     ]},
-    {t:'sk',min:'30-40',name:'Triple Fake Walk-Through',
-     desc:'All three performers — sweep RB QB and motion WR — walk through their fakes simultaneously in slow motion. Pause at the handoff moment. Everyone frozen. Coach checks all three positions. Only move to full speed when the freeze frame looks convincing at all three spots.',
-     cue:'Freeze. Are all three fakes convincing right now? No? Walk it again.'},
-    
-    {t:'tm',min:'52-63',name:'Full 8-play system — all plays installed',
-     desc:'Run all 8 current plays: Sweep R/L Counter R/L Bootleg Run R/L Bootleg Pass Reverse (walk speed still). Coach grades each rep: thumbs up clean flat hand needs work. After all 8: identify your top 5 for the scrimmage.',
-     cue:'Grade every rep. Thumbs up flat hand thumbs down. Know your top 5 before you leave tonight.'},
-    SM_BLOCK]},
-  {lbl:'3B',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-37',name:'Skill stations — QB reads / stalk block / ball security',
-     desc:'3 stations, rotate on whistle every 4 min.',
-     stations:[
-       'S1 — YOU — Route Recognition: two receivers run simultaneously — one flat, one crossing route at 8 yards. QB calls Flat or Cross out loud before throwing. If they did not call it before releasing they guessed.',
-       'S2 — ASST 1 — Stalk block 1v1: WR screens DB for 3 full seconds while carrier sweeps outside. Wide base, hands behind back, body between defender and ball. Score: DB scores for getting past, WR for holding.',
-       'S3 — ASST 2 — Ball security gauntlet: carrier runs with ball tucked while coach tries to knock it out (tap arm). Teaches 5 points of pressure: palm, fingertips, forearm, bicep, ribs. High and tight.'
-     ]},
-    
-    
-    {t:'tm',min:'52-63',name:'Call sheet run-through — possession 1 scripted',
-     desc:'Run scripted plays 1 through 5 in order. Coach calls the plays from the sideline using the call sheet. QB executes. After 5 plays: what worked? Adjust plays 6-10 for the scrimmage. This is the dress rehearsal for the actual call sheet.',
-     cue:'Run the script. 5 plays in order. Make mistakes here not Saturday.'},
-    SM_BLOCK]}
+{w:3,phase:'Pre-Season',theme:'Reverse and first passes: full system taking shape',prac:[
+  {lbl:'3A',blocks:[WU_BLOCK,
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull angles / drive block / route recognition',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'sk',min:'38-50',name:'Skill stations: motion timing / juke gauntlet / over-shoulder catch',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Motion Timing Count (reverse). WR in pre-snap motion everyone counts out loud: motion one two three cross. Walk speed only. WR hits handoff spot on cross every time.','S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'50-75',name:'All 8 plays — graded run-through',desc:'Run all 8 plays: Sweep R/L Counter R/L Bootleg R/L Bootleg Pass Reverse (walk speed). Coach grades each rep: thumbs up clean flat hand needs work. Identify top 5 for scrimmage.'},
+    {t:'gm',min:'75-90',name:'Ultimate Football',desc:'Like Ultimate Frisbee but with a football. No running with ball — catch stop throw. Defender has 5 seconds. Score by catching in end zone. 2 complete catches = first down. Builds decision-making and catching under pressure. High fun, high reps, great practice closer.',cue:'Catch it stop throw it. No running.'}]},
+  {lbl:'3B',blocks:[WU_BLOCK,
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull gauntlet / stalk block / flat route',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Ball Hide / juke mirrors / reverse live',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Ball Hide — must fool you 5 times in a row. Then Speed Exchange full game speed. If ball hits ground go back to slow.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Reverse live reps. 3 walk-throughs to confirm mechanics. Then half speed. Then full speed. Only advance when previous level is convincing.']},
+    {t:'tm',min:'50-75',name:'First competitive scrimmage — 6 plays available',desc:'Sweeps Counters Bootleg R/L only — 6 plays. Keep score. Real snap count 45 seconds. Every player carries before series ends. Defense celebrate stops. This is the first real game feel.'},
+    {t:'gm',min:'78-90',name:'Sharks and Minnows',desc:'Standard Sharks and Minnows closer. Full speed. Last minnow standing.',cue:'Sharks in the middle. GO.'}]}
 ]},
-{w:4,phase:'Pre-Season',theme:'Scrimmage prep — sharpen top 5 plays and every player touches',prac:[
-  {lbl:'4A',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-37',name:'Skill stations — ball hide / blocking / competitive flag pull',
-     desc:'Final station reps before the scrimmage. Everything at game speed.',
-     stations:[
-       'S1 — YOU — Ball Hide final check: 3 rounds. Must fool you every time. If you can still guess it the fakes are not ready for Saturday. Speed Exchange after — snap and hand at full game speed.',
-       'S2 — ASST 1 — Stay on Your Man + drive block: run a play, coach asks one random player who they were blocking — must point immediately. Then 1v1 drive block — OL drives defender 2 yards on whistle.',
-       'S3 — ASST 2 — Competitive 1v1 flag pull: full speed, carrier gets 3-yard head start, defender must pull before end cone. Keep score. Winners move to the next defender. Builds game urgency.'
-     ]},
-    
-    {t:'tm',min:'44-62',name:'Full game simulation — 45-second clock all rules',
-     desc:'Real snap count. 45-second play clock. Coaches in game positions. Rotate ball carriers. Every player touches before possession ends. Call plays from the call sheet exactly as you will Saturday. After simulation: every player names one thing they did well. Takes 3 minutes. They remember it.',
-     cue:'Run it exactly like Saturday. Make every mistake here.'},
-    SM_BLOCK]},
-  {lbl:'4B',blocks:[WU_BLOCK,SNAP_BLOCK,
-    {t:'sk',min:'22-32',name:'Pursuit angle drill — defensive prep',
-     desc:'Ball carrier goes wide. Two defenders must cut off at angles — not chase from behind. Cone marks the end zone. Challenge: defender must reach the cone before the ball carrier. The cone removes the instinct to chase and teaches the angle automatically.',
-     cue:'Run to where they are going not where they are.'},
-    {t:'sk',min:'32-44',name:'Scrimmage mental reps — QB reads out loud',
-     desc:'Walk-through of bootleg and pass plays at half speed. QB must verbalize every read: Keep or Held. Flat or Cross. Coach challenges: what would you call if the defender does X? Forces pre-game thinking. This is the Thursday night preparation Walsh talked about.',
-     cue:'Think it on Thursday so you do not have to think it on Saturday.'},
-    {t:'tm',min:'44-62',name:'Final scrimmage — play fast celebrate everything',
-     desc:'Go. Full speed. Every player carries. Coaches on field one last time then transition to sideline. After scrimmage: go around the circle — every player names one thing they are excited about for Saturday. End with team cheer.',
-     cue:'Play fast. Have fun. Everything you need is already in you.'},
-    SM_BLOCK]}
-]},
-{w:5,phase:'Development',theme:'Post-Game 1 fixes + Play-Action unlock',prac:[
+{w:4,phase:'Pre-Season',theme:'Scrimmage prep: sharpen top 5 plays, every player carries',prac:[
   {lbl:'4A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–24',name:'Fix the top 2 things from Game 1',desc:'Address specific breakdowns. Common: false starts, LBs cheating, QB holding ball too long. 10 targeted reps each fix.'},
-    {t:'sk',min:'24–37',name:'Play 9 — Play-Action Deep + QB Draw Keeper',desc:'PA Deep: fake HB Sweep → QB boots → deep go. QB Draw Keeper: drop back like a pass, tuck and run middle. Walk-through 6x each. For experienced players.'},
-    {t:'gm',min:'37–63',name:'Red zone drill + 9-play scrimmage',desc:'Possessions start at the 10. Identify your 3 best red zone plays. Then run all 9 plays in full scrimmage.'},
-    SM_BLOCK]},
+    {t:'sk',min:'22-38',name:'Skill stations: 2v2 flag pull / OL seal / catch on move',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'38-50',name:'Skill stations: top 5 position reps by group',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: QB and skill positions walk through top 5 plays at half speed. QB calls every snap count and read out loud.','S2 ASST 1: OL blocking assignments for top 5 plays. Each lineman names their man before the snap.','S3 ASST 2: RBs and WRs run their assignments for top 5 plays. Coach throws on every pass play.']},
+    {t:'tm',min:'50-75',name:'Full game simulation — 45-second clock all rules',desc:'Real snap count. 45-second clock. Coaches in game positions. Top 5 plays from call sheet. Every player carries. After sim: every player names one thing they did well.'},
+    {t:'gm',min:'75-90',name:'Ultimate Football',desc:'Like Ultimate Frisbee but with a football. No running with ball — catch stop throw. Defender has 5 seconds. Score by catching in end zone. 2 complete catches = first down. Builds decision-making and catching under pressure. High fun, high reps, great practice closer.',cue:'Catch it stop throw it. No running.'}]},
   {lbl:'4B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'Stalk blocking for WRs + wing back',desc:'WR positions body between DB and ball carrier. No contact — pure position. 1v1 drill. Celebrate this block loudly.'},
-    {t:'sk',min:'25–38',name:'Aggressive flag pursuit (physical, legal)',desc:'DB drives hard at ball carrier\'s hips, two-hand flag grab. "Attack the hips." Controlled but fast.'},
-    {t:'gm',min:'38–63',name:'Pass-heavy scrimmage + celebration culture',desc:'Must throw on 3 of 4 plays. Every TD: full team celebration. Every big defensive stop: team reacts together.'},
-    SM_BLOCK]}
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull basic / drive block / over-shoulder catch',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 1v1 flag pull lanes, 10 yards, carrier runs straight, defender goes for hip. 6 reps each switch. Cue: grab at the hip not the flag.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Ball Hide final check / vision cones / juke stop-go',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Ball Hide final. 3 rounds. If you can still guess it the fakes are not ready for Game 1. Keep going until you cannot guess.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.']},
+    {t:'tm',min:'50-75',name:'Full scrimmage — play fast celebrate everything',desc:'Full speed. Real snap count. Every player carries. Coaches on sideline. Call plays from the call sheet exactly as you will Game 1. End with team cheer — every player names one thing they are excited about.'},
+    {t:'gm',min:'78-90',name:'Sharks and Minnows',desc:'Standard Sharks and Minnows closer. Full speed. Last minnow standing.',cue:'Sharks in the middle. GO.'}]}
 ]},
-{w:6,phase:'Development',theme:'Pistol Spread intro + Double Reverse',prac:[
+{w:5,phase:'Development',theme:'Post-Game 1 fixes: fix what broke, build what opened up',prac:[
   {lbl:'5A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–26',name:'Pistol Spread formation intro (8 players)',desc:'QB 2 yards behind C. Both Ts split wide. Slot WR outside left T. RB beside QB. Walk through all 8 positions, alignment, and shotgun snap. This is your second system.'},
-    {t:'sk',min:'26–38',name:'Play 10 — Double Reverse (walk-through only)',desc:'T1 gets handoff going right. T2 comes from left — T1 hands to T2. 10 walk-throughs only. 3 clean reps before any live use.'},
-    {t:'tm',min:'38–50',name:'Pistol: Zone Read + Slant installs',desc:'QB reads DE: crashes = keep and run edge. Holds = hand off inside. Install double slant from pistol. 4 reps each.'},
-    {t:'gm',min:'50–63',name:'Two-system scrimmage',desc:'Rotate between Wing-T and Pistol. Coaches call the formation. Watch how kids adapt.'},
-    SM_BLOCK]},
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull angles / DL get-off / route timing',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'sk',min:'38-50',name:'Skill stations: game film corrections by position group',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: QB and backs — fix the specific fake or read that broke in Game 1. Name the exact play and exact problem. Drill it 10 reps.','S2 ASST 1: OL — fix the specific block that failed. Walk through the assignment then full speed.','S3 ASST 2: WRs and DBs — fix the coverage or route that broke. Drill it at full speed 8 reps.']},
+    {t:'tm',min:'50-75',name:'Live scrimmage: problem plays from Game 1 first, then open',desc:'Run the plays that broke in Game 1 first — five reps to fix them. Then open scrimmage. Keep score. Real clock. Every player carries.'},
+    {t:'gm',min:'75-90',name:'Ultimate Football',desc:'Like Ultimate Frisbee but with a football. No running with ball — catch stop throw. Defender has 5 seconds. Score by catching in end zone. 2 complete catches = first down. Builds decision-making and catching under pressure. High fun, high reps, great practice closer.',cue:'Catch it stop throw it. No running.'}]},
   {lbl:'5B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'Misdirection hold drill for defense',desc:'Run reverses, bootlegs, and counters vs defense. Defenders who hold assignment and don\'t bite get "LOCKED IN" cheer.'},
-    {t:'sk',min:'25–37',name:'Bootleg Run-Pass Option (RPO)',desc:'QB boots right after sweep fake. Edge open = QB runs. Edge held = QB throws flat. True RPO. Walk-through 5x then live. This ties the whole bootleg series together.'},
-    {t:'gm',min:'37–63',name:'Full scrimmage: touch rotation check',desc:'Rotate ball carriers. Check Touch Tracker. Anyone overdue for a carry gets one. No exceptions.'},
-    SM_BLOCK]}
+    {t:'sk',min:'22-38',name:'Skill stations: gauntlet / stalk block / catch on move',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Ball Hide / juke mirrors / play-action read intro',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Ball Hide then Three Count Fake. Fake carrier cannot stop before coach counts to three. Builds the selling habit.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Play-action read. QB fakes run bootlegs to edge. Receiver runs flat. QB reads defender: drops = keep running held = throw. Say it out loud.']},
+    {t:'tm',min:'50-75',name:'Scrimmage heavy — two full possessions each team',desc:'Two full possessions per team. Real snap count real clock. Coach calls plays from sideline using call sheet. Defense keep score of stops. Offense keep score of first downs and TDs.'},
+    {t:'gm',min:'78-90',name:'Sharks and Minnows',desc:'Standard Sharks and Minnows closer. Full speed. Last minnow standing.',cue:'Sharks in the middle. GO.'}]}
 ]},
-{w:7,phase:'Development',theme:'Pass game 50/50 + 2-minute drill',prac:[
+{w:6,phase:'Development',theme:'Last long practice: skill sharp, scrimmage is the main event',prac:[
   {lbl:'6A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–26',name:'Pistol pass package + Reverse Fake Bootleg',desc:'Pistol: Out Route and Go Route installs. Wing-T: Reverse Fake Bootleg (fake reverse, QB boots opposite). QB reads safety pre-snap.'},
-    {t:'sk',min:'26–38',name:'2-minute drill install',desc:'Down 8, 2 min left. Pistol spread. Fast to LOS. Quick routes. 5 full-pace 4-play series. Urgency is a skill.'},
-    {t:'gm',min:'38–63',name:'50/50 pass/run scrimmage',desc:'Track: equal run and pass calls. Which pass plays execute most cleanly? Those become your game staples.'},
-    SM_BLOCK]},
+    {t:'sk',min:'22-38',name:'Skill stations: 2v2 flag pull / OL fire and release / over-shoulder',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'sk',min:'38-50',name:'Skill stations: pursuit angles / juke stop-go / catch timing',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Pursuit angle drill (defense). Ball carrier goes wide two defenders must cut off diagonally not chase from behind. Must reach the cone first. Cue: run where they are going.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'tm',min:'50-75',name:'Scrimmage: 3 full possessions each — this is the game',desc:'Three possessions per team. Full rules full clock. Coach calls from call sheet. Offense tracks first downs and TDs. Defense tracks stops. This is the competitive standard from here forward.'},
+    {t:'gm',min:'75-90',name:'Ultimate Football',desc:'Like Ultimate Frisbee but with a football. No running with ball — catch stop throw. Defender has 5 seconds. Score by catching in end zone. 2 complete catches = first down. Builds decision-making and catching under pressure. High fun, high reps, great practice closer.',cue:'Catch it stop throw it. No running.'}]},
   {lbl:'6B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'Extra point + 2-point conversion',desc:'3-yard line = 1pt. 5-yard line = 2pt. 5 reps each. Pick your go-to for each situation before the game.'},
-    {t:'tm',min:'25–50',name:'Situational football + Sweep Fake QB Keep Middle',desc:'Coach calls scenarios live. Also install: fake sweep outside, QB keeps up middle gap. Defense chases edge — middle opens.'},
-    {t:'gm',min:'50–63',name:'Full game sim + defensive packages',desc:'Zone then man coverage. Both systems on offense. Full rules.'},
+    {t:'sk',min:'22-38',name:'Skill stations: flag pull basic / stalk block / flat route',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: 1v1 flag pull lanes, 10 yards, carrier runs straight, defender goes for hip. 6 reps each switch. Cue: grab at the hip not the flag.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'38-50',name:'Skill stations: Ball Hide / vision cones / juke mirrors',desc:'3 stations rotate on whistle every 4-5 min. Every player hits every station.',stations:['S1 YOU: Ball Hide. Must fool you 5 times. Then roll and call — QB says Keep or Throw before doing either.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
+    {t:'tm',min:'50-75',name:'Full game prep scrimmage — 45 seconds real clock',desc:'Full game speed. Real snap count and clock. Call sheet plays only. Track everything. After scrimmage: team circle, every player names one adjustment they will make in the next game.'},
+    {t:'gm',min:'78-90',name:'Sharks and Minnows',desc:'Standard Sharks and Minnows closer. Full speed. Last minnow standing.',cue:'Sharks in the middle. GO.'}]}
+]},
+{w:7,phase:'Development',theme:'75-min format begins: skill sharp scrimmage heavier',prac:[
+  {lbl:'7A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull / OL seal / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes and agility',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: 3 possessions each',desc:'Three full possessions per team. Real clock real snap count. Offense must score or get first down each possession. Defense celebrate stops. Track the score.'},
+    SM_BLOCK]},
+  {lbl:'7B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / drive block / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / vision cones / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide then Roll and Call. QB says Keep or Throw out loud every rep.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: call sheet plays only',desc:'Run only plays from your call sheet. No off-script calls. Coach grades execution on each play. Every player carries. Keep score.'},
     SM_BLOCK]}
 ]},
-{w:8,phase:'Development',theme:'Wing Seam + full two-system fluency',prac:[
-  {lbl:'7A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–26',name:'Wing Seam + Pistol Mesh + Belly Keep Pass Option',desc:'Wing seam: set up with curls, attack seam. Pistol mesh: crossing routes. Belly Keep Pass Option: fake FB dive, fake keep run, throwback pass. Three plays with max misdirection.'},
-    {t:'sk',min:'26–38',name:'Counter to the counter (both systems)',desc:'Wing-T: fake reverse, QB keeps same direction as original sweep. Pistol: fake zone read, QB draws middle. Punishes over-pursuit.'},
-    {t:'gm',min:'38–63',name:'Two-system full scrimmage',desc:'Coach alternates Wing-T and Pistol packages. Players must recognize and execute. Biggest test yet.'},
+{w:8,phase:'Development',theme:'Expand the playbook: pistol package or pass game emphasis',prac:[
+  {lbl:'8A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: 2v2 pull / stalk block / flat route',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes: mirror / stop-go / vision',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: introduce second package',desc:'First half of scrimmage: base plays only. Second half: introduce pistol or second system plays. See what transfers. Keep the reps high.'},
     SM_BLOCK]},
-  {lbl:'7B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'DL pass rush technique (physical, legal)',desc:'DL engages pad-to-pad aggressively, drives, then spins/swims. 1v1 DL vs OL, race to cone. Physical within the rules.'},
-    {t:'sk',min:'25–37',name:'Teach-back leadership drill',desc:'2 experienced players each teach one play. Others listen and ask questions. Coach confirms or adds one point.'},
-    {t:'gm',min:'37–63',name:'Championship series: 5 possessions each',desc:'Offense vs defense. Track first downs and TDs. Coaches fully in role. Build competitive habit.'},
+  {lbl:'8B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull angles / OL release / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / cones / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide — must fool you 5 times. No exceptions.','S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: 4 possessions — this is a game',desc:'Four full possessions each team. Real clock. Coaches on sideline. Call sheet only. Track TDs first downs and stops. After: team circle every player names one win.'},
     SM_BLOCK]}
 ]},
-{w:8,phase:'Execution',theme:'Game speed, full rules, breakout groups',prac:[
-  {lbl:'8A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–24',name:'Position breakout groups',desc:'QBs: reads + footwork (1 coach). WRs: route precision (1 coach). OL/DL: stance and engagement (1 coach). LBs/DBs: coverage keys (1 coach).'},
-    {t:'tm',min:'24–50',name:'Full 8v8 — complete play library',desc:'All installed plays. Game conditions: huddle, snap count, 45-sec clock, coaches on field. Track: how many execute cleanly? Goal: 10 of 14.'},
-    {t:'gm',min:'50–63',name:'Individual personal feedback',desc:'Every player: one specific positive + one focus area. Personal, not group.'},
+{w:9,phase:'Execution',theme:'Game speed: every rep at full speed, no walking through',prac:[
+  {lbl:'9A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / drive block / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes / route timing / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: situational down and distance',desc:'Set specific situations: 3rd and short 3rd and long red zone. Offense must convert. Defense must stop. Real clock. Coaches on field one last time.'},
     SM_BLOCK]},
-  {lbl:'8B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–26',name:'Play-Action Seam Boot + Pistol PA Deep',desc:'Wing-T: fake sweep → boot → seam throw. Pistol: fake zone read → PA deep. Install both. Walk-through only this week.'},
-    {t:'sk',min:'26–38',name:'Clock management: both scenarios',desc:'Up 8 with 3 min: run time, OL engages. Down 8 with 2 min: hurry-up. 4 reps each.'},
-    {t:'gm',min:'38–63',name:'Full game simulation — strict rules',desc:'All plays. Both systems. Timeouts. Clock managed. Most realistic prep yet.'},
+  {lbl:'9B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: 2v2 pull / stalk block / flat route',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / vision cones / juke mirror',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide then Three Count Fake. If anyone stops before three it does not count.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
+    {t:'tm',min:'45-65',name:'Full game simulation',desc:'Full game. Real everything. Coaches on sideline. Call sheet from the first play. Every player carries. Track all stats. End with team cheer.'},
     SM_BLOCK]}
 ]},
-{w:9,phase:'Execution',theme:'Trick play + pre-snap reads',prac:[
-  {lbl:'9A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'QB pre-snap reads: 3 looks',desc:'Heavy box = run away. Single high safety = throw to numbers. 2-high = run or quick short. QB points out the defensive tell pre-snap before every rep.'},
-    {t:'sk',min:'25–38',name:'Reverse Pass + Pistol Fake Screen Deep',desc:'Walk-through both trick plays 8x each. Coach signals from sideline. Once per game only. Keep it special.'},
-    {t:'gm',min:'38–63',name:'Scout team + adjustment scrimmage',desc:'Coaches run basic opposing offense vs defense. Defense adjusts. Every 4 plays: one live adjustment explained.'},
+{w:10,phase:'Execution',theme:'Perfect reps: quality over quantity every single block',prac:[
+  {lbl:'10A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull angles / OL seal / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes / catch on move / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: no sloppy reps',desc:'Any sloppy rep stops play immediately. Coach names what broke. Two clean reps of that play before continuing. Quality over quantity. This is what separates good teams from great ones.'},
     SM_BLOCK]},
-  {lbl:'9B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'Two-play combo attacks (both systems)',desc:'Wing-T: HB Sweep × 2 → Reverse. Pistol: Zone Read × 2 → PA Deep. Teach the setup-payoff sequence.'},
-    {t:'gm',min:'25–63',name:'Full scrimmage: QB-led possessions',desc:'QB calls from approved play list. Coaches coach technique only. Let players lead on field.'},
+  {lbl:'10B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / drive block / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / juke mirrors / vision cones',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide — if you can guess it the system is broken. Fix it before the game.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.']},
+    {t:'tm',min:'45-65',name:'Call sheet scrimmage — 5 possessions',desc:'Five possessions each team. Exact call sheet order. Coaches time each play. Any play taking longer than 45 seconds costs a timeout. Teaching clock discipline.'},
     SM_BLOCK]}
 ]},
-{w:10,phase:'Execution',theme:'Perfect reps + penalties',prac:[
-  {lbl:'10A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–24',name:'Perfect rep challenge: top 4 plays',desc:'Each play earns 5 consecutive clean reps. First time achieved: team does 10 fun pushups together.'},
-    {t:'sk',min:'24–37',name:'Penalty game: act it out',desc:'Coach acts out penalties. Players race to call it first. Wrong answer = silly dance. Makes rules memorable.'},
-    {t:'gm',min:'37–63',name:'Possession competition + season highlights',desc:'Offense vs defense competition. Coach calls one great moment from each player since Week 1.'},
+{w:11,phase:'Execution',theme:'Playoff intensity: every play matters, compete for every yard',prac:[
+  {lbl:'11A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: 2v2 pull / stalk block / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes: stop-go / cones / mirror',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: playoff rules no mercy',desc:'Full game speed. Coaches call it like a playoff game. No coaching during plays. Players make the calls. Celebrate every stop and every score. This is the standard.'},
     SM_BLOCK]},
-  {lbl:'10B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–25',name:'Ball carrier vision + elusiveness',desc:'5 cones as defenders. Ball carrier makes one cut per cone, accelerates. Builds elusiveness.'},
-    {t:'gm',min:'25–63',name:'Full scrimmage: coaches step back',desc:'Coaches step back from play-calling. QB leads. Coaches coach technique only.'},
+  {lbl:'11B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull angles / OL fire release / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / vision cones / flat route',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide — championship standard. 5 in a row. No excuses.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'tm',min:'45-65',name:'Full game simulation — playoff level',desc:'Full game. Every player carries. Coaches on sideline all game. Treat it exactly like a playoff game. End with team circle — every player names one thing they are proud of this season.'},
     SM_BLOCK]}
 ]},
-{w:11,phase:'Execution',theme:'Playoff-level intensity',prac:[
-  {lbl:'11A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–24',name:'Race to LOS + two-play combos',desc:'Race to LOS: beat 10-second record from huddle break. Two-play combos: run setup play twice, then call payoff. Teach the sequence.'},
-    {t:'gm',min:'24–63',name:'70% clean execution challenge + player debrief',desc:'Track every play. Goal: 70% clean. Players lead post-practice discussion. Playoff talk.'},
+{w:12,phase:'Peak',theme:'Playoff prep: play our game, trust the system',prac:[
+  {lbl:'12A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / stalk block / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes / route timing / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: best plays only, no experiments',desc:'Proven plays only. Nothing new. Call the plays that have worked all season. Trust the system. Every player carries. After scrimmage: name your three best plays as a team.'},
     SM_BLOCK]},
-  {lbl:'11B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–24',name:'Situational reps + trick play polish',desc:'3 reps each: 4th and 1, punt, safety return — until automatic. Run reverse pass and pistol fake screen 5x each until crisp.'},
-    {t:'gm',min:'24–63',name:'Full game — playoff energy + full rules',desc:'Play like it\'s a real playoff game. Full intensity. Coaches call timeouts strategically. Every celebration runs.'},
+  {lbl:'12B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull basic / drive block / flat route',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull lanes, 10 yards, carrier runs straight, defender goes for hip. 6 reps each switch. Cue: grab at the hip not the flag.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / juke mirrors / vision cones',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide. Championship standard. If you can guess it keep going.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.']},
+    {t:'tm',min:'45-65',name:'Final pre-playoff scrimmage',desc:'Last competitive scrimmage before playoffs. Full game speed. Call sheet top plays. Every player carries and plays defense. End with team cheer — loud together.'},
     SM_BLOCK]}
 ]},
-{w:12,phase:'Peak',theme:'Playoff prep — play our game',prac:[
-  {lbl:'12A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–22',name:'Top 6 plays only — confidence through familiarity',desc:'6 best plays. No new installs. 5 clean reps each. Execution confidence beats variety.'},
-    {t:'gm',min:'22–63',name:'Playoff simulation + team awards',desc:'Full rules. Playoff urgency. Fun awards for every player. Builds pride heading into playoffs.'},
+{w:13,phase:'Peak',theme:'Playoffs: play fast play together celebrate the season',prac:[
+  {lbl:'13A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull angles / stalk block / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jukes: all three drills',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
+    {t:'tm',min:'45-65',name:'Playoff warmup scrimmage — light and fun',desc:'Light scrimmage. High energy low stress. Remind players of their best plays. Keep it fun. End early — save the legs for the game.'},
     SM_BLOCK]},
-  {lbl:'12B',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–20',name:'Light day — energy preservation',desc:'Short throws, route timing, snap reps. Game is coming. Don\'t leave it in practice.'},
-    {t:'tm',min:'20–50',name:'Walk-through + game-day routine rehearsal',desc:'Walk-through key plays. Game-day sequence: warm-up → coin toss → first possession plan.'},
-    {t:'gm',min:'50–63',name:'Free play',desc:'Let kids be kids. Arrive game day fresh, loose, and excited.'},
+  {lbl:'13B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
+    {t:'sk',min:'18-32',name:'Skill stations: flag pull basic / drive block / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull lanes, 10 yards, carrier runs straight, defender goes for hip. 6 reps each switch. Cue: grab at the hip not the flag.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / vision cones / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide one final time. End the season with a perfect rep.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'45-65',name:'Season celebration practice',desc:'Short scrimmage then team time. Review season highlights. Name players who improved the most. Every player says one thing they are proud of. Every coach says one thing they saw grow in each player. Season close.'},
     SM_BLOCK]}
-]},
-{w:13,phase:'Peak',theme:'Playoffs + celebrate the season',prac:[
-  {lbl:'13A',blocks:[WU_BLOCK,
-    {t:'sk',min:'12–22',name:'Season best-of + confidence reps',desc:'Players vote on 3 favorite drills. Run them. Every player runs their proudest skill. Coach affirms each one by name.'},
-    {t:'tm',min:'22–45',name:'Final run-through + playoff bracket',desc:'Top 5 plays 3x each. Calm, clean, confident. Explain playoff format.'},
-    {t:'gm',min:'45–63',name:'Final scrimmage of the season',desc:'Full intensity, full joy. Every celebration runs. Coaches celebrate every rep.'},
-    SM_BLOCK]},
-  {lbl:'13B (post-playoffs)',blocks:[
-    {t:'gm',min:'0–25',name:'Celebration practice — no drills',desc:'Keep-away, QB accuracy contest, touch football. They earned it.'},
-    {t:'gm',min:'25–55',name:'Personal awards + parents invited',desc:'Coach gives every player a personal card. Handwritten. Specific memory. Team vs parents flag football.'},
-    {t:'gm',min:'55–75',name:'Party + final Sharks & Minnows (one last time)',desc:'End the season the right way. One final Sharks & Minnows. Last one standing is the season champion.'}]}
 ]}
 ];
-
 // ════════════════════════════════════════════
 // RENDER FUNCTIONS
 // ════════════════════════════════════════════
@@ -2453,831 +2346,26 @@ let curPracWeek = 1;
 let curPbSub = 'active';
 let curTool = 'situations';
 let curDrillCat = 'All';
-let showFDMOnly = false;
 let activeDrillForPlan = null;
 let activePlayForBook = null;
 
-const PRAC_TAB_NAMES = {plans:'Practice Plans',builder:'Practice Builder',drills:'Drill Bank',games:'Games & Activities'};
 function pracTab(tab, el) {
   curPracTab = tab;
   document.querySelectorAll('#pg-practices .tab').forEach(t=>t.classList.remove('active'));
-  if(el) el.classList.add('active');
-  const title = document.getElementById('hdr-title');
-  if(title && currentPage==='pg-practices') title.textContent = 'Practice › ' + (PRAC_TAB_NAMES[tab]||tab);
+  el.classList.add('active');
   renderPracContent();
 }
 
 function renderPracContent() {
   const el = document.getElementById('prac-content');
   if(curPracTab === 'plans') renderPracPlans(el);
-  else if(curPracTab === 'pregame') renderPregameWU(el);
   else if(curPracTab === 'builder') renderPracBuilder(el);
   else if(curPracTab === 'drills') renderDrillBank(el);
   else if(curPracTab === 'games') renderActivities(el);
 }
 
-// ════════════════════════════════════════════
-// PREGAME WARMUP ROUTINE
-// ════════════════════════════════════════════
-function renderPregameWU(el) {
-  const is56 = state.division === '56';
-
-  const wu78 = {
-    title: '7/8 Pregame Warmup Routine',
-    subtitle: '12-15 minutes · Same routine every game · Builds ritual focus',
-    phases: [
-      {
-        name: 'Dynamic Warmup',
-        time: '3-4 min',
-        color: 'var(--green)',
-        steps: [
-          'High knees (10 yards down and back)',
-          'Butt kicks (10 yards down and back)',
-          'Side shuffles both ways',
-          'Quick skips or bounding',
-          'Fast feet in place (5 seconds on your count)',
-          'Tip: Make it a race to the cone and back -- keeps them engaged'
-        ]
-      },
-      {
-        name: 'Arm Warmup (QBs and Receivers)',
-        time: '2 min',
-        color: 'var(--blue)',
-        steps: [
-          'Arm Flaps and Arm Circles (both directions, small to large)',
-          'Arm Slaps and Hugs (internal/external rotation)',
-          'Never throw with a cold arm -- even at 7/8',
-          '5 partner passes at 5 yards, just to warm up'
-        ]
-      },
-      {
-        name: 'Skill Refreshers',
-        time: '4-5 min',
-        color: 'var(--gold)',
-        steps: [
-          'Snap Line Reps: 5 UC snaps, 5 shotgun snaps (all centers rotate)',
-          'QB/RB Handoff Relay: every back takes 2 handoffs each',
-          '1v1 Flag Pull: 3 quick reps per pair, full speed',
-          'Route Line: 2 reps of your first-call play at half speed'
-        ]
-      },
-      {
-        name: 'Team Focus',
-        time: '2-3 min',
-        color: 'var(--red)',
-        steps: [
-          'Walk through your first 3 plays as a full team at walking speed',
-          'Quick talk: effort, fast play clock, have fun',
-          'Team cheer: use your season cheer -- loud and together',
-          'Same cheer every game -- makes it a ritual, not a routine'
-        ]
-      }
-    ]
-  };
-
-  const wu56 = {
-    title: '5/6 Pregame Warmup Routine',
-    subtitle: '10-12 minutes · Short and fun · Attention spans are short at this age',
-    phases: [
-      {
-        name: 'Dynamic Warmup',
-        time: '3-4 min',
-        color: 'var(--green)',
-        steps: [
-          'High knees (10 yards) -- make it a race!',
-          'Butt kicks (10 yards)',
-          'Side shuffles both ways',
-          'Quick skips or bounding (silly is good)',
-          'Fast feet in place (5 seconds on your count)',
-          'Keep everything fast-paced -- no waiting in long lines'
-        ]
-      },
-      {
-        name: 'Flag and Movement Drills',
-        time: '3-4 min',
-        color: 'var(--gold)',
-        steps: [
-          'Gauntlet Drill: run through short lane, 2 coaches try to pull flags',
-          '1v1 Flag Pull: pairs, practice staying low and grabbing at the hip',
-          'Handoff Relay: QB hands off, runner goes 10 yards, back in line',
-          'Every kid gets 2-3 reps of each -- keep it moving'
-        ]
-      },
-      {
-        name: 'Team Ball Drills',
-        time: '3-4 min',
-        color: 'var(--blue)',
-        steps: [
-          'Snap and Handoff Reps: QB practices 3-4 handoffs with each RB',
-          'Run one or two of your simplest plays at half speed for alignment',
-          'Quick walk-through of your first play as a team',
-          'End with a snap count rep so everyone knows the signal'
-        ]
-      },
-      {
-        name: 'Huddle and Focus',
-        time: '1-2 min',
-        color: 'var(--red)',
-        steps: [
-          'Call team together -- brief, energy-focused talk',
-          'Talk about: playing fast, having fun, effort not outcome',
-          'Team cheer: same one every game -- it becomes their ritual',
-          'Tip: build routine -- same warmup every game builds automatic focus'
-        ]
-      }
-    ]
-  };
-
-  const wu = is56 ? wu56 : wu78;
-
-  let h = `<div class="card card-gold" style="margin-bottom:10px;">
-    <div class="card-title">${wu.title}</div>
-    <div class="card-sub">${wu.subtitle}</div>
-  </div>
-  <div style="padding:8px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;margin-bottom:12px;font-size:11px;color:var(--g3);">
-    <strong style="color:var(--green);">Key principle:</strong> Same routine every game. Kids who know what to expect are calmer, more focused, and ready to play. Do not change the order.
-  </div>`;
-
-  wu.phases.forEach((phase, i) => {
-    h += `<div class="card" style="margin-bottom:10px;border-left:3px solid ${phase.color};">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div style="font-size:14px;font-weight:700;">${i+1}. ${phase.name}</div>
-        <span class="badge b-gray">${phase.time}</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${phase.steps.map(s => `<div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;">
-          <div style="color:${phase.color};font-size:14px;flex-shrink:0;margin-top:-1px;">▸</div>
-          <div>${s}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  });
-
-  const cheer = state.culture && state.culture.cheer;
-  if(cheer) {
-    h += `<div style="padding:14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;text-align:center;margin-top:6px;">
-      <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px;">YOUR TEAM CHEER</div>
-      <div style="font-size:20px;font-weight:700;">📣 ${cheer}</div>
-    </div>`;
-  } else {
-    h += `<div style="padding:12px;background:var(--navy3);border-radius:10px;text-align:center;margin-top:6px;font-size:12px;color:var(--g3);">
-      Set your team cheer in Tools → Culture to display it here.
-    </div>`;
-  }
-
-  el.innerHTML = h;
-}
-
 function getActivePracticePlans() {
   return state.division === '56' ? PRACTICE_PLANS_56 : PRACTICE_PLANS;
-}
-
-function getFDMStructureNote() {
-  if(state.division === '56') {
-    return 'USA Football FDM 5+ Format: Character Dev (3) → Dynamic WU (5) → Athletic Foundations (5) → Hydration (2) → Skills (20-24) → Hydration (2) → Team Offense (9) → Team Defense (9) → Cool Down + Flag Pull + Sharks and Minnows';
-  }
-  return 'USA Football FDM 8+ Format: Character Dev (5) → Dynamic WU (7) → Athletic Foundations (10) → Hydration (2) → Individual Skills (28-34) → Hydration (2) → Team Offense (15) → Team Defense (15) → Cool Down + Flag Pull + Sharks and Minnows';
-}
-
-function loadFDMTemplate(weekIdx) {
-  const templates = FDM_TEMPLATES[state.division] || [];
-  const tmpl = templates[weekIdx];
-  if(!tmpl) return;
-  if(!confirm(`Load FDM Week ${weekIdx+1} template ("${tmpl.title}") into Practice Builder? This will clear your current custom plan.`)) return;
-
-  // Convert FDM template drills into our practice builder format
-  const DRILL_TYPE_MAP = {
-    'Hydration Break': 'wu', 'Character Theme': 'wu', 'Cool Down': 'gm',
-    'Team Offense': 'tm', 'Team Defense': 'tm', 'Sharks and Minnows': 'gm',
-    'Every Man Flag Pull': 'gm'
-  };
-
-  const planBlocks = tmpl.drills
-    .filter(d => d.dur > 0)
-    .map((d, i) => {
-      // Try to match to a drill in the bank by name
-      const match = DRILLS.find(dr =>
-        dr.name.toLowerCase().includes(d.name.toLowerCase().substring(0,12)) ||
-        d.name.toLowerCase().includes(dr.name.toLowerCase().substring(0,12))
-      );
-      // Determine type
-      let type = 'sk';
-      for(const [key, val] of Object.entries(DRILL_TYPE_MAP)) {
-        if(d.name.includes(key)) { type = val; break; }
-      }
-      if(match) type = match.type || type;
-
-      return {
-        id: match ? match.id : 'custom_' + i,
-        name: d.name,
-        time: d.dur,
-        cat: match ? match.cat : 'Custom',
-        desc: match ? match.desc : d.name,
-        cue: match ? match.cue : '',
-        level: match ? match.level : 'All',
-        group: match ? match.group : 'Full team',
-        equip: match ? match.equip : '',
-        type: type
-      };
-    });
-
-  if(state.division === '56') state.customPractice56 = planBlocks;
-  else state.customPractice = planBlocks;
-  save();
-
-  // Switch to builder tab
-  curPracTab = 'builder';
-  document.querySelectorAll('#pg-practices .tab').forEach((t,i) => t.classList.toggle('active', i===1));
-  const title = document.getElementById('hdr-title');
-  if(title) title.textContent = 'Practice › Practice Builder';
-  renderPracContent();
-  showToast('FDM Week ' + (weekIdx+1) + ' template loaded into builder!');
-}
-
-function sharePracticePlan() {
-  try {
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===curPracWeek);
-  if(!wk) { alert('Week ' + curPracWeek + ' not found. Plans has ' + plans.length + ' weeks: ' + plans.map(p=>p.w).join(',')); return; }
-  const theme = wk.theme || wk.phase || ('Week ' + wk.w);
-  if(!theme || theme === ('Week ' + wk.w)) { console.log('Week ' + wk.w + ' object:', JSON.stringify(Object.keys(wk))); }
-  let text = 'PRACTICE PLAN -- WEEK ' + wk.w + ': ' + wk.theme.toUpperCase() + '\n' + '='.repeat(50) + '\n\n';
-  wk.prac.forEach(pr => {
-    text += '\n--- ' + pr.lbl + ' (75 min) ---\n';
-    getPracBlocks(wk, pr).filter(Boolean).forEach(b => {
-      const btype = tl[b.t] || (b.t ? String(b.t).toUpperCase() : 'BLOCK');
-      const bmin = b.min || b.time || '';
-      const bname = b.name || '(unnamed)';
-      text += '\n[' + btype + '] min ' + bmin + '\n' + bname + '\n';
-      if(b.stations) {
-        b.stations.forEach(function(s,i){ text += '  S'+(i+1)+': '+s+'\n'; });
-      } else {
-        text += (b.desc||'') + '\n';
-      }
-    });
-  });
-  text += '\n' + '='.repeat(50) + '\nGenerated by Flag Football Coach App';
-  navigator.clipboard.writeText(text)
-    .then(()=>alert('Practice plan copied! Paste it into a text message or email.'))
-    .catch(()=>{
-      const ta=document.createElement('textarea');
-      ta.value=text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      alert('Practice plan copied! Paste it into a text message or email.');
-    });
-  } catch(e) { alert('Share error: ' + e.message); }
-}
-
-// Get editable blocks for a practice (override or built-in)
-function getPracBlocks(wk, pr) {
-  if(!state.planOverrides) state.planOverrides = {};
-  const key = state.division + '_w' + wk.w + '_' + pr.lbl;
-  return state.planOverrides[key] ? state.planOverrides[key] : pr.blocks;
-}
-
-function savePracBlocks(wk, pr, blocks) {
-  if(!state.planOverrides) state.planOverrides = {};
-  const key = state.division + '_w' + wk.w + '_' + pr.lbl;
-  state.planOverrides[key] = blocks;
-  save();
-}
-
-function resetCurrentPracBlock(wkNum, pracLbl) {
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===wkNum);
-  if(!wk) return;
-  const pr = wk.prac.find(p=>p.lbl===pracLbl);
-  if(!pr) return;
-  resetPracBlocks(wk, pr);
-}
-
-function resetPracBlocks(wk, pr) {
-  if(!state.planOverrides) return;
-  const key = state.division + '_w' + wk.w + '_' + pr.lbl;
-  delete state.planOverrides[key];
-  save();
-  const el = document.getElementById('prac-content');
-  if(el) renderPracPlans(el);
-  showToast('Practice reset to default');
-}
-
-function deletePracBlock(wkNum, pracLbl, blockIdx) {
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===wkNum);
-  const pr = wk.prac.find(p=>p.lbl===pracLbl);
-  const blocks = [...getPracBlocks(wk, pr)];
-  blocks.splice(blockIdx, 1);
-  savePracBlocks(wk, pr, blocks);
-  const el = document.getElementById('prac-content');
-  if(el) renderPracPlans(el);
-}
-
-function movePracBlock(wkNum, pracLbl, blockIdx, dir) {
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===wkNum);
-  const pr = wk.prac.find(p=>p.lbl===pracLbl);
-  const blocks = [...getPracBlocks(wk, pr)];
-  const newIdx = blockIdx + dir;
-  if(newIdx < 0 || newIdx >= blocks.length) return;
-  [blocks[blockIdx], blocks[newIdx]] = [blocks[newIdx], blocks[blockIdx]];
-  savePracBlocks(wk, pr, blocks);
-  const el = document.getElementById('prac-content');
-  if(el) renderPracPlans(el);
-}
-
-// ── temp state for add-block flow ──
-let _addBlockCtx = null;
-let _addDrillFilter = '';
-let _addDrillCat = 'All';
-let _pickerSelected = new Set(); // IDs of drills selected in the picker
-
-function openEditBlock(wkNum, pracLbl, blockIdx) {
-  // blockIdx >= 0  → editing existing block (show form)
-  // blockIdx < 0   → adding new block (show drill picker first)
-  if(blockIdx >= 0) {
-    _openEditBlockForm(wkNum, pracLbl, blockIdx);
-  } else {
-    _addBlockCtx = (wkNum === -1) ? null : {wkNum, pracLbl};
-    _pickerSelected.clear();
-    _addDrillFilter = '';
-    _addDrillCat = 'All';
-    _openDrillPicker();
-  }
-}
-
-let _stationMode = false;
-
-function setPickerCat(el) { _addDrillCat = el.dataset.cat; _openDrillPicker(); }
-function setPickerDrill(el) { _selectDrillInPicker(el.dataset.id); }
-
-function _openDrillPicker() {
-  const cats = ['All', ...new Set(DRILLS.concat(state.customDrills||[]).map(d=>d.cat))];
-  const allDrills = DRILLS.concat(state.customDrills||[]);
-  const filtered = allDrills.filter(d => {
-    if(_addDrillCat !== 'All' && d.cat !== _addDrillCat) return false;
-    if(_addDrillFilter && !d.name.toLowerCase().includes(_addDrillFilter.toLowerCase())) return false;
-    return true;
-  });
-  const tl = {wu:'Warm-up',sk:'Skill',tm:'Team',gm:'Game'};
-  const tc = {wu:'var(--green)',sk:'var(--blue)',tm:'#a855f7',gm:'var(--red)'};
-  const ctxLabel = _addBlockCtx ? 'Week '+_addBlockCtx.wkNum+' Practice '+_addBlockCtx.pracLbl : 'Practice Builder';
-  const count = _pickerSelected.size;
-  const selArray = [..._pickerSelected];
-  const stationColors = ['#f5a623','#22c55e','#3b82f6'];
-  const stationNames = ['S1','S2','S3'];
-
-  let h = '<div class="modal-title">Add drills</div>';
-
-  // Station mode toggle
-  h += '<div style="display:flex;gap:6px;margin-bottom:10px;padding:8px;background:var(--navy3);border-radius:10px;align-items:center;">';
-  h += '<div style="flex:1;"><div style="font-size:12px;font-weight:600;">Station mode</div>';
-  h += '<div style="font-size:10px;color:var(--g3);margin-top:1px;">' + (_stationMode ? 'Drills become S1/S2/S3 in one block' : 'Each drill added as its own block') + '</div></div>';
-  h += '<button onclick="_stationMode=!_stationMode;_openDrillPicker()" style="padding:8px 14px;border-radius:8px;border:2px solid '+(_stationMode?'var(--gold)':'var(--navy3)')+';background:'+(_stationMode?'rgba(245,166,35,.15)':'transparent')+';color:'+(_stationMode?'var(--gold)':'var(--g3)')+';font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;white-space:nowrap;">' + (_stationMode ? 'S ON' : 'S OFF') + '</button>';
-  h += '</div>';
-
-  // Search + custom
-  h += '<div style="display:flex;gap:6px;margin-bottom:8px;"><input type="text" id="drill-picker-search" placeholder="Search drills" oninput="_addDrillFilter=this.value;_openDrillPicker()" value="'+_addDrillFilter+'" style="flex:1;margin:0;font-size:14px;"><button onclick="openAddCustomDrill()" class="btn btn-sm" style="flex-shrink:0;font-size:11px;">+ Custom</button></div>';
-
-  // Category tabs
-  let tabHtml = '<div class="tab-row" style="margin-bottom:8px;">';
-  cats.forEach(c => {
-    tabHtml += '<div class="tab '+(c===_addDrillCat?'active':'')+'" onclick="setPickerCat(this)" data-cat="'+c+'" style="font-size:11px;padding:6px 10px;">'+c+'</div>';
-  });
-  tabHtml += '</div>';
-  h += tabHtml;
-
-  // Instruction
-  h += '<div style="font-size:11px;color:var(--g3);margin-bottom:8px;">' + (_stationMode ? 'Select 2-3 drills: 1st = S1 (you), 2nd = S2 (asst 1), 3rd = S3 (asst 2).' : 'Tap to select. Each becomes its own block.') + '</div>';
-
-  // Confirm button sticky
-  const btnLabel = count > 0 ? (_stationMode ? 'Add as 1 station block ('+count+' stations)' : 'Add '+count+' drill'+(count>1?'s':'')+' as separate blocks') : 'Select drills below';
-  h += '<div style="position:sticky;top:0;z-index:10;margin-bottom:8px;"><button onclick="_confirmAddDrill()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;background:'+(count>0?'var(--gold)':'var(--navy3)')+';color:'+(count>0?'var(--navy)':'var(--g3)')+';font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">' + btnLabel + '</button></div>';
-
-  // Drill list
-  if(!filtered.length) {
-    h += '<div style="padding:20px;text-align:center;color:var(--g3);font-size:13px;">No drills match.</div>';
-  } else {
-    h += '<div style="display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
-    filtered.forEach(d => {
-      const isSel = _pickerSelected.has(d.id);
-      const selIdx = selArray.indexOf(d.id);
-      const badge = _stationMode && isSel && selIdx >= 0 ? (stationNames[selIdx]||'S'+(selIdx+1)) : (isSel ? 'V' : '');
-      const badgeBg = (_stationMode && isSel) ? (stationColors[selIdx]||'var(--gold)') : (isSel ? 'var(--gold)' : 'transparent');
-      h += '<div onclick="setPickerDrill(this)" data-id="'+d.id+'" style="padding:10px 12px;border-radius:10px;border:2px solid '+(isSel?'var(--gold)':'var(--navy3)')+';background:'+(isSel?'rgba(245,166,35,.1)':'var(--navy2)')+';cursor:pointer;touch-action:manipulation;">';
-      h += '<div style="display:flex;align-items:center;gap:8px;">';
-      h += '<div style="width:28px;height:28px;border-radius:7px;border:2px solid '+(isSel?'var(--gold)':'var(--navy3)')+';background:'+badgeBg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:'+(isSel?'var(--navy)':'transparent')+';flex-shrink:0;">'+badge+'</div>';
-      h += '<div style="flex:1;min-width:0;">';
-      h += '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;"><span style="font-size:12px;font-weight:600;">'+d.name+'</span><span style="font-size:9px;font-weight:700;color:'+(tc[d.type]||tc.sk)+';text-transform:uppercase;">'+(tl[d.type]||d.type)+'</span><span style="font-size:9px;color:var(--g3);">'+d.time+' min</span>'+(d.fdm?'<span style="font-size:9px;color:var(--gold);">FDM</span>':'')+(d.custom?'<span style="font-size:9px;color:#a855f7;">Custom</span>':'')+'</div>';
-      h += '<div style="font-size:10px;color:var(--g3);margin-top:2px;line-height:1.3;">'+(d.desc||'').substring(0,80)+(((d.desc||'').length>80)?'...':'')+'</div>';
-      if(d.cue) h += '<div style="font-size:9px;color:var(--g3);font-style:italic;margin-top:1px;">Cue: '+d.cue.substring(0,60)+'</div>';
-      h += '</div></div></div>';
-    });
-    h += '</div>';
-  }
-
-  document.getElementById('slot-picker-content').innerHTML = h;
-  document.getElementById('slot-picker-pos').value = 'drillpicker';
-  openModal('modal-slot-picker');
-  setTimeout(() => {
-    const s = document.getElementById('drill-picker-search');
-    if(s && _addDrillFilter) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
-  }, 50);
-}
-
-function _selectDrillInPicker(id) {
-  if(_pickerSelected.has(id)) _pickerSelected.delete(id);
-  else _pickerSelected.add(id);
-  _openDrillPicker();
-}
-
-function _confirmAddDrill() {
-  if(!_pickerSelected.size) return;
-  const allDrills = DRILLS.concat(state.customDrills||[]);
-  const selected = [..._pickerSelected].map(id=>allDrills.find(d=>d.id===id)).filter(Boolean);
-  const stationLabels = ['S1 - YOU','S2 - ASST 1','S3 - ASST 2'];
-
-  let blocksToAdd = [];
-  if(_stationMode && selected.length > 1) {
-    const rotMin = Math.ceil(selected.reduce((s,d)=>s+(d.time||5),0)/selected.length);
-    blocksToAdd = [{
-      t:'sk', type:'sk',
-      name: 'Skill stations - ' + selected.map(d=>d.name).join(' / '),
-      min: String(rotMin * selected.length),
-      time: rotMin * selected.length,
-      desc: selected.length + ' stations, rotate every ' + rotMin + ' min.',
-      stations: selected.map((d,i) =>
-        (stationLabels[i]||'S'+(i+1)) + ' - ' + d.name + ': ' +
-        (d.desc||'').substring(0,100) + (d.cue ? ' Cue: ' + d.cue : '')
-      )
-    }];
-  } else {
-    blocksToAdd = selected.map(d => ({...d, type:d.type||d.t||'sk'}));
-  }
-
-  _pickerSelected.clear();
-
-  if(_addBlockCtx) {
-    const {wkNum, pracLbl} = _addBlockCtx;
-    const plans = getActivePracticePlans();
-    const wk = plans.find(p=>p.w===wkNum);
-    const pr = wk.prac.find(p=>p.lbl===pracLbl);
-    const blocks = [...getPracBlocks(wk, pr)];
-    blocksToAdd.forEach(b => blocks.push(b));
-    savePracBlocks(wk, pr, blocks);
-    closeModal('modal-slot-picker');
-    const el = document.getElementById('prac-content');
-    if(el) renderPracPlans(el);
-    showToast(_stationMode ? 'Station block added!' : selected.length + ' drill(s) added');
-  } else {
-    const arr = state.division==='56' ? (state.customPractice56||(state.customPractice56=[])) : state.customPractice;
-    blocksToAdd.forEach(b => arr.push(b));
-    save();
-    closeModal('modal-slot-picker');
-    curPracTab = 'builder';
-    document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
-    renderPracContent();
-    showToast(_stationMode ? 'Station block added to builder!' : selected.length + ' drill(s) added');
-  }
-}
-
-function _openEditBlockForm(wkNum, pracLbl, blockIdx) {
-  // Edit an existing block — show the form populated with current values
-  const isBuilder = wkNum === -1;
-  const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game/scrimmage'};
-  const types = ['wu','sk','tm','gm'];
-
-  let b;
-  if(isBuilder) {
-    const arr = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
-    b = arr[blockIdx];
-  } else {
-    const plans = getActivePracticePlans();
-    const wk = plans.find(p=>p.w===wkNum);
-    const pr = wk.prac.find(p=>p.lbl===pracLbl);
-    b = getPracBlocks(wk, pr)[blockIdx];
-  }
-  if(!b) return;
-  const t = b.t || b.type || 'sk';
-
-  let h = `<div class="modal-title">Edit block</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;" id="block-type-picker">
-      ${types.map(tp=>`<button onclick="selectBlockType('${tp}')" id="btype-${tp}"
-        style="padding:10px 8px;border-radius:8px;border:2px solid ${tp===t?'var(--gold)':'var(--navy3)'};
-        background:${tp===t?'rgba(245,166,35,.15)':'var(--navy3)'};
-        color:${tp===t?'var(--gold)':'var(--g3)'};font-size:12px;font-weight:600;cursor:pointer;touch-action:manipulation;">${tl[tp]}</button>`).join('')}
-    </div>
-    <input type="hidden" id="edit-block-type" value="${t}">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Name</label>
-    <input type="text" id="edit-block-name" value="${(b.name||'').replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Time (min)</label>
-    <input type="text" id="edit-block-min" placeholder="e.g. 10 or 10-20" value="${b.min||b.time||''}" style="margin-bottom:10px;">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Description / coaching notes</label>
-    <textarea id="edit-block-desc"
-      style="width:100%;min-height:90px;background:var(--navy3);border:1px solid var(--navy3);border-radius:8px;
-      padding:9px 12px;color:var(--white);font-family:Barlow,sans-serif;font-size:14px;resize:vertical;margin-bottom:12px;">${b.desc||''}</textarea>
-    <button onclick="saveEditBlock(${wkNum},'${pracLbl}',${blockIdx})"
-      class="btn btn-gold" style="width:100%;min-height:48px;font-size:15px;">Save changes</button>`;
-
-  document.getElementById('slot-picker-content').innerHTML = h;
-  document.getElementById('slot-picker-pos').value = 'editblock';
-  openModal('modal-slot-picker');
-  setTimeout(() => document.getElementById('edit-block-name').focus(), 200);
-}
-
-function selectBlockType(t) {
-  document.getElementById('edit-block-type').value = t;
-  document.querySelectorAll('#block-type-picker button').forEach(btn => {
-    const isThis = btn.id === 'btype-' + t;
-    btn.style.borderColor = isThis ? 'var(--gold)' : 'var(--navy3)';
-    btn.style.background = isThis ? 'rgba(245,166,35,.15)' : 'var(--navy3)';
-    btn.style.color = isThis ? 'var(--gold)' : 'var(--g3)';
-  });
-}
-
-function saveEditBlock(wkNum, pracLbl, blockIdx) {
-  const name = (document.getElementById('edit-block-name').value||'').trim();
-  const min  = (document.getElementById('edit-block-min').value||'').trim();
-  const desc = (document.getElementById('edit-block-desc').value||'').trim();
-  const t    = document.getElementById('edit-block-type').value || 'sk';
-  if(!name) { alert('Please enter a name.'); return; }
-  const block = {t, type:t, name, min:min||'—', time:parseInt(min)||10, desc:desc||name};
-
-  if(wkNum === -1) {
-    const arr = state.division==='56' ? (state.customPractice56||(state.customPractice56=[])) : state.customPractice;
-    if(blockIdx >= 0) arr[blockIdx] = {...arr[blockIdx], ...block};
-    else arr.push(block);
-    save(); closeModal('modal-slot-picker'); renderPracContent();
-    showToast(blockIdx >= 0 ? 'Block updated!' : 'Block added!');
-    return;
-  }
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===wkNum);
-  const pr = wk.prac.find(p=>p.lbl===pracLbl);
-  const blocks = [...getPracBlocks(wk, pr)];
-  if(blockIdx >= 0) blocks[blockIdx] = block; else blocks.push(block);
-  savePracBlocks(wk, pr, blocks);
-  closeModal('modal-slot-picker');
-  const el = document.getElementById('prac-content');
-  if(el) renderPracPlans(el);
-  showToast(blockIdx >= 0 ? 'Block updated!' : 'Block added!');
-}
-
-// ── Play installer picker — add a play install block to a practice ──
-let _playPickerSelected = new Set();
-let _playStationMode = false;
-let _playPickerCtx = null;
-
-function openPlayPicker(wkNum, pracLbl) {
-  _playPickerCtx = {wkNum, pracLbl};
-  _playPickerSelected.clear();
-  _playStationMode = false;
-  _renderPlayPicker();
-}
-
-function _renderPlayPicker() {
-  const {wkNum, pracLbl} = _playPickerCtx;
-  const division = state.division;
-  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
-  const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
-  const allPlays = bank;
-  const selArray = [..._playPickerSelected];
-  const count = _playPickerSelected.size;
-  const stationColors = ['#f5a623','#22c55e','#3b82f6'];
-  const stationNames = ['S1','S2','S3'];
-
-  let h = '<div class="modal-title">Add play install</div>';
-
-  // Station mode toggle
-  h += '<div style="display:flex;gap:6px;margin-bottom:10px;padding:8px;background:var(--navy3);border-radius:10px;align-items:center;">';
-  h += '<div style="flex:1;"><div style="font-size:12px;font-weight:600;">Station mode</div>';
-  h += '<div style="font-size:10px;color:var(--g3);margin-top:1px;">' + (_playStationMode
-    ? 'Each play installed at a different station simultaneously'
-    : 'One play added as a single team period block') + '</div></div>';
-  h += '<button onclick="_playStationMode=!_playStationMode;_renderPlayPicker()" style="padding:8px 14px;border-radius:8px;border:2px solid ' + (_playStationMode?'var(--gold)':'var(--navy3)') + ';background:' + (_playStationMode?'rgba(245,166,35,.15)':'transparent') + ';color:' + (_playStationMode?'var(--gold)':'var(--g3)') + ';font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;white-space:nowrap;">' + (_playStationMode ? 'S ON' : 'S OFF') + '</button>';
-  h += '</div>';
-
-  // Station mode explainer
-  if(_playStationMode) {
-    h += '<div style="padding:8px 10px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;margin-bottom:10px;font-size:11px;color:var(--g3);">';
-    h += 'Select 2-3 plays. <strong style="color:#f5a623;">S1 (you)</strong> walks QB + skill positions through the play. <strong style="color:#22c55e;">S2 (asst 1)</strong> drills OL blocking assignments. <strong style="color:#3b82f6;">S3 (asst 2)</strong> runs the play with the scout/backup group. Rotate on whistle.';
-    h += '</div>';
-  }
-
-  // Confirm button
-  const btnLabel = count > 0
-    ? (_playStationMode
-        ? 'Add as 1 station block (' + count + ' play' + (count>1?'s':'') + ')'
-        : 'Add ' + count + ' play install block' + (count>1?'s':''))
-    : 'Select a play below';
-  h += '<div style="position:sticky;top:0;z-index:10;margin-bottom:10px;"><button onclick="_confirmAddPlay()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;background:' + (count>0?'var(--gold)':'var(--navy3)') + ';color:' + (count>0?'var(--navy)':'var(--g3)') + ';font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">' + btnLabel + '</button></div>';
-
-  // Play list
-  h += '<div style="display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
-  const tiers = ['Core','Intermediate','Advanced','Trick'];
-  tiers.forEach(tier => {
-    const tierPlays = allPlays.filter(p=>p.tier===tier);
-    if(!tierPlays.length) return;
-    h += '<div style="font-size:10px;font-weight:700;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;padding:6px 0 2px;">' + tier + '</div>';
-    tierPlays.forEach(p => {
-      const isActive = activeIds.includes(p.id);
-      const isSel = _playPickerSelected.has(p.id);
-      const selIdx = selArray.indexOf(p.id);
-      const badge = _playStationMode && isSel && selIdx >= 0 ? (stationNames[selIdx]||'S'+(selIdx+1)) : (isSel ? 'V' : '+');
-      const badgeBg = (_playStationMode && isSel) ? (stationColors[selIdx]||'var(--gold)') : (isSel ? 'var(--gold)' : 'rgba(255,255,255,.06)');
-      const badgeColor = isSel ? 'var(--navy)' : 'var(--g3)';
-
-      h += '<div onclick="togglePlaySelect(\'' + p.id + '\')" data-playid="' + p.id + '" style="padding:10px 12px;border-radius:10px;border:2px solid ' + (isSel?'var(--gold)':(isActive?'rgba(245,166,35,.3)':'var(--navy3)')) + ';background:' + (isSel?'rgba(245,166,35,.1)':(isActive?'rgba(245,166,35,.04)':'var(--navy2)')) + ';cursor:pointer;touch-action:manipulation;">';
-      h += '<div style="display:flex;align-items:center;gap:8px;">';
-      h += '<div style="width:28px;height:28px;border-radius:7px;background:' + badgeBg + ';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:' + badgeColor + ';flex-shrink:0;">' + badge + '</div>';
-      h += '<div style="flex:1;min-width:0;">';
-      h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
-      h += '<span style="font-size:13px;font-weight:' + (isActive?700:500) + ';color:' + (isActive?'var(--gold)':'var(--white)') + ';">' + p.n + '</span>';
-      if(isActive) h += '<span style="font-size:9px;color:var(--gold);font-weight:700;">ACTIVE</span>';
-      h += '<span style="font-size:9px;color:var(--g3);">' + (p.pass?'Pass':'Run') + ' · ' + p.mis + ' mis.</span>';
-      h += '</div>';
-      h += '<div style="font-size:10px;color:var(--g3);margin-top:2px;line-height:1.3;">' + (p.desc||p.note||'').substring(0,70) + '</div>';
-      h += '</div></div></div>';
-    });
-  });
-  h += '</div>';
-
-  document.getElementById('slot-picker-content').innerHTML = h;
-  document.getElementById('slot-picker-pos').value = 'playpicker';
-  openModal('modal-slot-picker');
-}
-
-function togglePlaySelect(id) {
-  if(_playPickerSelected.has(id)) _playPickerSelected.delete(id);
-  else _playPickerSelected.add(id);
-  _renderPlayPicker();
-}
-
-function _confirmAddPlay() {
-  if(!_playPickerSelected.size) return;
-  const {wkNum, pracLbl} = _playPickerCtx;
-  const division = state.division;
-  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
-  const selected = [..._playPickerSelected].map(id=>bank.find(p=>p.id===id)).filter(Boolean);
-
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===wkNum);
-  const pr = wk.prac.find(p=>p.lbl===pracLbl);
-  const blocks = [...getPracBlocks(wk, pr)];
-
-  if(_playStationMode && selected.length > 1) {
-    // Wrap plays as a station block — each play at a different station
-    const stationLabels = ['S1 - YOU','S2 - ASST 1','S3 - ASST 2'];
-    const stationsArr = selected.map((p, i) => {
-      const lbl = stationLabels[i] || 'S'+(i+1);
-      const role = i===0
-        ? lbl + ' - ' + p.n + ': Walk QB and skill positions through assignments. 5 walk-throughs then live reps. QB calls the snap count.'
-        : i===1
-          ? lbl + ' - ' + p.n + ': OL blocking assignments. Who blocks whom? Walk through 5x then rep at full speed.'
-          : lbl + ' - ' + p.n + ': Backup/scout group runs the play. Focus on the ball carrier and the key block.';
-      return role;
-    });
-    blocks.push({
-      t: 'tm', type: 'tm',
-      name: 'Play install stations - ' + selected.map(p=>p.n).join(' / '),
-      min: '12-15',
-      time: 13,
-      desc: selected.length + ' plays installed simultaneously at ' + selected.length + ' stations. Rotate on whistle every 4 min.',
-      stations: stationsArr
-    });
-    showToast('Station install block added to Practice ' + pracLbl);
-  } else {
-    // Add each play as its own block
-    selected.forEach(play => {
-      const installDesc = [
-        play.formation ? 'Formation: ' + play.formation + '.' : '',
-        play.desc || '',
-        play.note ? 'Coach note: ' + play.note : ''
-      ].filter(Boolean).join(' ');
-      blocks.push({
-        t: 'tm', type: 'tm',
-        name: 'Play install: ' + play.n,
-        min: '10-15',
-        time: 12,
-        desc: installDesc || 'Walk-through and live reps of ' + play.n + '. 5 walk-throughs then 10 live reps at speed.',
-        cue: play.note || ''
-      });
-    });
-    showToast(selected.length + ' play install block' + (selected.length>1?'s':'') + ' added');
-  }
-
-  _playPickerSelected.clear();
-  savePracBlocks(wk, pr, blocks);
-  closeModal('modal-slot-picker');
-  const el = document.getElementById('prac-content');
-  if(el) renderPracPlans(el);
-}
-
-function addPlayToPlan(wkNum, pracLbl, playId) {
-  // Legacy single-play path (called from non-picker contexts)
-  _playPickerCtx = {wkNum, pracLbl};
-  _playPickerSelected.clear();
-  _playPickerSelected.add(playId);
-  _playStationMode = false;
-  _confirmAddPlay();
-}
-
-
-function openAddCustomDrill() {
-  const types = ['wu','sk','tm','gm'];
-  const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game/scrimmage'};
-  let h = `<div class="modal-title">Add custom drill to bank</div>
-    <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">This drill will be saved permanently to your drill bank and available to add to any practice.</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;" id="custom-drill-type-picker">
-      ${types.map(tp=>`<button onclick="selectCustomDrillType('${tp}')" id="cdtype-${tp}"
-        style="padding:10px 8px;border-radius:8px;border:2px solid ${'sk'===tp?'var(--gold)':'var(--navy3)'};
-        background:${'sk'===tp?'rgba(245,166,35,.15)':'var(--navy3)'};
-        color:${'sk'===tp?'var(--gold)':'var(--g3)'};font-size:12px;font-weight:600;cursor:pointer;touch-action:manipulation;">${tl[tp]}</button>`).join('')}
-    </div>
-    <input type="hidden" id="cd-type" value="sk">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Drill name *</label>
-    <input type="text" id="cd-name" placeholder="e.g. 2v2 Flag Chase" style="margin-bottom:10px;">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Category</label>
-    <input type="text" id="cd-cat" placeholder="e.g. Flag Pulling, Agility, QB Skills" style="margin-bottom:10px;" value="Custom">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Time (minutes)</label>
-    <input type="text" id="cd-time" placeholder="e.g. 8" style="margin-bottom:10px;">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Group size</label>
-    <input type="text" id="cd-group" placeholder="e.g. Pairs, Full team, Groups of 4" style="margin-bottom:10px;">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Equipment</label>
-    <input type="text" id="cd-equip" placeholder="e.g. Flags, Ball, Cones" style="margin-bottom:10px;">
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Description *</label>
-    <textarea id="cd-desc" placeholder="What happens, how to run it, what to watch for."
-      style="width:100%;min-height:80px;background:var(--navy3);border:1px solid var(--navy3);border-radius:8px;
-      padding:9px 12px;color:var(--white);font-family:Barlow,sans-serif;font-size:14px;resize:vertical;margin-bottom:10px;"></textarea>
-    <label style="font-size:12px;color:var(--g3);margin-bottom:4px;display:block;">Coaching cue</label>
-    <input type="text" id="cd-cue" placeholder="One-line cue coaches say during the drill" style="margin-bottom:12px;">
-    <button onclick="saveCustomDrill()" class="btn btn-gold" style="width:100%;min-height:48px;font-size:15px;">Save to drill bank</button>`;
-
-  document.getElementById('slot-picker-content').innerHTML = h;
-  document.getElementById('slot-picker-pos').value = 'customdrill';
-  openModal('modal-slot-picker');
-  setTimeout(() => document.getElementById('cd-name').focus(), 200);
-}
-
-function selectCustomDrillType(t) {
-  document.getElementById('cd-type').value = t;
-  document.querySelectorAll('#custom-drill-type-picker button').forEach(btn => {
-    const isThis = btn.id === 'cdtype-' + t;
-    btn.style.borderColor = isThis ? 'var(--gold)' : 'var(--navy3)';
-    btn.style.background  = isThis ? 'rgba(245,166,35,.15)' : 'var(--navy3)';
-    btn.style.color       = isThis ? 'var(--gold)' : 'var(--g3)';
-  });
-}
-
-function saveCustomDrill() {
-  const name = (document.getElementById('cd-name').value||'').trim();
-  const desc = (document.getElementById('cd-desc').value||'').trim();
-  if(!name || !desc) { alert('Name and description are required.'); return; }
-  if(!state.customDrills) state.customDrills = [];
-  const drill = {
-    id: 'cd_' + Date.now(),
-    custom: true,
-    name,
-    type: document.getElementById('cd-type').value || 'sk',
-    cat:  (document.getElementById('cd-cat').value||'Custom').trim(),
-    time: parseInt(document.getElementById('cd-time').value)||10,
-    group:(document.getElementById('cd-group').value||'Full team').trim(),
-    equip:(document.getElementById('cd-equip').value||'None').trim(),
-    desc,
-    cue:  (document.getElementById('cd-cue').value||'').trim(),
-    level:'All',
-  };
-  state.customDrills.push(drill);
-  save();
-  showToast(drill.name + ' added to drill bank!');
-  // Go back to the picker so you can immediately select it
-  closeModal('modal-slot-picker');
-  _pickerSelected.clear();
-  _pickerSelected.add(drill.id);
-  _addDrillCat = drill.cat;
-  _openDrillPicker();
-}
-
-
-function renderStations(b) {
-  if(!b) return '';
-  if(!b.stations || !b.stations.length) {
-    const desc = b.desc || '';
-    return '<div style="font-size:11px;color:var(--g3);line-height:1.5;">' + (desc.length>120?desc.substring(0,120)+'…':desc) + '</div>';
-  }
-  const colors = ['#f5a623','#22c55e','#3b82f6'];
-  const labels = ['You','Asst 1','Asst 2'];
-  let html = '<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">';
-  b.stations.forEach(function(s, i) {
-    html += '<div style="display:flex;gap:6px;align-items:flex-start;">';
-    html += '<div style="font-size:9px;font-weight:700;color:' + (colors[i]||'#999') + ';min-width:44px;padding-top:1px;text-transform:uppercase;">S'+(i+1)+' '+(labels[i]||'Asst '+(i+1))+'</div>';
-    html += '<div style="font-size:11px;color:var(--g3);flex:1;line-height:1.4;">' + s + '</div>';
-    html += '</div>';
-  });
-  html += '</div>';
-  return html;
 }
 
 function renderPracPlans(el) {
@@ -3294,321 +2382,120 @@ function renderPracPlans(el) {
   const wk = plans.find(p=>p.w===curPracWeek);
   if(!wk) { el.innerHTML=''; el.appendChild(wks); return; }
   const tc = {wu:'pb-wu',sk:'pb-sk',tm:'pb-tm',gm:'pb-gm'};
-  const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game'};
-  const charTheme = CHARACTER_THEMES[(curPracWeek-1) % CHARACTER_THEMES.length];
-  const fdmNote = getFDMStructureNote ? getFDMStructureNote() : '';
+  const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game/scrimmage'};
+  const stationColors = ['#f5a623','#22c55e','#3b82f6'];
 
-  // Check if any practice in this week has overrides
-  const hasOverrides = wk.prac.some(pr => {
-    if(!state.planOverrides) return false;
-    return !!state.planOverrides[state.division + '_w' + wk.w + '_' + pr.lbl];
-  });
-
-  let h = `<div class="card" style="margin-bottom:8px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-      <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
-        <span class="badge b-blue">${wk.phase}</span>
-        <span style="font-size:14px;font-weight:600;line-height:1.3;">${wk.theme}</span>
-      </div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;">
-        ${hasOverrides?'<button onclick="wk.prac.forEach(function(pr){resetPracBlocks(wk,pr)})" class="btn btn-sm" style="font-size:10px;color:var(--g3);">↺ Reset</button>':''}
-        <button onclick="sharePracticePlan()" class="btn btn-sm" style="font-size:11px;">📤</button>
-        <button onclick="printPracticePlan()" class="btn btn-sm" style="font-size:11px;">🖨️</button>
-      </div>
-    </div>
-    <div style="padding:7px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;margin-bottom:6px;">
-      <div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;">CHARACTER THEME — ${charTheme.theme}</div>
-      <div style="font-size:11px;color:var(--g3);">${(charTheme.tip||'').replace(/'/g,'\u2019')}</div>
-    </div>
-    <div style="font-size:10px;color:var(--g3);font-style:italic;line-height:1.4;">${fdmNote}</div>
-  </div>`;
-
-  wk.prac.forEach(pr => {
-    const blocks = getPracBlocks(wk, pr);
-    const totalMin = blocks.reduce((s,b) => {
-      const parts = String(b.min).split(/[-–]/);
-      return s + (parseInt(parts[parts.length-1])||0);
-    }, 0);
-    const isEdited = state.planOverrides && !!state.planOverrides[state.division+'_w'+wk.w+'_'+pr.lbl];
-
-    h += `<div style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:12px;font-weight:700;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;">
-          Practice ${pr.lbl} — ~${totalMin} min
-          ${isEdited?'<span class="badge b-amber" style="font-size:9px;margin-left:4px;vertical-align:middle;">Edited</span>':''}
-        </div>
-        <div style="display:flex;gap:4px;">
-          ${isEdited?'<button onclick="resetCurrentPracBlock('+wk.w+',\''+pr.lbl+'\')" class="btn btn-sm" style="font-size:9px;color:var(--g3);">\u21ba</button>':''}
-        </div>
-      </div>`;
-
-    blocks.forEach((b, bi) => {
-      const typeColor = {wu:'rgba(34,197,94,.15)',sk:'rgba(59,130,246,.15)',tm:'rgba(168,85,247,.15)',gm:'rgba(239,68,68,.15)'};
-      const typeBorder = {wu:'rgba(34,197,94,.3)',sk:'rgba(59,130,246,.3)',tm:'rgba(168,85,247,.3)',gm:'rgba(239,68,68,.3)'};
-      const typeTextColor = {wu:'var(--green)',sk:'var(--blue)',tm:'#a855f7',gm:'var(--red)'};
-      const bg = typeColor[b.t] || typeColor.sk;
-      const border = typeBorder[b.t] || typeBorder.sk;
-      const textColor = typeTextColor[b.t] || typeTextColor.sk;
-
-      h += `<div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:10px 12px;margin-bottom:6px;">
-        <div style="display:flex;align-items:flex-start;gap:8px;">
-          <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
-              <span style="font-size:10px;font-weight:700;color:${textColor};text-transform:uppercase;">${tl[b.t]||b.t}</span>
-              <span style="font-size:10px;color:var(--g3);">· ${b.min} min</span>
-            </div>
-            <div style="font-size:13px;font-weight:600;margin-bottom:3px;line-height:1.3;">${b.name}</div>
-            ${renderStations(b)}
-          </div>
-          <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
-            <button onclick="openEditBlock(${wk.w},'${pr.lbl}',${bi})" style="background:none;border:1px solid var(--navy3);border-radius:6px;color:var(--g3);cursor:pointer;padding:4px 7px;font-size:12px;min-height:30px;touch-action:manipulation;">✏️</button>
-            <button onclick="movePracBlock(${wk.w},'${pr.lbl}',${bi},-1)" ${bi===0?'disabled':''} style="background:none;border:1px solid var(--navy3);border-radius:6px;color:${bi===0?'var(--navy3)':'var(--g3)'};cursor:pointer;padding:4px 7px;font-size:11px;min-height:30px;touch-action:manipulation;">↑</button>
-            <button onclick="movePracBlock(${wk.w},'${pr.lbl}',${bi},1)" ${bi===blocks.length-1?'disabled':''} style="background:none;border:1px solid var(--navy3);border-radius:6px;color:${bi===blocks.length-1?'var(--navy3)':'var(--g3)'};cursor:pointer;padding:4px 7px;font-size:11px;min-height:30px;touch-action:manipulation;">↓</button>
-            <button onclick="deletePracBlock(${wk.w},'${pr.lbl}',${bi})" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:6px;color:var(--red);cursor:pointer;padding:4px 7px;font-size:12px;min-height:30px;touch-action:manipulation;">×</button>
-          </div>
-        </div>
-      </div>`;
+  function renderBlockBody(b) {
+    if(!b.stations || !b.stations.length) {
+      return '<div class="pb-desc">' + (b.desc||'') + '</div>';
+    }
+    // Brief one-liner per station
+    let html = '<div style="margin:4px 0 6px;display:flex;flex-direction:column;gap:2px;">';
+    b.stations.forEach(function(s, i) {
+      const clean = (s||'').replace(/^S\d+\s*[-—]+\s*(YOU|ASST \d+)\s*[-—]+\s*/i,'');
+      const brief = clean.split(/[:.]/)[0].trim();
+      const short = brief.length>55 ? brief.substring(0,55)+'…' : brief;
+      html += '<div style="display:flex;gap:5px;align-items:baseline;">'
+        + '<span style="font-size:9px;font-weight:800;color:'+(stationColors[i]||'#999')+';text-transform:uppercase;flex-shrink:0;min-width:40px;">S'+(i+1)+'</span>'
+        + '<span style="font-size:11px;color:var(--g3);">' + short + '</span>'
+        + '</div>';
     });
+    html += '</div>';
+    // Full detail per station
+    html += '<div style="display:flex;flex-direction:column;gap:4px;">';
+    b.stations.forEach(function(s, i) {
+      const clean = (s||'').replace(/^S\d+\s*[-—]+\s*(YOU|ASST \d+)\s*[-—]+\s*/i,'');
+      html += '<div style="padding:4px 7px;border-left:2px solid '+(stationColors[i]||'#999')+';background:rgba(255,255,255,.04);border-radius:0 4px 4px 0;">'
+        + '<div style="font-size:9px;font-weight:700;color:'+(stationColors[i]||'#999')+';text-transform:uppercase;margin-bottom:1px;">S'+(i+1)+' — '+(['You','Asst 1','Asst 2'][i]||'Asst '+(i+1))+'</div>'
+        + '<div style="font-size:10px;color:var(--g3);line-height:1.4;">' + clean + '</div>'
+        + '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
 
-    h += `<div style="display:flex;gap:6px;margin-top:4px;">
-      <button onclick="openEditBlock(${wk.w},'${pr.lbl}',-1)" style="flex:1;padding:10px;border-radius:8px;border:2px dashed var(--navy3);background:transparent;color:var(--g3);font-size:12px;cursor:pointer;touch-action:manipulation;">+ Drill from bank</button>
-      <button onclick="openPlayPicker(${wk.w},'${pr.lbl}')" style="flex:1;padding:10px;border-radius:8px;border:2px dashed rgba(245,166,35,.4);background:transparent;color:var(--gold);font-size:12px;cursor:pointer;touch-action:manipulation;">+ Play install</button>
-    </div>
-    </div>`;
+  const timing = (wk.w <= 6) ? '90 min' : '75 min';
+  let h = `<div class="card" style="margin-bottom:8px;"><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;"><span class="badge b-blue">${wk.phase}</span><span style="font-size:14px;font-weight:600;">${wk.theme}</span><span style="font-size:11px;color:var(--g3);">${timing}</span></div></div>`;
+  wk.prac.forEach(pr => {
+    h += `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Practice ${pr.lbl}</div>`;
+    pr.blocks.forEach(b => {
+      h += `<div class="prac-block ${tc[b.t]||'pb-sk'}"><div class="pb-type">${tl[b.t]||b.t} · min ${b.min}</div><div class="pb-name">${b.name}</div>${renderBlockBody(b)}</div>`;
+    });
+    h += '</div>';
   });
-
   el.innerHTML = '';
   el.appendChild(wks);
   el.insertAdjacentHTML('beforeend', h);
 }
 
 function renderPracBuilder(el) {
-  const plan = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
+  const plan = state.customPractice;
+  const tc = {wu:'pb-wu',sk:'pb-sk',tm:'pb-tm',gm:'pb-gm'};
   const tl = {wu:'Warm-up',sk:'Skill',tm:'Team',gm:'Game'};
-  const typeColor = {wu:'rgba(34,197,94,.15)',sk:'rgba(59,130,246,.15)',tm:'rgba(168,85,247,.15)',gm:'rgba(239,68,68,.15)'};
-  const typeBorder = {wu:'rgba(34,197,94,.3)',sk:'rgba(59,130,246,.3)',tm:'rgba(168,85,247,.3)',gm:'rgba(239,68,68,.3)'};
-  const typeTextColor = {wu:'var(--green)',sk:'var(--blue)',tm:'#a855f7',gm:'var(--red)'};
-  const totalTime = plan.reduce((s,d)=>s+(parseInt(d.time)||0),0);
-
-  let h = `<div class="card" style="margin-bottom:10px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div class="card-title">Practice Builder</div>
-        <div class="card-sub">Go to <strong>Drills</strong> tab to select and add. Drag ⠿ to reorder.</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:20px;font-weight:800;color:var(--gold);">${totalTime}</div>
-        <div style="font-size:10px;color:var(--g3);">min total</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:6px;margin-top:10px;">
-      <button onclick="openEditBlock(-1,'custom',-1)" class="btn btn-gold btn-sm" style="flex:1;">+ Add from drill bank</button>
-      ${plan.length?`<button onclick="clearPlan()" class="btn btn-danger btn-sm">Clear all</button>`:''}
-    </div>
+  let h = `<div class="card" style="margin-bottom:8px;">
+    <div class="card-title">Custom practice builder</div>
+    <div class="card-sub">Add drills from the Drill Bank tab. Drag to reorder. 75 min target.</div>
+    <div style="font-size:12px;color:var(--gold);font-weight:600;margin-top:6px;">Total time: ${plan.reduce((s,d)=>s+d.time,0)} min</div>
   </div>`;
-
   if(!plan.length) {
-    h += `<div style="padding:24px;text-align:center;background:var(--navy3);border-radius:10px;border:2px dashed var(--navy3);">
-      <div style="font-size:28px;margin-bottom:8px;">📋</div>
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Builder is empty</div>
-      <div style="font-size:12px;color:var(--g3);">Go to the <strong>Drills</strong> tab, select drills with the checkbox, then tap <strong>+ Add selected</strong>.</div>
-    </div>`;
+    h += `<div class="drop-zone" id="main-drop">Go to <strong>Drill Bank</strong> tab and tap a drill to add it here</div>`;
   } else {
-    plan.forEach((d, i) => {
-      const t = d.type || d.t || 'sk';
-      const bg = typeColor[t] || typeColor.sk;
-      const border = typeBorder[t] || typeBorder.sk;
-      const textColor = typeTextColor[t] || typeTextColor.sk;
-      h += `<div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:10px 12px;margin-bottom:6px;"
-              draggable="true" ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondrop="dropBlock(event,${i})">
-        <div style="display:flex;align-items:flex-start;gap:8px;">
-          <span style="color:var(--g3);font-size:18px;cursor:grab;flex-shrink:0;margin-top:2px;touch-action:none;">⠿</span>
-          <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-              <span style="font-size:10px;font-weight:700;color:${textColor};text-transform:uppercase;">${tl[t]||t}</span>
-              <span style="font-size:10px;color:var(--g3);">· ${d.time||d.min||'?'} min</span>
-            </div>
-            <div style="font-size:13px;font-weight:600;line-height:1.3;">${d.name}</div>
+    h += '<div id="plan-list">';
+    plan.forEach((d,i) => {
+      h += `<div class="prac-block ${tc[d.type||'sk']}" draggable="true" ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondrop="dropBlock(event,${i})">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="drag-handle">⠿</span>
+          <div style="flex:1;">
+            <div class="pb-type">${tl[d.type||'sk']} · ${d.time} min</div>
+            <div class="pb-name">${d.name}</div>
+            <div class="pb-desc">${d.desc.substring(0,100)}...</div>
           </div>
-          <div style="display:flex;gap:3px;flex-shrink:0;">
-            <button onclick="editPlanBlock(${i})" style="background:none;border:1px solid var(--navy3);border-radius:6px;color:var(--g3);cursor:pointer;padding:4px 7px;font-size:12px;min-height:32px;touch-action:manipulation;">✏️</button>
-            <button onclick="removePlanBlock(${i})" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:6px;color:var(--red);cursor:pointer;padding:4px 7px;font-size:13px;min-height:32px;touch-action:manipulation;">×</button>
-          </div>
+          <button onclick="removePlanBlock(${i})" class="btn btn-danger btn-sm">×</button>
         </div>
       </div>`;
     });
+    h += '</div>';
+    h += `<button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="clearPlan()">Clear plan</button>`;
+    h += `<div style="margin-top:10px;font-size:11px;color:var(--g3);">Tip: Add drills from the Drill Bank tab. Total time shown above.</div>`;
   }
   el.innerHTML = h;
 }
 
 let dragIdx = null;
-let selectedDrillIds = new Set();
-
 function dragStart(i) { dragIdx = i; }
 function dragOver(e, i) { e.preventDefault(); }
 function dropBlock(e, i) {
   e.preventDefault();
   if(dragIdx === null || dragIdx === i) return;
-  const arr = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
+  const arr = state.customPractice;
   const item = arr.splice(dragIdx,1)[0];
   arr.splice(i,0,item);
   dragIdx = null;
   save();
   renderPracContent();
 }
-function removePlanBlock(i) {
-  const arr = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
-  arr.splice(i,1);
-  save();
-  renderPracContent();
-}
-function clearPlan() {
-  if(confirm('Clear the custom plan?')) {
-    if(state.division==='56') state.customPractice56=[];
-    else state.customPractice=[];
-    save(); renderPracContent();
-  }
-}
-function editPlanBlock(i) {
-  const arr = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
-  const b = arr[i];
-  if(!b) return;
-  const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game/scrimmage'};
-  const types = ['wu','sk','tm','gm'];
-  let h = `<div class="modal-title">Edit block</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;" id="block-type-picker2">
-      ${types.map(t=>`<button onclick="selectBlockType2('${t}')" id="btype2-${t}" style="padding:10px 8px;border-radius:8px;border:2px solid ${b.t===t?'var(--gold)':'var(--navy3)'};background:${b.t===t?'rgba(245,166,35,.15)':'var(--navy3)'};color:${b.t===t?'var(--gold)':'var(--g3)'};font-size:12px;font-weight:600;cursor:pointer;touch-action:manipulation;">${tl[t]}</button>`).join('')}
-    </div>
-    <input type="hidden" id="edit-block2-type" value="${b.t||'sk'}">
-    <input type="text" id="edit-block2-name" placeholder="Name" value="${b.name.replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
-    <input type="text" id="edit-block2-min" placeholder="Time e.g. 10 or 10-20" value="${b.time||b.min||''}" style="margin-bottom:10px;">
-    <textarea id="edit-block2-desc" style="width:100%;min-height:80px;background:var(--navy3);border:1px solid var(--navy3);border-radius:8px;padding:9px 12px;color:var(--white);font-family:Barlow,sans-serif;font-size:14px;resize:vertical;margin-bottom:12px;">${b.desc||''}</textarea>
-    <button onclick="savePlanBlockEdit(${i})" class="btn btn-gold" style="width:100%;min-height:48px;font-size:15px;">Save changes</button>`;
-  document.getElementById('slot-picker-content').innerHTML = h;
-  document.getElementById('slot-picker-pos').value = 'editplanblock';
-  openModal('modal-slot-picker');
-  setTimeout(() => document.getElementById('edit-block2-name').focus(), 200);
-}
-function selectBlockType2(t) {
-  document.getElementById('edit-block2-type').value = t;
-  document.querySelectorAll('#block-type-picker2 button').forEach(btn => {
-    const isThis = btn.id === 'btype2-' + t;
-    btn.style.borderColor = isThis ? 'var(--gold)' : 'var(--navy3)';
-    btn.style.background = isThis ? 'rgba(245,166,35,.15)' : 'var(--navy3)';
-    btn.style.color = isThis ? 'var(--gold)' : 'var(--g3)';
-  });
-}
-function savePlanBlockEdit(i) {
-  const arr = state.division==='56' ? (state.customPractice56||[]) : state.customPractice;
-  const name = document.getElementById('edit-block2-name').value.trim();
-  if(!name) { alert('Enter a name.'); return; }
-  arr[i] = {
-    ...arr[i],
-    t: document.getElementById('edit-block2-type').value,
-    type: document.getElementById('edit-block2-type').value,
-    name,
-    time: parseInt(document.getElementById('edit-block2-min').value)||arr[i].time||10,
-    min: document.getElementById('edit-block2-min').value||String(arr[i].time||10),
-    desc: document.getElementById('edit-block2-desc').value||name,
-  };
-  save();
-  closeModal('modal-slot-picker');
-  renderPracContent();
-  showToast('Block updated!');
-}
-function toggleDrillSelect(id) {
-  if(selectedDrillIds.has(id)) {
-    selectedDrillIds.delete(id);
-  } else {
-    selectedDrillIds.add(id);
-  }
-  // Update just the tapped card's visual state — no full re-render
-  const card = document.getElementById('dcard-' + id);
-  if(card) {
-    const sel = selectedDrillIds.has(id);
-    card.style.borderColor = sel ? 'var(--gold)' : 'var(--navy3)';
-    card.style.background  = sel ? 'rgba(245,166,35,.08)' : 'var(--navy2)';
-    const box = card.querySelector('.drill-checkbox');
-    if(box) {
-      box.style.borderColor = sel ? 'var(--gold)' : 'var(--navy3)';
-      box.style.background  = sel ? 'var(--gold)'  : 'transparent';
-      box.textContent = sel ? '✓' : '';
-    }
-  }
-  // Show/hide the sticky bar
-  const btn = document.getElementById('add-selected-btn');
-  if(btn) {
-    btn.style.display = selectedDrillIds.size > 0 ? 'block' : 'none';
-    btn.textContent = `+ Add ${selectedDrillIds.size} drill${selectedDrillIds.size>1?'s':''} to builder`;
-  }
-}
-
-function addSelectedDrills() {
-  if(!selectedDrillIds.size) return;
-  const allDrills = DRILLS.concat(state.customDrills||[]);
-  const arr = state.division==='56' ? (state.customPractice56||(state.customPractice56=[])) : state.customPractice;
-  let count = 0;
-  selectedDrillIds.forEach(id => {
-    const d = allDrills.find(dr=>dr.id===id);
-    if(d) { arr.push({...d, type:d.type||d.t||'sk'}); count++; }
-  });
-  selectedDrillIds.clear();
-  save();
-  // Switch to Builder tab (index 1)
-  curPracTab = 'builder';
-  document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
-  const title = document.getElementById('hdr-title');
-  if(title) title.textContent = 'Practice › Builder';
-  renderPracContent();
-  showToast(count + ' drill' + (count>1?'s':'') + ' added to builder');
-}
+function removePlanBlock(i) { state.customPractice.splice(i,1); save(); renderPracContent(); }
+function clearPlan() { if(confirm('Clear the custom plan?')) { state.customPractice=[]; save(); renderPracContent(); } }
 
 function renderDrillBank(el) {
-  const divLabel = state.division === '56' ? '5/6' : '7/8';
   const cats = ['All',...new Set(DRILLS.map(d=>d.cat))];
-  const allDrills = DRILLS.concat((state.customDrills||[]).map(d=>({...d,type:d.type||'sk'})));
-  const visible = allDrills.filter(d => {
-    if(curDrillCat !== 'All' && d.cat !== curDrillCat) return false;
-    if(showFDMOnly && !d.fdm) return false;
-    return true;
-  });
-  const tl = {wu:'Warm-up',sk:'Skill',tm:'Team',gm:'Game'};
-  const tc = {wu:'b-green',sk:'b-blue',tm:'b-amber',gm:'b-red'};
-
-  let h = `<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
-    <div style="font-size:12px;font-weight:600;color:var(--g3);">Filter:</div>
-    <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;margin-left:auto;">
-      <input type="checkbox" ${showFDMOnly?'checked':''} onchange="showFDMOnly=this.checked;renderPracContent()" style="accent-color:var(--gold);">
-      <span style="color:var(--gold);">FDM only</span>
-    </label>
-  </div>
-  <div class="tab-row" style="margin-bottom:10px;">
+  const filtered = curDrillCat==='All' ? DRILLS : DRILLS.filter(d=>d.cat===curDrillCat);
+  let h = `<div class="tab-row" style="margin-bottom:10px;">
     ${cats.map(c=>`<div class="tab ${c===curDrillCat?'active':''}" onclick="setDrillCat('${c}')">${c}</div>`).join('')}
   </div>
-  <!-- Sticky add button — shown when drills are selected -->
-  <div id="add-selected-btn" onclick="addSelectedDrills()" style="display:${selectedDrillIds.size>0?'block':'none'};position:sticky;top:0;z-index:10;background:var(--gold);color:var(--navy);padding:14px;border-radius:10px;text-align:center;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;touch-action:manipulation;box-shadow:0 2px 12px rgba(0,0,0,.3);">+ Add selected (${selectedDrillIds.size}) to builder</div>
-  <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">Tap any drill to select it (turns gold). Select as many as you want, then tap the gold bar above.</div>`;
-
-  visible.forEach(d => {
-    const isSelected = selectedDrillIds.has(d.id);
-    h += `<div id="dcard-${d.id}" onclick="toggleDrillSelect('${d.id}')" style="background:${isSelected?'rgba(245,166,35,.08)':'var(--navy2)'};border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;touch-action:manipulation;">
-      <div style="display:flex;align-items:flex-start;gap:8px;">
-        <div class="drill-checkbox" style="width:22px;height:22px;border-radius:6px;border:2px solid ${isSelected?'var(--gold)':'var(--navy3)'};background:${isSelected?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:12px;color:var(--navy);">${isSelected?'✓':''}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-            <span style="font-size:13px;font-weight:600;">${d.name}</span>
-            <span class="badge ${tc[d.type]||'b-gray'}" style="font-size:9px;">${tl[d.type]||d.type}</span>
-            ${d.fdm?'<span class="badge b-gold" style="font-size:9px;">FDM</span>':''}
-          </div>
-          <div style="font-size:11px;color:var(--g3);margin-bottom:5px;line-height:1.4;">${(d.desc||'').substring(0,90)}${(d.desc||'').length>90?'…':''}</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-            <span class="badge b-gray" style="font-size:9px;">${d.cat}</span>
-            <span class="badge b-gray" style="font-size:9px;">${d.time} min</span>
-            <span class="badge b-gray" style="font-size:9px;">${d.group}</span>
-            <button onclick="event.stopPropagation();showDrillDetail('${d.id}')" style="margin-left:auto;background:none;border:1px solid var(--navy3);border-radius:6px;color:var(--g3);font-size:10px;padding:3px 8px;cursor:pointer;touch-action:manipulation;">Details</button>
-            ${d.custom?`<button onclick="event.stopPropagation();deleteCustomDrill('${d.id}')" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:6px;color:var(--red);font-size:10px;padding:3px 8px;cursor:pointer;touch-action:manipulation;">✕ Delete</button>`:''}
-          </div>
-        </div>
+  <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">Tap a drill to view details and add to your practice plan.</div>`;
+  filtered.forEach(d => {
+    h += `<div class="drill-card" onclick="showDrillDetail('${d.id}')">
+      <div class="dc-header">
+        <div class="dc-title">${d.name}</div>
+        <span class="badge b-${d.type==='wu'?'green':d.type==='sk'?'blue':d.type==='tm'?'amber':'red'}">${d.type==='wu'?'Warm-up':d.type==='sk'?'Skill':d.type==='tm'?'Team':'Game'}</span>
+      </div>
+      <div class="dc-body">${d.desc.substring(0,100)}...</div>
+      <div class="dc-footer">
+        <span class="badge b-gray">${d.cat}</span>
+        <span class="dc-time">${d.time} min</span>
+        <span class="badge b-gray">${d.group}</span>
+        <span class="badge b-gray">${d.equip}</span>
       </div>
     </div>`;
   });
@@ -3647,16 +2534,12 @@ function showDrillDetail(id) {
 
 function addDrillToPlan() {
   if(!selectedDrill) return;
-  const arr = state.division==='56' ? (state.customPractice56||(state.customPractice56=[])) : state.customPractice;
-  arr.push({...selectedDrill});
+  state.customPractice.push({...selectedDrill});
   save();
   closeModal('modal-drill-detail');
   curPracTab = 'builder';
   document.querySelectorAll('#pg-practices .tab').forEach((t,i)=>t.classList.toggle('active',i===1));
-  const title = document.getElementById('hdr-title');
-  if(title) title.textContent = 'Practice › Builder';
   renderPracContent();
-  showToast(selectedDrill.name + ' added to builder');
 }
 
 function renderActivities(el) {
@@ -3712,20 +2595,15 @@ function selectSystem(sys, el) {
   renderPbContent();
 }
 
-const PB_TAB_NAMES = {active:'Active Playbook',bank:'Play Bank',defense:'Defense',formation:'Formations',playlog:'Play Log',callsheet:'Call Sheet'};
 function pbTab(tab, el) {
   curPbSub = tab;
   document.querySelectorAll('#pg-playbook .tab').forEach(t=>t.classList.remove('active'));
-  if(el) el.classList.add('active');
-  const title = document.getElementById('hdr-title');
-  if(title && currentPage==='pg-playbook') title.textContent = 'Playbook › ' + (PB_TAB_NAMES[tab]||tab);
+  el.classList.add('active');
   renderPbContent();
 }
 
 function renderPbContent() {
   const el = document.getElementById('pb-content');
-  if(curPbSub === 'playlog') { renderPlayLog(el); return; }
-  if(curPbSub === 'callsheet') { renderCallSheet(el); return; }
   if(state.division === '56') {
     renderPbContent56(el);
     return;
@@ -3916,7 +2794,7 @@ function renderPlayCard(p, showRemove) {
     <div class="dc-footer" style="margin-top:7px;">
       <span class="badge b-${p.tier==='Core'?'green':p.tier==='Advanced'||p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
       ${p.pass?'<span class="badge b-blue">Pass</span>':'<span class="badge b-gray">Run</span>'}
-      ${(()=>{const s=getPlayStats(p.id);return s?`<span class="badge b-${s.pct>=60?'green':s.pct>=30?'amber':'red'}">${s.pct}% W (${s.total})</span>`:'';})()}
+      <span class="badge b-${p.mis==='Very High'?'red':p.mis==='High'?'amber':p.mis==='Med'?'blue':'gray'}">${p.mis} mis.</span>
     </div>
   </div>`;
 }
@@ -4037,13 +2915,10 @@ function renderFormations(el) {
 // ════════════════════════════════════════════
 // TOOLS
 // ════════════════════════════════════════════
-const TOOL_TAB_NAMES = {situations:'Situations',touches:'Touch Tracker',games:'Game Log',scouting:'Scouting',culture:'Team Culture',tips:'Coaching Tips'};
 function toolTab(tab, el) {
   curToolTab = tab;
   document.querySelectorAll('#pg-tools .tab').forEach(t=>t.classList.remove('active'));
-  if(el) el.classList.add('active');
-  const title = document.getElementById('hdr-title');
-  if(title && currentPage==='pg-tools') title.textContent = 'Tools › ' + (TOOL_TAB_NAMES[tab]||tab);
+  el.classList.add('active');
   renderToolContent();
 }
 
@@ -4052,8 +2927,6 @@ function renderToolContent() {
   if(curToolTab === 'situations') renderSituations(el);
   else if(curToolTab === 'touches') renderTouches(el);
   else if(curToolTab === 'games') renderGames(el);
-  else if(curToolTab === 'scouting') renderScouting(el);
-  else if(curToolTab === 'culture') renderCulture(el);
   else if(curToolTab === 'tips') renderTips(el);
 }
 
@@ -4130,10 +3003,8 @@ function logCarry(pi) { if(!state.roster[pi].touchGames)state.roster[pi].touchGa
 
 function renderGames(el) {
   const games = activeGames();
-  const is56 = state.division === '56';
   let h = `<div style="display:flex;gap:8px;margin-bottom:12px;">
     <button class="btn btn-gold" onclick="addGame()" style="flex:1;">+ Add game</button>
-    ${is56?`<button class="btn btn-outline" onclick="showScrimmageFormat()" style="font-size:11px;">📋 Scrimmage format</button>`:''}
   </div>`;
   if(!games.length) h += '<div class="empty"><div class="empty-icon">🏟️</div><div class="empty-text">No games yet.<br>No official score kept — focus on execution.</div></div>';
   games.forEach((g,gi) => {
@@ -4267,42 +3138,10 @@ const SINGLEWING_BANK = [
    desc:'Mirror of QB Bootleg Right. Fake inside, QB rolls left.',
    note:'Run both bootleg directions. Alternate based on which edge opens.',
    formation:'Under center, inside fake, QB rolls left'},
-  // ── Double Wing core plays (from PDF source) ──
-  {id:'sw21',n:'Power Dive Right',tier:'Core',wk:2,mis:'Med',pass:false,
-   desc:'Fake sweep motion away (left RB goes left). Play-side RB takes quick handoff and dives inside right guard. Short yardage weapon -- best on 4th and 1 or inside the 5.',
-   note:'Fake the sweep first -- defense must respect the outside. Then hit inside.',
-   formation:'Under center, sweep fake left, right back dives inside'},
-  {id:'sw22',n:'Power Dive Left',tier:'Core',wk:2,mis:'Med',pass:false,
-   desc:'Mirror of Power Dive Right. Sweep fake right, left back dives inside left guard.',
-   note:'Run both dives. Mix with sweeps to attack both inside and outside.',
-   formation:'Under center, sweep fake right, left back dives inside'},
-  {id:'sw23',n:'Reverse with Lead Block',tier:'Advanced',wk:5,mis:'High',pass:false,
-   desc:'One RB goes in pre-snap motion right (reverse look). QB hands to that RB going left. The other RB leads as a blocker on the edge for the reverse runner.',
-   note:'The blocker makes this play. Practice the lead block -- body position between defender and ball carrier.',
-   formation:'Pre-snap motion, reverse hand, lead blocker'},
-  {id:'sw24',n:'Halfback Pass',tier:'Trick',wk:8,mis:'Very High',pass:true,
-   desc:'Sweep fake to RB. RB takes the handoff and runs the sweep -- but instead of running, stops and throws back to the QB who leaked out to the flat. QB must sell staying in the pocket.',
-   note:'Once per season. Walk-through 8x. QB sells pocket presence. RB must be able to throw.',
-   formation:'Under center, sweep hand, RB throws back to QB in flat'},
-  {id:'sw25',n:'Inside Trap (Power)',tier:'Advanced',wk:6,mis:'High',pass:false,
-   desc:'Both RBs show sweep action outside. Guard lets one DL through intentionally (trap block). RB hits the gap right behind the DL who is now trapped out of position. Defense gets confused.',
-   note:'Advanced concept but kids love the idea of letting a defender through on purpose. Walk-through slowly.',
-   formation:'Under center, both backs outside fake, guard trap block'},
-  {id:'sw26',n:'Spin Move Keeper',tier:'Trick',wk:7,mis:'Very High',pass:false,
-   desc:'QB takes snap, fakes inside to one RB, then executes a 180-degree spin move and keeps on the opposite edge. The spin is the misdirection. Works when defense crashes hard inside.',
-   note:'Practice the spin without defenders first. QB must not lose the ball during the spin.',
-   formation:'Under center, inside fake, QB spin and keep outside'},
-  {id:'sw27',n:'Flea Flicker',tier:'Trick',wk:9,mis:'Very High',pass:true,
-   desc:'QB hands to RB who runs a sweep (defense commits). RB tosses ball back to QB. QB throws deep to a receiver who has been left wide open by the defense chasing the run. Once per season.',
-   note:'Once per season. The toss back must be clean and QB must be in position to throw. Save for the right moment.',
-   formation:'Under center, sweep hand, lateral back to QB, deep throw'},
-  {id:'sw28',n:'Pop Pass to Center',tier:'Core',wk:3,mis:'Med',pass:true,
-   desc:'Fake the sweep in either direction. Center immediately releases 3-4 yards downfield and plants. QB throws a quick short pass to the center. Super high percentage -- defense never accounts for the center.',
-   note:'The simplest pass play in your playbook. High percentage because the center is always open. Walk-through: snap, center releases, QB throws immediately. No hesitation.',
-   formation:'Under center, sweep fake, center releases 3-4 yards, QB quick throw'}];
+];
 
 const WU_BLOCK_56 = {t:'wu',min:'0-12',name:'Daily warm-up (5/6 edition)',desc:'5 under-center snaps · 5 partner passes · 10 stalk blocks · 5 fake handoff drills · Every man for himself flag pull (2 min full speed — ends the warm-up). Same every day. Motor memory builds through repetition.'};
-const SM_BLOCK_56 = {t:'gm',min:'65-75',name:'Cool Down + Every Man Flag Pull + Sharks and Minnows',desc:'[2 min] Cool Down: reinforce the character theme from the start of practice. Ask one kid: what did we learn today about [theme]? [3 min] Every man for himself flag pull -- full speed, celebrate big plays. [5 min] Sharks and Minnows to close every practice. Last minnow is the champion. This sequence ends EVERY practice without exception.'};
+const SM_BLOCK_56 = {t:'gm',min:'63-75',name:'Sharks and Minnows -- end every practice',desc:'Every practice ends here. Last minnow standing wins. Increase to 3-4 sharks as season progresses. This is the reward. Never skip it.'};
 
 const PRACTICE_PLANS_56 = [
 {w:1,phase:'Foundation',theme:'First day: learn names, learn flags, everyone touches the ball',prac:[
