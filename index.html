@@ -6203,7 +6203,7 @@ function swapGameSheetPlayer(gameIdx, half, possIdx, playerIdx) {
         + name + (name===current?' (current)':'')
         + '</button>'
       ).join('')
-    + '<button onclick="closeModal("modal-slot-picker")" class="btn btn-sm" style="width:100%;margin-top:8px;">Cancel</button>'
+    + '<button onclick="closePicker()" class="btn btn-sm" style="width:100%;margin-top:8px;">Cancel</button>'
     + '</div>';
 
   document.getElementById('slot-picker-content').innerHTML = pickerHtml;
@@ -6235,7 +6235,7 @@ function doSwapPlayer(gameIdx, half, possIdx, playerIdx, newName) {
   });
   save();
   closeModal('modal-slot-picker');
-  renderGameSheets(document.getElementById('depth-content'));
+  renderGS();
 }
 
 function swapFixed(gameIdx, half, playerIdx) {
@@ -6277,7 +6277,7 @@ function doSwapFixed(gameIdx, half, playerIdx, newName) {
   });
   save();
   closeModal('modal-slot-picker');
-  renderGameSheets(document.getElementById('depth-content'));
+  renderGS();
 }
 
 let _activeGameSheet = 0;
@@ -6350,7 +6350,7 @@ function renderGameSheets(el) {
 
       // Rotating players (tappable)
       players.forEach((name, oi) => {
-        s += '<div onclick="swapGSP(this)" '
+        s += '<div onclick="swapGSP(this)" data-gi="'+gameIdx+'" data-h="'+halfKey+'" data-pi="'+pi+'" data-li="'+oi+'" '
           + 'style="display:grid;grid-template-columns:1fr 60px 70px;gap:0;padding:7px 10px;border-top:1px solid var(--navy3);align-items:center;cursor:pointer;touch-action:manipulation;background:rgba(255,255,255,.02);">'
           + '<div style="font-size:13px;font-weight:600;">' + name + ' <span style="font-size:9px;color:var(--g3);">tap to swap</span></div>'
           + '<div style="font-size:11px;color:var(--g3);font-weight:700;">' + offPos[oi] + '</div>'
