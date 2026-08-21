@@ -545,7 +545,8 @@ let state = {
   playLog:[],
   scouting:[],
   ratingHistory:[],
-  callSheet:{78:[],56:[]}  // ordered list of play IDs for game call sheet
+  callSheet:{78:[],56:[]},
+  planOverrides:{}  // ordered list of play IDs for game call sheet
 };
 let selectedDrill = null;
 let selectedPlay = null;
@@ -1685,7 +1686,68 @@ const WINGT_BANK = [
   {id:'wt34',n:'Bootleg Run-Pass Option',tier:'Advanced',mis:'High',pass:true,wk:9,
    desc:'QB boots right after a sweep fake. QB reads the edge: if it\'s clear — QB runs. If a defender holds the edge — QB throws to the flat route or the trailing back. Two outcomes, one motion. True run-pass option.',
    note:'"Edge open = run. Edge held = throw. Make the decision before you get there." This is the play that ties your whole bootleg series together.',
-   formation:'Under center, sweep fake, boot with flat option'}];
+   formation:'Under center, sweep fake, boot with flat option'},
+
+  // ── New misdirection and constraint plays ──
+  {id:'wt35',n:'Rocket Motion Sweep Right',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+   desc:'RB2 goes in full-speed pre-snap motion toward RB1. QB snaps it as RB2 hits the handoff point already at full speed. Ball carrier has momentum before the play starts. Blocking identical to Sweep Right.',
+   note:'The motion is the play. Snap it when the moving back is at the handoff spot — not before, not after.',
+   formation:'Under center, RB2 jet motion right'},
+
+  {id:'wt36',n:'Unbalanced Line Sweep',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+   desc:'Both guards shift to the strong side pre-snap — 4 blockers on one side, 1 on the other. Run Sweep into the heavy side. Defense cannot match the numbers before the snap.',
+   note:'Walk the shift twice before snapping. Defense never figures out an unbalanced line at this age.',
+   formation:'Under center, both guards shifted strong side'},
+
+  {id:'wt37',n:'Trips Motion Sweep Away',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Both RBs and one TE shift to the same side pre-snap. Defense rotates to match. Run Sweep to the weak side into the space they just vacated. The defense does the work for you.',
+   note:'Let them set before the snap. The defense shifts — that is the point. Hit the opposite edge.',
+   formation:'Under center, trips left, sweep right'},
+
+  {id:'wt38',n:'Wildcat Give or Keep',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Snap directly to RB1 in shotgun position. QB stands empty-handed. RB1 reads the edge defender — crashes = give to crossing RB2, hesitates = keep. Two threats, one read, no arm required.',
+   note:'Teach RB1 one rule only: if the edge defender commits to you, give it. If he hesitates, keep it.',
+   formation:'Shotgun, RB1 at QB spot, QB off to side'},
+
+  {id:'wt39',n:'Fly Sweep',tier:'Advanced',mis:'High',pass:false,wk:5,
+   desc:'Fastest non-QB kid goes in pre-snap motion across the entire formation at top speed. QB snaps it at exactly the right moment and hands to the fly player already at full sprint across the formation.',
+   note:'Timing is everything. Snap it when the fly player hits the handoff spot. Practice the count until it is automatic.',
+   formation:'Under center, fly motion full width'},
+
+  {id:'wt40',n:'Fullback Lead Dive',tier:'Core',mis:'Low',pass:false,wk:2,
+   desc:'Both RBs aligned close. RB1 leads through the A gap as a blocker. RB2 follows directly behind. No fakes, no misdirection — a downhill double-team. Most defenses at this age do not assign anyone to the lead blocker.',
+   note:'RB1 hits the first defender inside. RB2 follows the block. Simple and physical.',
+   formation:'Under center, both backs tight, RB1 leads'},
+
+  {id:'wt41',n:'Hook and Lateral',tier:'Advanced',mis:'High',pass:true,wk:5,
+   desc:'QB throws a 5-yard flat pass to RB2. RB2 catches and immediately pitches lateral to RB1 trailing behind. Defense converges on the catch — the lateral hits before they arrive. Legal as long as the pitch goes sideways or backward.',
+   note:'Catch, one step, pitch. Drill that timing until it is automatic. The pitch must go sideways or backward.',
+   formation:'Shotgun, RB2 flat route, RB1 trailing'},
+
+  {id:'wt42',n:'Halfback Pass',tier:'Advanced',mis:'Very High',pass:true,wk:5,
+   desc:'Hand off to RB1 on a sweep. RB1 stops and throws back to TE running a crossing route or RB2 in the flat. Works because nobody covers a running back as a passer at this age.',
+   note:'RB1 must be an athlete who can throw. Walk it 20 times. The stop-and-throw timing is the whole play.',
+   formation:'Under center, sweep action, RB1 throwback'},
+
+  {id:'wt43',n:'Flea Flicker',tier:'Trick',mis:'Very High',pass:true,wk:6,
+   desc:'Hand to RB1 on a sweep. RB1 pitches back to QB. QB throws deep to fastest TE or RB running a go route. Run your Sweep twice first — then run this. Defense crashes on the handoff. Deep receiver is alone.',
+   note:'Set it up with two sweeps first. The pitch back must be practiced until automatic. Throw it up and trust the kid.',
+   formation:'Under center, sweep to pitch to deep shot'},
+
+  {id:'wt44',n:'Middle Screen',tier:'Intermediate',mis:'Med',pass:true,wk:4,
+   desc:'QB fakes a deep pass and steps back while OL releases and forms a wall in the middle. RB leaks into the middle behind the screen wall. Short flip pass into space. Defense chases the fake rush and the OL wall opens a lane.',
+   note:'OL releases as soon as the QB drops. RB waits for the wall to form then leaks into it. Defense runs right past.',
+   formation:'Shotgun, OL screen release, RB delayed middle'},
+
+  {id:'wt45',n:'Statue of Liberty',tier:'Advanced',mis:'Very High',pass:false,wk:5,
+   desc:'QB drops back like passing, arm extended in full throwing motion, completely still. RB comes in motion and takes the handoff from the extended arm while QB holds the fake. Defense reads throw and drops into coverage — run hits an empty box.',
+   note:'QB must sell the throw and not move their feet. The stillness is the whole deception.',
+   formation:'Under center, QB throw fake, RB motion handoff'},
+
+  {id:'wt46',n:'Bootleg Fake Pass Keep',tier:'Intermediate',mis:'High',pass:false,wk:3,
+   desc:'QB bootlegs to the edge and fully sells a pass — eyes downfield, arm up like throwing. Defenders drop into coverage. QB tucks and runs. Works because once your bootleg pass is established defenders respect the throw. Now punish them for it.',
+   note:'Sell the throw completely. Eyes downfield, hitch the arm. If they drop off the run is wide open.',
+   formation:'Under center, sweep fake, boot and fake throw'}];
 
 // ════════════════════════════════════════════
 // PISTOL SPREAD PLAY BANK
@@ -2364,69 +2426,498 @@ function renderPracContent() {
   else if(curPracTab === 'games') renderActivities(el);
 }
 
+// Full editable practice plan system
+
 function getActivePracticePlans() {
   return state.division === '56' ? PRACTICE_PLANS_56 : PRACTICE_PLANS;
 }
 
-function renderPracPlans(el) {
+function getPracBlocks(wk, pr) {
+  if(!state.planOverrides) state.planOverrides = {};
+  const key = state.division + '_w' + wk.w + '_' + pr.lbl;
+  return state.planOverrides[key] ? state.planOverrides[key] : pr.blocks;
+}
+
+function savePracBlocks(wk, pr, blocks) {
+  if(!state.planOverrides) state.planOverrides = {};
+  const key = state.division + '_w' + wk.w + '_' + pr.lbl;
+  state.planOverrides[key] = blocks;
+  save();
+}
+
+function resetPracBlocks(wk, pr) {
+  if(!state.planOverrides) state.planOverrides = {};
+  const key = state.division + '_w' + wk.w + '_' + pr.lbl;
+  delete state.planOverrides[key];
+  save();
+  const el = document.getElementById('prac-content');
+  if(el) renderPracPlans(el);
+}
+
+function resetCurrentPracBlock(wkNum, pracLbl) {
   const plans = getActivePracticePlans();
-  const wks = document.createElement('div');
-  wks.className = 'week-scroller';
-  plans.forEach(p => {
-    const b = document.createElement('button');
-    b.className = 'week-btn' + (p.w===curPracWeek?' active':'');
-    b.textContent = p.w;
-    b.onclick = () => { curPracWeek = p.w; renderPracPlans(el); };
-    wks.appendChild(b);
-  });
-  const wk = plans.find(p=>p.w===curPracWeek);
-  if(!wk) { el.innerHTML=''; el.appendChild(wks); return; }
-  const tc = {wu:'pb-wu',sk:'pb-sk',tm:'pb-tm',gm:'pb-gm'};
-  const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game/scrimmage'};
-  const stationColors = ['#f5a623','#22c55e','#3b82f6'];
+  const wk = plans.find(p=>p.w===wkNum);
+  if(!wk) return;
+  const pr = wk.prac.find(p=>p.lbl===pracLbl);
+  if(!pr) return;
+  resetPracBlocks(wk, pr);
+}
 
-  function renderBlockBody(b) {
-    if(!b.stations || !b.stations.length) {
-      return '<div class="pb-desc">' + (b.desc||'') + '</div>';
-    }
-    // Brief one-liner per station
-    let html = '<div style="margin:4px 0 6px;display:flex;flex-direction:column;gap:2px;">';
-    b.stations.forEach(function(s, i) {
-      const clean = (s||'').replace(/^S\d+\s*[-—]+\s*(YOU|ASST \d+)\s*[-—]+\s*/i,'');
-      const brief = clean.split(/[:.]/)[0].trim();
-      const short = brief.length>55 ? brief.substring(0,55)+'…' : brief;
-      html += '<div style="display:flex;gap:5px;align-items:baseline;">'
-        + '<span style="font-size:9px;font-weight:800;color:'+(stationColors[i]||'#999')+';text-transform:uppercase;flex-shrink:0;min-width:40px;">S'+(i+1)+'</span>'
-        + '<span style="font-size:11px;color:var(--g3);">' + short + '</span>'
-        + '</div>';
-    });
-    html += '</div>';
-    // Full detail per station
-    html += '<div style="display:flex;flex-direction:column;gap:4px;">';
-    b.stations.forEach(function(s, i) {
-      const clean = (s||'').replace(/^S\d+\s*[-—]+\s*(YOU|ASST \d+)\s*[-—]+\s*/i,'');
-      html += '<div style="padding:4px 7px;border-left:2px solid '+(stationColors[i]||'#999')+';background:rgba(255,255,255,.04);border-radius:0 4px 4px 0;">'
-        + '<div style="font-size:9px;font-weight:700;color:'+(stationColors[i]||'#999')+';text-transform:uppercase;margin-bottom:1px;">S'+(i+1)+' — '+(['You','Asst 1','Asst 2'][i]||'Asst '+(i+1))+'</div>'
-        + '<div style="font-size:10px;color:var(--g3);line-height:1.4;">' + clean + '</div>'
-        + '</div>';
-    });
-    html += '</div>';
-    return html;
+function openEditBlock(wkNum, pracLbl, blockIdx) {
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===wkNum);
+  if(!wk) return;
+  const pr = wk.prac.find(p=>p.lbl===pracLbl);
+  if(!pr) return;
+  const blocks = getPracBlocks(wk, pr);
+  const b = blocks[blockIdx];
+  if(!b) return;
+  const tl = {wu:'Warm-up',sk:'Skill',tm:'Team',gm:'Game'};
+  const stationLines = (b.stations||[]).join('\n');
+  const escapedName = (b.name||'').replace(/"/g,'&quot;');
+  const html = '<div class="modal-title">Edit block</div>'
+    + '<div style="display:flex;flex-direction:column;gap:10px;">'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Name</label>'
+    + '<input id="eb-name" value="' + escapedName + '" style="width:100%;margin-top:4px;"></div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Type</label>'
+    + '<select id="eb-type" style="width:100%;margin-top:4px;">'
+    + ['wu','sk','tm','gm'].map(function(t){return '<option value="'+t+'"'+(b.t===t?' selected':'')+'>'+tl[t]+'</option>';}).join('')
+    + '</select></div>'
+    + '<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Min</label>'
+    + '<input id="eb-min" value="' + (b.min||'') + '" style="width:100%;margin-top:4px;" placeholder="e.g. 22-37"></div></div>'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Description</label>'
+    + '<textarea id="eb-desc" style="width:100%;margin-top:4px;height:70px;">' + (b.desc||'') + '</textarea></div>'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Stations (one per line, blank for no stations)</label>'
+    + '<textarea id="eb-stations" style="width:100%;margin-top:4px;height:100px;font-size:11px;">' + stationLines + '</textarea></div>'
+    + '<button onclick="saveEditBlock(' + wkNum + ',\'' + pracLbl + '\',' + blockIdx + ')" class="btn btn-gold" style="width:100%;min-height:48px;">Save</button>'
+    + '<button onclick="deleteBlock(' + wkNum + ',\'' + pracLbl + '\',' + blockIdx + ')" class="btn btn-danger btn-sm" style="width:100%;margin-top:4px;">Delete this block</button>'
+    + '</div>';
+  document.getElementById('slot-picker-content').innerHTML = html;
+  document.getElementById('slot-picker-pos').value = 'editblock';
+  openModal('modal-slot-picker');
+}
+
+function saveEditBlock(wkNum, pracLbl, blockIdx) {
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===wkNum);
+  if(!wk) return;
+  const pr = wk.prac.find(p=>p.lbl===pracLbl);
+  if(!pr) return;
+  const blocks = getPracBlocks(wk, pr).slice();
+  const b = Object.assign({}, blocks[blockIdx]);
+  b.name = document.getElementById('eb-name').value;
+  b.t    = document.getElementById('eb-type').value;
+  b.min  = document.getElementById('eb-min').value;
+  b.desc = document.getElementById('eb-desc').value;
+  const st = document.getElementById('eb-stations').value.trim();
+  b.stations = st ? st.split('\n').filter(function(s){return s.trim();}) : undefined;
+  blocks[blockIdx] = b;
+  savePracBlocks(wk, pr, blocks);
+  closeModal('modal-slot-picker');
+  const el = document.getElementById('prac-content');
+  if(el) renderPracPlans(el);
+}
+
+function deleteBlock(wkNum, pracLbl, blockIdx) {
+  if(!confirm('Delete this block?')) return;
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===wkNum);
+  if(!wk) return;
+  const pr = wk.prac.find(p=>p.lbl===pracLbl);
+  if(!pr) return;
+  const blocks = getPracBlocks(wk, pr).slice();
+  blocks.splice(blockIdx, 1);
+  savePracBlocks(wk, pr, blocks);
+  closeModal('modal-slot-picker');
+  const el = document.getElementById('prac-content');
+  if(el) renderPracPlans(el);
+}
+
+function movePracBlock(wkNum, pracLbl, blockIdx, dir) {
+  const plans = getActivePracticePlans();
+  const wk = plans.find(p=>p.w===wkNum);
+  if(!wk) return;
+  const pr = wk.prac.find(p=>p.lbl===pracLbl);
+  if(!pr) return;
+  const blocks = getPracBlocks(wk, pr).slice();
+  const newIdx = blockIdx + dir;
+  if(newIdx<0||newIdx>=blocks.length) return;
+  var tmp=blocks[blockIdx]; blocks[blockIdx]=blocks[newIdx]; blocks[newIdx]=tmp;
+  savePracBlocks(wk, pr, blocks);
+  const el = document.getElementById('prac-content');
+  if(el) renderPracPlans(el);
+}
+
+function renderStations(b) {
+  if(!b) return '';
+  if(!b.stations||!b.stations.length) {
+    const desc = b.desc||'';
+    return '<div style="font-size:11px;color:var(--g3);line-height:1.5;">'+(desc.length>120?desc.substring(0,120)+'...':desc)+'</div>';
   }
+  const colors=['#f5a623','#22c55e','#3b82f6'];
+  let html='<div style="margin:4px 0 5px;display:flex;flex-direction:column;gap:2px;">';
+  b.stations.forEach(function(s,i){
+    var clean=(s||'').replace(/^S\d+\s*[-\u2014]+\s*(YOU|ASST \d+)\s*[-\u2014]+\s*/i,'');
+    var brief=clean.split(/[:.]/)[0].trim();
+    var short=brief.length>55?brief.substring(0,55)+'...':brief;
+    html+='<div style="display:flex;gap:5px;align-items:baseline;">'
+      +'<span style="font-size:9px;font-weight:800;color:'+(colors[i]||'#999')+';text-transform:uppercase;flex-shrink:0;min-width:40px;">S'+(i+1)+'</span>'
+      +'<span style="font-size:11px;color:var(--g3);">'+short+'</span></div>';
+  });
+  html+='</div><div style="display:flex;flex-direction:column;gap:4px;">';
+  b.stations.forEach(function(s,i){
+    var clean=(s||'').replace(/^S\d+\s*[-\u2014]+\s*(YOU|ASST \d+)\s*[-\u2014]+\s*/i,'');
+    html+='<div style="padding:4px 7px;border-left:2px solid '+(colors[i]||'#999')+';background:rgba(255,255,255,.04);border-radius:0 4px 4px 0;">'
+      +'<div style="font-size:9px;font-weight:700;color:'+(colors[i]||'#999')+';text-transform:uppercase;margin-bottom:1px;">S'+(i+1)+' -- '+(['You','Asst 1','Asst 2'][i]||'Asst '+(i+1))+'</div>'
+      +'<div style="font-size:10px;color:var(--g3);line-height:1.4;">'+clean+'</div></div>';
+  });
+  return html+'</div>';
+}
 
-  const timing = (wk.w <= 6) ? '90 min' : '75 min';
-  let h = `<div class="card" style="margin-bottom:8px;"><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;"><span class="badge b-blue">${wk.phase}</span><span style="font-size:14px;font-weight:600;">${wk.theme}</span><span style="font-size:11px;color:var(--g3);">${timing}</span></div></div>`;
-  wk.prac.forEach(pr => {
-    h += `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Practice ${pr.lbl}</div>`;
-    pr.blocks.forEach(b => {
-      h += `<div class="prac-block ${tc[b.t]||'pb-sk'}"><div class="pb-type">${tl[b.t]||b.t} · min ${b.min}</div><div class="pb-name">${b.name}</div>${renderBlockBody(b)}</div>`;
+function sharePracticePlan() {
+  try {
+    const plans=getActivePracticePlans();
+    const wk=plans.find(p=>p.w===curPracWeek);
+    if(!wk){alert('Week not found.');return;}
+    const theme=wk.theme||wk.phase||('Week '+wk.w);
+    const tl={wu:'WARM-UP',sk:'SKILL',tm:'TEAM',gm:'GAME'};
+    let text='PRACTICE PLAN -- WEEK '+wk.w+': '+theme.toUpperCase()+'\n'+'='.repeat(50)+'\n\n';
+    wk.prac.forEach(function(pr){
+      text+='\n--- Practice '+pr.lbl+' ---\n';
+      getPracBlocks(wk,pr).filter(Boolean).forEach(function(b){
+        text+='\n['+(tl[b.t]||(b.t||'BLOCK').toUpperCase())+'] '+b.name+'\n';
+        if(b.stations) b.stations.forEach(function(s,i){text+='  S'+(i+1)+': '+s+'\n';});
+        else text+=(b.desc||'')+'\n';
+      });
     });
-    h += '</div>';
+    navigator.clipboard.writeText(text)
+      .then(function(){alert('Copied! Paste into a message or email.');})
+      .catch(function(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('Copied!');});
+  } catch(e){alert('Share error: '+e.message);}
+}
+
+var _addBlockCtx=null,_addDrillCat='All',_addDrillFilter='',_pickerSelected=new Set(),_stationMode=false;
+var _playPickerSelected=new Set(),_playStationMode=false,_playPickerCtx=null;
+
+function addBlockToPlan(wkNum,pracLbl){
+  _addBlockCtx={wkNum:wkNum,pracLbl:pracLbl};
+  _pickerSelected.clear();
+  _stationMode=false;
+  _addDrillCat='All';
+  _addDrillFilter='';
+  _openDrillPicker();
+}
+
+function setPickerCat(el){ _addDrillCat=el.dataset.cat; _openDrillPicker(); }
+function setPickerDrill(el){ _selectDrillInPicker(el.dataset.id); }
+
+function _selectDrillInPicker(id){
+  if(_pickerSelected.has(id)) _pickerSelected.delete(id);
+  else _pickerSelected.add(id);
+  _openDrillPicker();
+}
+
+function _openDrillPicker(){
+  var cats=['All'].concat([...new Set(DRILLS.concat(state.customDrills||[]).map(function(d){return d.cat;}))]);
+  var allDrills=DRILLS.concat(state.customDrills||[]);
+  var filtered=allDrills.filter(function(d){
+    if(_addDrillCat!=='All'&&d.cat!==_addDrillCat) return false;
+    if(_addDrillFilter&&!d.name.toLowerCase().includes(_addDrillFilter.toLowerCase())) return false;
+    return true;
+  });
+  var count=_pickerSelected.size;
+  var selArray=[..._pickerSelected];
+  var stationColors=['#f5a623','#22c55e','#3b82f6'];
+  var stationNames=['S1','S2','S3'];
+  var ctxLabel=_addBlockCtx?'Week '+_addBlockCtx.wkNum+' Prac '+_addBlockCtx.pracLbl:'Builder';
+
+  var h='<div class="modal-title">Add drills to '+ctxLabel+'</div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:10px;padding:8px;background:var(--navy3);border-radius:10px;align-items:center;">'
+    +'<div style="flex:1;"><div style="font-size:12px;font-weight:600;">Station mode</div>'
+    +'<div style="font-size:10px;color:var(--g3);">'+(_stationMode?'Selected drills become S1/S2/S3 in one block':'Each drill added as its own block')+'</div></div>'
+    +'<button onclick="_stationMode=!_stationMode;_openDrillPicker()" style="padding:8px 14px;border-radius:8px;border:2px solid '+(_stationMode?'var(--gold)':'var(--navy3)')+';background:'+(_stationMode?'rgba(245,166,35,.15)':'transparent')+';color:'+(_stationMode?'var(--gold)':'var(--g3)')+';font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;">'+(_stationMode?'S ON':'S OFF')+'</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:8px;">'
+    +'<input type="text" id="drill-picker-search" placeholder="Search drills..." oninput="_addDrillFilter=this.value;_openDrillPicker()" value="'+_addDrillFilter+'" style="flex:1;margin:0;font-size:14px;">'
+    +'<button onclick="openAddCustomDrill()" class="btn btn-sm" style="flex-shrink:0;font-size:11px;white-space:nowrap;">+ Custom</button>'
+    +'</div>'
+    +'<div class="tab-row" style="margin-bottom:8px;">';
+  cats.forEach(function(c){
+    h+='<div class="tab '+(c===_addDrillCat?'active':'')+'" onclick="setPickerCat(this)" data-cat="'+c+'" style="font-size:11px;padding:6px 10px;">'+c+'</div>';
+  });
+  h+='</div>'
+    +'<div style="font-size:11px;color:var(--g3);margin-bottom:8px;">'+(_stationMode?'Select 2-3 drills. 1st = S1 (you), 2nd = S2, 3rd = S3.':'Tap drills to select.')+'</div>'
+    +'<div style="position:sticky;top:0;z-index:10;margin-bottom:8px;">'
+    +'<button onclick="_confirmAddDrill()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;background:'+(count>0?'var(--gold)':'var(--navy3)')+';color:'+(count>0?'var(--navy)':'var(--g3)')+';font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">'
+    +(count>0?(_stationMode?'Add as 1 station block ('+count+' stations)':'Add '+count+' drill'+(count>1?'s':'')+' as separate blocks'):'Select drills below')+'</button></div>';
+
+  if(!filtered.length){
+    h+='<div style="padding:20px;text-align:center;color:var(--g3);">No drills match.</div>';
+  } else {
+    h+='<div style="display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
+    filtered.forEach(function(d){
+      var isSel=_pickerSelected.has(d.id);
+      var selIdx=selArray.indexOf(d.id);
+      var badge=(_stationMode&&isSel&&selIdx>=0)?(stationNames[selIdx]||'S'+(selIdx+1)):(isSel?'V':'');
+      var badgeBg=(_stationMode&&isSel)?(stationColors[selIdx]||'var(--gold)'):(isSel?'var(--gold)':'transparent');
+      h+='<div data-id="'+d.id+'" onclick="setPickerDrill(this)" style="padding:10px 12px;border-radius:10px;border:2px solid '+(isSel?'var(--gold)':'var(--navy3)')+';background:'+(isSel?'rgba(245,166,35,.1)':'var(--navy2)')+';cursor:pointer;touch-action:manipulation;">'
+        +'<div style="display:flex;align-items:center;gap:8px;">'
+        +'<div style="width:28px;height:28px;border-radius:7px;border:2px solid '+(isSel?'var(--gold)':'var(--navy3)')+';background:'+badgeBg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:'+(isSel?'var(--navy)':'transparent')+';flex-shrink:0;">'+badge+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:12px;font-weight:600;">'+d.name+'</div>'
+        +'<div style="font-size:10px;color:var(--g3);margin-top:2px;">'+(d.desc||'').substring(0,80)+'</div>'
+        +(d.cue?'<div style="font-size:9px;color:var(--g3);font-style:italic;">Cue: '+d.cue.substring(0,60)+'</div>':'')
+        +'</div></div></div>';
+    });
+    h+='</div>';
+  }
+  document.getElementById('slot-picker-content').innerHTML=h;
+  document.getElementById('slot-picker-pos').value='drillpicker';
+  openModal('modal-slot-picker');
+  setTimeout(function(){
+    var s=document.getElementById('drill-picker-search');
+    if(s&&_addDrillFilter){s.focus();s.setSelectionRange(s.value.length,s.value.length);}
+  },50);
+}
+
+function _confirmAddDrill(){
+  if(!_pickerSelected.size) return;
+  var allDrills=DRILLS.concat(state.customDrills||[]);
+  var selected=[..._pickerSelected].map(function(id){return allDrills.find(function(d){return d.id===id;});}).filter(Boolean);
+  var stationLabels=['S1 - YOU','S2 - ASST 1','S3 - ASST 2'];
+  var blocksToAdd=[];
+  if(_stationMode&&selected.length>1){
+    var rotMin=Math.ceil(selected.reduce(function(s,d){return s+(d.time||5);},0)/selected.length);
+    blocksToAdd=[{t:'sk',type:'sk',
+      name:'Skill stations - '+selected.map(function(d){return d.name;}).join(' / '),
+      min:String(rotMin*selected.length),time:rotMin*selected.length,
+      desc:selected.length+' stations, rotate every '+rotMin+' min.',
+      stations:selected.map(function(d,i){return (stationLabels[i]||'S'+(i+1))+' - '+d.name+': '+(d.desc||'').substring(0,100)+(d.cue?' Cue: '+d.cue:'');})
+    }];
+  } else {
+    blocksToAdd=selected.map(function(d){return Object.assign({},d,{type:d.type||d.t||'sk'});});
+  }
+  _pickerSelected.clear();
+  if(_addBlockCtx){
+    var plans=getActivePracticePlans();
+    var wk=plans.find(function(p){return p.w===_addBlockCtx.wkNum;});
+    var pr=wk.prac.find(function(p){return p.lbl===_addBlockCtx.pracLbl;});
+    var blocks=getPracBlocks(wk,pr).slice();
+    blocksToAdd.forEach(function(b){blocks.push(b);});
+    savePracBlocks(wk,pr,blocks);
+    closeModal('modal-slot-picker');
+    var el=document.getElementById('prac-content');
+    if(el) renderPracPlans(el);
+    showToast(_stationMode?'Station block added!':selected.length+' drill(s) added');
+  } else {
+    var arr=state.division==='56'?(state.customPractice56||(state.customPractice56=[])):state.customPractice;
+    blocksToAdd.forEach(function(b){arr.push(b);});
+    save(); closeModal('modal-slot-picker'); renderPracContent();
+    showToast(selected.length+' drill(s) added to builder');
+  }
+}
+
+function openAddCustomDrill(){
+  var h='<div class="modal-title">Create custom drill</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px;">'
+    +'<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Name</label>'
+    +'<input id="cd-name" placeholder="e.g. 2v1 Flag Pull" style="width:100%;margin-top:4px;"></div>'
+    +'<div style="display:flex;gap:8px;">'
+    +'<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Category</label>'
+    +'<input id="cd-cat" placeholder="e.g. Flag Pulling" style="width:100%;margin-top:4px;"></div>'
+    +'<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Time (min)</label>'
+    +'<input id="cd-time" type="number" value="8" style="width:100%;margin-top:4px;"></div>'
+    +'</div>'
+    +'<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Description</label>'
+    +'<textarea id="cd-desc" style="width:100%;margin-top:4px;height:80px;" placeholder="What players do, how many reps, what to watch for..."></textarea></div>'
+    +'<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Coaching cue</label>'
+    +'<input id="cd-cue" placeholder="One-line cue you say out loud" style="width:100%;margin-top:4px;"></div>'
+    +'<button onclick="saveCustomDrill()" class="btn btn-gold" style="width:100%;min-height:48px;">Save drill</button>'
+    +'<button onclick="_openDrillPicker()" class="btn btn-sm" style="width:100%;">Back to picker</button>'
+    +'</div>';
+  document.getElementById('slot-picker-content').innerHTML=h;
+  openModal('modal-slot-picker');
+}
+
+function saveCustomDrill(){
+  var name=document.getElementById('cd-name').value.trim();
+  if(!name){alert('Name is required.');return;}
+  if(!state.customDrills) state.customDrills=[];
+  var id='cd_'+Date.now();
+  state.customDrills.push({
+    id:id, name:name,
+    cat:document.getElementById('cd-cat').value.trim()||'Custom',
+    time:parseInt(document.getElementById('cd-time').value)||8,
+    desc:document.getElementById('cd-desc').value.trim(),
+    cue:document.getElementById('cd-cue').value.trim(),
+    type:'sk', level:'All', group:'Full team', equip:'None', custom:true
+  });
+  save();
+  _openDrillPicker();
+  showToast(name+' added to drill bank');
+}
+
+function openPlayPicker(wkNum,pracLbl){
+  _playPickerCtx={wkNum:wkNum,pracLbl:pracLbl};
+  _playPickerSelected.clear();
+  _playStationMode=false;
+  _renderPlayPicker();
+}
+
+function togglePlaySelect(id){
+  if(_playPickerSelected.has(id)) _playPickerSelected.delete(id);
+  else _playPickerSelected.add(id);
+  _renderPlayPicker();
+}
+
+function _renderPlayPicker(){
+  var division=state.division;
+  var bank=division==='56'?SINGLEWING_BANK:(curSystem==='pistol'?PISTOL_BANK:WINGT_BANK);
+  var activeIds=division==='56'?(state.activePlays56.singlewing||[]):(state.activePlays[curSystem]||[]);
+  var selArray=[..._playPickerSelected];
+  var count=_playPickerSelected.size;
+  var stationColors=['#f5a623','#22c55e','#3b82f6'];
+  var stationNames=['S1','S2','S3'];
+
+  var h='<div class="modal-title">Add play install</div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:10px;padding:8px;background:var(--navy3);border-radius:10px;align-items:center;">'
+    +'<div style="flex:1;"><div style="font-size:12px;font-weight:600;">Station mode</div>'
+    +'<div style="font-size:10px;color:var(--g3);">'+(_playStationMode?'Each play at a different station':'One play per block')+'</div></div>'
+    +'<button onclick="_playStationMode=!_playStationMode;_renderPlayPicker()" style="padding:8px 14px;border-radius:8px;border:2px solid '+(_playStationMode?'var(--gold)':'var(--navy3)')+';background:'+(_playStationMode?'rgba(245,166,35,.15)':'transparent')+';color:'+(_playStationMode?'var(--gold)':'var(--g3)')+';font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;">'+(_playStationMode?'S ON':'S OFF')+'</button>'
+    +'</div>'
+    +'<div style="position:sticky;top:0;z-index:10;margin-bottom:10px;">'
+    +'<button onclick="_confirmAddPlay()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;background:'+(count>0?'var(--gold)':'var(--navy3)')+';color:'+(count>0?'var(--navy)':'var(--g3)')+';font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">'
+    +(count>0?(_playStationMode?'Add station block ('+count+' plays)':'Add '+count+' play install'+(count>1?'s':'')):'Select a play')+'</button></div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">';
+
+  ['Core','Intermediate','Advanced','Trick'].forEach(function(tier){
+    var tierPlays=bank.filter(function(p){return p.tier===tier;});
+    if(!tierPlays.length) return;
+    h+='<div style="font-size:10px;font-weight:700;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;padding:6px 0 2px;">'+tier+'</div>';
+    tierPlays.forEach(function(p){
+      var isActive=activeIds.includes(p.id);
+      var isSel=_playPickerSelected.has(p.id);
+      var selIdx=selArray.indexOf(p.id);
+      var badge=(_playStationMode&&isSel&&selIdx>=0)?(stationNames[selIdx]||'S'+(selIdx+1)):(isSel?'V':'+');
+      var badgeBg=(_playStationMode&&isSel)?(stationColors[selIdx]||'var(--gold)'):(isSel?'var(--gold)':'rgba(255,255,255,.06)');
+      h+='<div data-pid="'+p.id+'" onclick="togglePlaySelect(this.dataset.pid)" style="padding:10px 12px;border-radius:10px;border:2px solid '+(isSel?'var(--gold)':(isActive?'rgba(245,166,35,.3)':'var(--navy3)'))+';background:'+(isSel?'rgba(245,166,35,.1)':(isActive?'rgba(245,166,35,.04)':'var(--navy2)'))+';cursor:pointer;touch-action:manipulation;">'
+        +'<div style="display:flex;align-items:center;gap:8px;">'
+        +'<div style="width:28px;height:28px;border-radius:7px;background:'+badgeBg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--navy);flex-shrink:0;">'+badge+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<span style="font-size:13px;font-weight:'+(isActive?700:500)+';color:'+(isActive?'var(--gold)':'var(--white)')+';">'+p.n+'</span>'
+        +(isActive?' <span style="font-size:9px;color:var(--gold);font-weight:700;">ACTIVE</span>':'')
+        +'<div style="font-size:10px;color:var(--g3);">'+(p.pass?'Pass':'Run')+' &middot; '+p.mis+' mis</div>'
+        +'</div></div></div>';
+    });
+  });
+  h+='</div>';
+  document.getElementById('slot-picker-content').innerHTML=h;
+  document.getElementById('slot-picker-pos').value='playpicker';
+  openModal('modal-slot-picker');
+}
+
+function _confirmAddPlay(){
+  if(!_playPickerSelected.size) return;
+  var division=state.division;
+  var bank=division==='56'?SINGLEWING_BANK:(curSystem==='pistol'?PISTOL_BANK:WINGT_BANK);
+  var selected=[..._playPickerSelected].map(function(id){return bank.find(function(p){return p.id===id;});}).filter(Boolean);
+  var wk=getActivePracticePlans().find(function(p){return p.w===_playPickerCtx.wkNum;});
+  var pr=wk.prac.find(function(p){return p.lbl===_playPickerCtx.pracLbl;});
+  var blocks=getPracBlocks(wk,pr).slice();
+  if(_playStationMode&&selected.length>1){
+    var sl=['S1 - YOU','S2 - ASST 1','S3 - ASST 2'];
+    blocks.push({t:'tm',type:'tm',
+      name:'Play install stations - '+selected.map(function(p){return p.n;}).join(' / '),
+      min:'12-15',time:13,
+      desc:selected.length+' plays installed simultaneously. Rotate on whistle every 4 min.',
+      stations:selected.map(function(p,i){
+        return (sl[i]||'S'+(i+1))+' - '+p.n+': '+(i===0?'Walk QB and skill through assignments. 5 walk-throughs then live reps.':i===1?'OL blocking assignments. Walk through 5x then rep at full speed.':'Backup/scout group runs the play. Focus on ball carrier and key block.');
+      })});
+    showToast('Station install block added');
+  } else {
+    selected.forEach(function(p){
+      blocks.push({t:'tm',type:'tm',name:'Play install: '+p.n,min:'10-15',time:12,
+        desc:'Walk-through and live reps of '+p.n+'. 5 walk-throughs then 10 live reps at speed.',cue:p.note||''});
+    });
+    showToast(selected.length+' play install block'+(selected.length>1?'s':'')+' added');
+  }
+  _playPickerSelected.clear();
+  savePracBlocks(wk,pr,blocks);
+  closeModal('modal-slot-picker');
+  var el=document.getElementById('prac-content');
+  if(el) renderPracPlans(el);
+}
+
+
+
+
+function renderPracPlans(el) {
+  var plans = getActivePracticePlans();
+  var wks = document.createElement('div');
+  wks.className = 'week-scroller';
+  plans.forEach(function(p) {
+    var btn = document.createElement('button');
+    btn.className = 'week-btn' + (p.w===curPracWeek?' active':'');
+    btn.textContent = p.w;
+    btn.onclick = function(){ curPracWeek = p.w; renderPracPlans(el); };
+    wks.appendChild(btn);
+  });
+  var wk = plans.find(function(p){return p.w===curPracWeek;});
+  if(!wk) { el.innerHTML=''; el.appendChild(wks); return; }
+  var tc = {wu:'pb-wu',sk:'pb-sk',tm:'pb-tm',gm:'pb-gm'};
+  var tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game'};
+  var timing = wk.w <= 6 ? '90 min' : '75 min';
+  var theme = wk.theme || wk.phase || ('Week '+wk.w);
+  var h = '<div class="card" style="margin-bottom:8px;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">'
+    + '<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">'
+    + '<span class="badge b-blue">'+wk.phase+'</span>'
+    + '<span style="font-size:14px;font-weight:600;">'+theme+'</span>'
+    + '<span style="font-size:11px;color:var(--g3);">'+timing+'</span>'
+    + '</div>'
+    + '<div style="display:flex;gap:5px;">'
+    + '<button onclick="sharePracticePlan()" class="btn btn-sm" style="font-size:11px;">Share</button>'
+    + '<button onclick="printPracticePlan()" class="btn btn-sm" style="font-size:11px;">Print</button>'
+    + '</div></div></div>';
+  wk.prac.forEach(function(pr) {
+    var blocks = getPracBlocks(wk, pr).filter(Boolean);
+    var overrideKey = state.division+'_w'+wk.w+'_'+pr.lbl;
+    var isEdited = !!(state.planOverrides && state.planOverrides[overrideKey]);
+    h += '<div style="margin-bottom:16px;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
+      + '<div style="display:flex;align-items:center;gap:6px;">'
+      + '<span style="font-size:12px;font-weight:700;color:var(--g3);letter-spacing:.5px;text-transform:uppercase;">Practice '+pr.lbl+'</span>'
+      + (isEdited?'<span class="badge b-amber" style="font-size:9px;">Edited</span>':'')
+      + '</div>'
+      + (isEdited?'<button onclick="resetCurrentPracBlock('+wk.w+',\'' +pr.lbl+ '\')" class="btn btn-sm" style="font-size:9px;color:var(--g3);">Reset</button>':'')
+      + '</div>';
+    blocks.forEach(function(b, bi) {
+      var t = b.t || 'sk';
+      h += '<div class="prac-block '+(tc[t]||'pb-sk')+'" style="margin-bottom:6px;">'
+        + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div class="pb-type">'+(tl[t]||t)+' &middot; '+b.min+' min</div>'
+        + '<div class="pb-name">'+b.name+'</div>'
+        + renderStations(b)
+        + '</div>'
+        + '<div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">'
+        + '<button onclick="openEditBlock('+wk.w+',\'' +pr.lbl+ '\','+bi+')" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:11px;touch-action:manipulation;">Edit</button>'
+        + (bi>0?'<button onclick="movePracBlock('+wk.w+',\'' +pr.lbl+ '\','+bi+',-1)" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:10px;touch-action:manipulation;">Up</button>':'')
+        + (bi<blocks.length-1?'<button onclick="movePracBlock('+wk.w+',\'' +pr.lbl+ '\','+bi+',1)" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:10px;touch-action:manipulation;">Dn</button>':'')
+        + '<button onclick="deleteBlock('+wk.w+',\'' +pr.lbl+ '\','+bi+')" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:5px;color:var(--red);cursor:pointer;padding:3px 8px;font-size:11px;touch-action:manipulation;">X</button>'
+        + '</div></div></div>';
+    });
+    h += '<div style="display:flex;gap:6px;margin-top:6px;">'
+      + '<button onclick="addBlockToPlan('+wk.w+',\'' +pr.lbl+ '\')" class="btn btn-sm" style="flex:1;font-size:11px;">+ Drill from bank</button>'
+      + '<button onclick="openPlayPicker('+wk.w+',\'' +pr.lbl+ '\')" class="btn btn-sm" style="flex:1;font-size:11px;">+ Play install</button>'
+      + '</div></div>';
   });
   el.innerHTML = '';
   el.appendChild(wks);
   el.insertAdjacentHTML('beforeend', h);
 }
+
 
 function renderPracBuilder(el) {
   const plan = state.customPractice;
@@ -2604,6 +3095,7 @@ function pbTab(tab, el) {
 
 function renderPbContent() {
   const el = document.getElementById('pb-content');
+  if(curPbSub === 'callsheet') { renderCallSheet(el); return; }
   if(state.division === '56') {
     renderPbContent56(el);
     return;
@@ -2612,34 +3104,79 @@ function renderPbContent() {
   else if(curPbSub === 'bank') renderPlayBank(el);
   else if(curPbSub === 'defense') renderDefense(el);
   else if(curPbSub === 'formation') renderFormations(el);
+  else if(curPbSub === 'playlog') renderPlayLog(el);
 }
+
+let _swSelectMode = false;
+let _swSelected = new Set();
 
 function renderPbContent56(el) {
   const activeIds = state.activePlays56.singlewing || [];
   const tiers = ['Core','Intermediate','Advanced','Trick'];
+  const selCount = _swSelected.size;
+
   let h = `<div class="card card-gold" style="margin-bottom:10px;">
-    <div class="card-title">Single Wing offense (5/6)</div>
-    <div class="card-sub">Run-heavy misdirection. Every play is a fake or a counter. One pass play per game max (Back Pass Option). Tap any play to add or remove from active playbook (max 10).</div>
-    <div style="margin-top:8px;font-size:12px;color:var(--gold);font-weight:600;">${activeIds.length}/10 plays selected</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div>
+        <div class="card-title">Single Wing offense (5/6)</div>
+        <div class="card-sub">Run-heavy misdirection. Max 10 plays.</div>
+        <div style="margin-top:4px;font-size:12px;color:var(--gold);font-weight:600;">${activeIds.length}/10 selected</div>
+      </div>
+      <button onclick="_swSelectMode=!_swSelectMode;_swSelected.clear();renderPbContent()"
+        style="padding:6px 12px;border-radius:8px;border:2px solid ${_swSelectMode?'var(--gold)':'var(--navy3)'};background:${_swSelectMode?'rgba(245,166,35,.15)':'transparent'};color:${_swSelectMode?'var(--gold)':'var(--g3)'};font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;white-space:nowrap;">
+        ${_swSelectMode?'Cancel':'Select multiple'}
+      </button>
+    </div>
   </div>`;
 
-  const activeSection = SINGLEWING_BANK.filter(p=>activeIds.includes(p.id));
-  if(activeSection.length) {
-    h += '<div style="font-size:12px;font-weight:600;color:var(--g3);margin:10px 0 6px;letter-spacing:.5px;text-transform:uppercase;">Active plays</div>';
-    activeSection.forEach(p => {
-      h += swPlayCard(p, true);
-    });
+  if(_swSelectMode) {
+    h += `<div style="position:sticky;top:0;z-index:10;margin-bottom:10px;">
+      <button onclick="_addSelectedSwPlays()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;
+        background:${selCount>0?'var(--gold)':'var(--navy3)'};color:${selCount>0?'var(--navy)':'var(--g3)'};
+        font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">
+        ${selCount>0?'Add '+selCount+' play'+(selCount>1?'s':'')+' to playbook':'Tap plays to select'}
+      </button>
+    </div>`;
+  }
+
+  // Active plays section (only in normal mode)
+  if(!_swSelectMode) {
+    const activeSection = SINGLEWING_BANK.filter(p=>activeIds.includes(p.id));
+    if(activeSection.length) {
+      h += '<div style="font-size:12px;font-weight:600;color:var(--g3);margin:10px 0 6px;letter-spacing:.5px;text-transform:uppercase;">Active plays</div>';
+      activeSection.forEach(p => { h += swPlayCard(p, true); });
+    }
   }
 
   tiers.forEach(tier => {
     const plays = SINGLEWING_BANK.filter(p=>p.tier===tier);
     if(!plays.length) return;
-    h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin:14px 0 6px;letter-spacing:.5px;text-transform:uppercase;">${tier} plays</div>`;
+    h += `<div style="font-size:12px;font-weight:600;color:var(--g3);margin:14px 0 6px;letter-spacing:.5px;text-transform:uppercase;">${tier}</div>`;
     plays.forEach(p => {
-      h += swPlayCard(p, false);
+      const isActive = activeIds.includes(p.id);
+      const isSel = _swSelected.has(p.id);
+      if(_swSelectMode) {
+        h += `<div onclick="_toggleSwSelect('${p.id}')"
+          style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:6px;
+          border:2px solid ${isSel?'var(--gold)':isActive?'rgba(245,166,35,.3)':'var(--navy3)'};
+          background:${isSel?'rgba(245,166,35,.12)':isActive?'rgba(245,166,35,.04)':'var(--navy2)'};
+          cursor:pointer;touch-action:manipulation;">
+          <div style="width:26px;height:26px;border-radius:7px;border:2px solid ${isSel?'var(--gold)':'var(--navy3)'};
+            background:${isSel?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;
+            font-size:12px;font-weight:800;color:var(--navy);flex-shrink:0;">${isSel?'✓':''}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:${isActive?700:600};color:${isActive?'var(--gold)':'var(--white)'};">${p.n}</div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;">${p.tier} · ${p.pass?'Pass':'Run'} · ${p.mis} mis</div>
+          </div>
+          ${isActive?'<span class="badge b-green" style="flex-shrink:0;">Active</span>':''}
+        </div>`;
+      } else {
+        h += swPlayCard(p, false);
+      }
     });
   });
 
+  // Defense and formation (always shown)
   h += '<div style="font-size:13px;font-weight:600;color:var(--g3);margin:16px 0 8px;letter-spacing:.5px;text-transform:uppercase;">Defense (5/6)</div>';
   DEF_PLAYS_56.forEach(p => {
     h += `<div class="drill-card">
@@ -2665,6 +3202,33 @@ function renderPbContent56(el) {
 
   el.innerHTML = h;
 }
+
+function _toggleSwSelect(id) {
+  if(_swSelected.has(id)) _swSelected.delete(id);
+  else _swSelected.add(id);
+  renderPbContent();
+}
+
+function _addSelectedSwPlays() {
+  if(!_swSelected.size) return;
+  if(!state.activePlays56) state.activePlays56 = {singlewing:[]};
+  if(!state.activePlays56.singlewing) state.activePlays56.singlewing = [];
+  const active = state.activePlays56.singlewing;
+  let added = 0;
+  _swSelected.forEach(id => {
+    if(!active.includes(id)) {
+      if(active.length >= 10) return;
+      active.push(id);
+      added++;
+    }
+  });
+  _swSelected.clear();
+  _swSelectMode = false;
+  save();
+  renderPbContent();
+  showToast(added + ' play' + (added!==1?'s':'') + ' added to your 5/6 playbook');
+}
+
 
 function swPlayCard(p, isActive) {
   const inActive = (state.activePlays56.singlewing||[]).includes(p.id);
@@ -2730,59 +3294,231 @@ function toggleSwPlay(id) {
 }
 
 function renderActivePlaybook(el) {
-  const bank = curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK;
-  const active = state.activePlays[curSystem] || [];
+  if(!state.customPlays) state.customPlays = {};
+  const sys = curSystem;
+  const customForSys = state.customPlays[sys] || [];
+  const bank = [...(sys==='wingt' ? WINGT_BANK : PISTOL_BANK), ...customForSys];
+  const active = state.activePlays[sys] || [];
   const activePlays = bank.filter(p=>active.includes(p.id));
   const sysName = curSystem==='wingt' ? 'Wing-T' : 'Pistol Spread';
   let h = `<div class="card" style="margin-bottom:10px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
       <div><div class="card-title">${sysName} active playbook</div>
       <div class="card-sub">${activePlays.length} of 16 max plays selected</div></div>
-      <span class="badge ${activePlays.length>=12&&activePlays.length<=16?'b-green':activePlays.length>16?'b-red':'b-amber'}">${activePlays.length}/16</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="badge ${activePlays.length>=12&&activePlays.length<=16?'b-green':activePlays.length>16?'b-red':'b-amber'}">${activePlays.length}/16</span>
+        <button onclick="openCreatePlay()" class="btn btn-sm" style="font-size:11px;white-space:nowrap;">+ Create play</button>
+      </div>
     </div>
     <div style="margin-top:8px;background:var(--navy3);border-radius:8px;overflow:hidden;height:6px;">
       <div style="height:100%;background:var(--gold);width:${Math.min(activePlays.length/16*100,100)}%;transition:width .3s;"></div>
     </div>
   </div>`;
   if(!activePlays.length) {
-    h += `<div class="empty"><div class="empty-icon">📖</div><div class="empty-text">No plays in your playbook yet.<br>Go to <strong>Play Bank</strong> to add plays.</div></div>`;
+    h += `<div class="empty"><div class="empty-icon">📖</div><div class="empty-text">No plays in your playbook yet.<br>Go to <strong>Play Bank</strong> to add plays, or tap <strong>+ Create play</strong> to add your own.</div></div>`;
   } else {
     activePlays.forEach(p => {
       h += renderPlayCard(p, true);
     });
   }
+  // Show custom plays section if any exist
+  if(customForSys.length) {
+    h += `<div class="sec-hdr" style="margin-top:12px;">Your custom plays</div>`;
+    customForSys.forEach(p => {
+      h += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--navy3);border-radius:8px;margin-bottom:5px;">
+        <div>
+          <div style="font-size:13px;font-weight:600;">${p.n}</div>
+          <div style="font-size:10px;color:var(--g3);">${p.pass?'Pass':'Run'} · ${p.mis} mis · Wk ${p.wk}+</div>
+        </div>
+        <button onclick="deleteCustomPlay('${p.id}')" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:5px;color:var(--red);cursor:pointer;padding:4px 8px;font-size:11px;touch-action:manipulation;">Delete</button>
+      </div>`;
+    });
+  }
   el.innerHTML = h;
 }
 
+let _bankSelectMode = false;
+let _bankSelected = new Set();
+
+function getFullBank() {
+  if(!state.customPlays) state.customPlays = {};
+  const custom = state.customPlays[curSystem] || [];
+  const base = curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK;
+  return [...base, ...custom];
+}
+
+function openCreatePlay() {
+  const h = '<div class="modal-title">Create a custom play</div>'
+    + '<div style="display:flex;flex-direction:column;gap:10px;">'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Play name</label>'
+    + '<input id="cp-name" placeholder="e.g. Jet Sweep Right" style="width:100%;margin-top:4px;"></div>'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Description</label>'
+    + '<textarea id="cp-desc" style="width:100%;margin-top:4px;height:70px;" placeholder="What happens on this play..."></textarea></div>'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Coaching note</label>'
+    + '<input id="cp-note" placeholder="Key cue you say to the team" style="width:100%;margin-top:4px;"></div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Type</label>'
+    + '<select id="cp-pass" style="width:100%;margin-top:4px;">'
+    + '<option value="false">Run</option><option value="true">Pass</option>'
+    + '</select></div>'
+    + '<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Misdirection</label>'
+    + '<select id="cp-mis" style="width:100%;margin-top:4px;">'
+    + '<option value="Low">Low</option><option value="Med">Med</option>'
+    + '<option value="High">High</option><option value="Very High">Very High</option>'
+    + '</select></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Tier</label>'
+    + '<select id="cp-tier" style="width:100%;margin-top:4px;">'
+    + '<option>Core</option><option>Intermediate</option><option>Advanced</option><option>Trick</option>'
+    + '</select></div>'
+    + '<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Install week</label>'
+    + '<input id="cp-wk" type="number" value="1" min="1" max="13" style="width:100%;margin-top:4px;"></div>'
+    + '</div>'
+    + '<div><label style="font-size:11px;color:var(--g3);font-weight:600;">Formation</label>'
+    + '<input id="cp-formation" placeholder="e.g. Under center, wing right" style="width:100%;margin-top:4px;"></div>'
+    + '<button onclick="saveCustomPlay()" class="btn btn-gold" style="width:100%;min-height:48px;margin-top:4px;">Save play</button>'
+    + '</div>';
+  document.getElementById('slot-picker-content').innerHTML = h;
+  document.getElementById('slot-picker-pos').value = 'createplay';
+  openModal('modal-slot-picker');
+}
+
+function saveCustomPlay() {
+  const name = document.getElementById('cp-name').value.trim();
+  if(!name) { alert('Name is required.'); return; }
+  if(!state.customPlays) state.customPlays = {};
+  if(!state.customPlays[curSystem]) state.customPlays[curSystem] = [];
+  const id = 'cp_' + Date.now();
+  const play = {
+    id, n: name,
+    desc: document.getElementById('cp-desc').value.trim() || name,
+    note: document.getElementById('cp-note').value.trim() || '',
+    pass: document.getElementById('cp-pass').value === 'true',
+    mis: document.getElementById('cp-mis').value,
+    tier: document.getElementById('cp-tier').value,
+    wk: parseInt(document.getElementById('cp-wk').value) || 1,
+    formation: document.getElementById('cp-formation').value.trim() || 'Custom formation',
+    custom: true,
+  };
+  state.customPlays[curSystem].push(play);
+  // Auto-add to active playbook
+  if(!state.activePlays[curSystem]) state.activePlays[curSystem] = [];
+  if(state.activePlays[curSystem].length < 16) {
+    state.activePlays[curSystem].push(id);
+  }
+  save();
+  closeModal('modal-slot-picker');
+  renderPbContent();
+  showToast(name + ' added to your playbook');
+}
+
+function deleteCustomPlay(id) {
+  if(!confirm('Delete this custom play?')) return;
+  if(!state.customPlays || !state.customPlays[curSystem]) return;
+  state.customPlays[curSystem] = state.customPlays[curSystem].filter(p=>p.id!==id);
+  // Also remove from active
+  if(state.activePlays[curSystem]) {
+    state.activePlays[curSystem] = state.activePlays[curSystem].filter(x=>x!==id);
+  }
+  save();
+  renderPbContent();
+}
+
 function renderPlayBank(el) {
-  const bank = curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK;
+  if(!state.customPlays) state.customPlays = {};
+  const customForSys = state.customPlays[curSystem] || [];
+  const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...customForSys];
   const active = state.activePlays[curSystem] || [];
   const tiers = ['Core','Intermediate','Advanced','Trick'];
   const sysName = curSystem==='wingt' ? 'Wing-T' : 'Pistol Spread';
-  let h = `<div style="font-size:12px;color:var(--g3);margin-bottom:12px;">Tap a play to view details. Add to your active playbook (max 16). <strong style="color:var(--gold);">${active.length}/16 selected.</strong></div>`;
+  const selCount = _bankSelected.size;
+
+  let h = `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+    <div style="font-size:12px;color:var(--g3);"><strong style="color:var(--gold);">${active.length}/16</strong> in your playbook.</div>
+    <button onclick="_bankSelectMode=!_bankSelectMode;_bankSelected.clear();renderPbContent()"
+      style="padding:6px 12px;border-radius:8px;border:2px solid ${_bankSelectMode?'var(--gold)':'var(--navy3)'};background:${_bankSelectMode?'rgba(245,166,35,.15)':'transparent'};color:${_bankSelectMode?'var(--gold)':'var(--g3)'};font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;">
+      ${_bankSelectMode?'Cancel':'Select multiple'}
+    </button>
+  </div>`;
+
+  if(_bankSelectMode) {
+    h += `<div style="position:sticky;top:0;z-index:10;margin-bottom:10px;">
+      <button onclick="_addSelectedPlays()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;
+        background:${selCount>0?'var(--gold)':'var(--navy3)'};color:${selCount>0?'var(--navy)':'var(--g3)'};
+        font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">
+        ${selCount>0?'Add '+selCount+' play'+(selCount>1?'s':'')+' to playbook':'Tap plays to select'}
+      </button>
+    </div>`;
+  }
+
   tiers.forEach(tier => {
     const plays = bank.filter(p=>p.tier===tier);
     if(!plays.length) return;
     h += `<div class="sec-hdr">${tier}</div>`;
     plays.forEach(p => {
       const isActive = active.includes(p.id);
-      h += `<div class="drill-card ${isActive?'selected':''}" onclick="showPlayDetail('${p.id}')">
-        <div class="dc-header">
-          <div class="dc-title">${p.n}</div>
-          ${isActive?'<span class="badge b-green">In playbook</span>':''}
-        </div>
-        <div class="dc-body">${p.desc.substring(0,90)}...</div>
-        <div class="dc-footer">
-          <span class="badge b-${p.tier==='Core'?'green':p.tier==='Advanced'||p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
-          ${p.pass?'<span class="badge b-blue">Pass</span>':'<span class="badge b-gray">Run</span>'}
-          <span class="badge b-${p.mis==='Very High'?'red':p.mis==='High'?'amber':p.mis==='Med'?'blue':'gray'}">${p.mis} mis.</span>
-          <span class="badge b-gray">Wk ${p.wk}+</span>
-        </div>
-      </div>`;
+      const isSel = _bankSelected.has(p.id);
+      if(_bankSelectMode) {
+        h += `<div onclick="_toggleBankSelect('${p.id}')"
+          style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:6px;
+          border:2px solid ${isSel?'var(--gold)':isActive?'rgba(245,166,35,.3)':'var(--navy3)'};
+          background:${isSel?'rgba(245,166,35,.12)':isActive?'rgba(245,166,35,.04)':'var(--navy2)'};
+          cursor:pointer;touch-action:manipulation;">
+          <div style="width:26px;height:26px;border-radius:7px;border:2px solid ${isSel?'var(--gold)':'var(--navy3)'};
+            background:${isSel?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;
+            font-size:12px;font-weight:800;color:var(--navy);flex-shrink:0;">${isSel?'✓':''}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:${isActive?700:600};color:${isActive?'var(--gold)':'var(--white)'};">${p.n}</div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;">${p.tier} · ${p.pass?'Pass':'Run'} · ${p.mis} mis · Wk ${p.wk}+</div>
+          </div>
+          ${isActive?'<span class="badge b-green" style="flex-shrink:0;">Active</span>':''}
+        </div>`;
+      } else {
+        h += `<div class="drill-card ${isActive?'selected':''}" onclick="showPlayDetail('${p.id}')">
+          <div class="dc-header">
+            <div class="dc-title">${p.n}</div>
+            ${isActive?'<span class="badge b-green">In playbook</span>':''}
+          </div>
+          <div class="dc-body">${p.desc.substring(0,90)}...</div>
+          <div class="dc-footer">
+            <span class="badge b-${p.tier==='Core'?'green':p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
+            ${p.pass?'<span class="badge b-blue">Pass</span>':'<span class="badge b-gray">Run</span>'}
+            <span class="badge b-${p.mis==='Very High'?'red':p.mis==='High'?'amber':p.mis==='Med'?'blue':'gray'}">${p.mis} mis.</span>
+            <span class="badge b-gray">Wk ${p.wk}+</span>
+          </div>
+        </div>`;
+      }
     });
   });
   el.innerHTML = h;
 }
+
+function _toggleBankSelect(id) {
+  if(_bankSelected.has(id)) _bankSelected.delete(id);
+  else _bankSelected.add(id);
+  renderPbContent();
+}
+
+function _addSelectedPlays() {
+  if(!_bankSelected.size) return;
+  if(!state.activePlays[curSystem]) state.activePlays[curSystem] = [];
+  const active = state.activePlays[curSystem];
+  let added = 0;
+  _bankSelected.forEach(id => {
+    if(!active.includes(id)) {
+      if(active.length >= 16) return;
+      active.push(id);
+      added++;
+    }
+  });
+  _bankSelected.clear();
+  _bankSelectMode = false;
+  save();
+  renderPbContent();
+  showToast(added + ' play' + (added!==1?'s':'') + ' added to your playbook');
+}
+
 
 function renderPlayCard(p, showRemove) {
   return `<div class="drill-card" onclick="showPlayDetail('${p.id}')">
@@ -2800,7 +3536,9 @@ function renderPlayCard(p, showRemove) {
 }
 
 function showPlayDetail(id) {
-  const bank = curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK;
+  if(!state.customPlays) state.customPlays = {};
+  const custom = state.customPlays[curSystem] || [];
+  const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...custom];
   const p = bank.find(x=>x.id===id);
   if(!p) return;
   selectedPlay = p;
@@ -4098,7 +4836,10 @@ function getCallSheet() {
 
 function renderCallSheet(el) {
   const division = state.division;
-  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  if(!state.customPlays) state.customPlays = {};
+  const custom = state.customPlays[curSystem] || [];
+  const baseBank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const bank = [...baseBank, ...custom];
   const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
   const activePlays = bank.filter(p=>activeIds.includes(p.id));
   const sheet = getCallSheet();
@@ -4121,21 +4862,14 @@ function renderCallSheet(el) {
     'CLOSER':'#f97316',
   };
 
-  const possLabels = [
-    'Possession 1 — Establish the base. Read their response. Shanahan: run before you pass.',
-    'Possession 2 — You know their tendency. Johnson: call the constraint that punishes it.',
-    'Possession 3 — Full information. McVay: motion reveals if they adjusted since P1.',
-    'Possession 4 — Double what worked. Abandon what did not. Johnson: never same look twice.',
-    'Possession 5 — Hammer. Walsh: by P5 you know exactly what this defense does.',
-    'Possession 6 — Finish. Walsh: closer decided before kickoff. No decisions under pressure.',
-  ];
-
   let h = `<div class="card card-gold" style="margin-bottom:10px;">
     <div class="card-title">Game ${gameNum} call sheet</div>
-    <div class="card-sub">30 scripted calls across 6 possessions. Same plays repeat — each for a different reason. Read the cue before every call.</div>
+    <div class="card-sub">30 scripted calls. Play them in order. Read the cue before each one.</div>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-    <button onclick="autoScriptCallSheet()" class="btn btn-gold" style="flex:1;font-size:13px;min-height:48px;">⚡ Auto-Script 30 plays</button>
+    <button onclick="autoScriptCallSheet(30,'full')" class="btn btn-gold" style="flex:1;font-size:12px;min-height:48px;">⚡ 30 plays</button>
+    <button onclick="autoScriptCallSheet(20,'starters')" class="btn btn-gold" style="flex:1;font-size:12px;min-height:48px;">⭐ 20 Starters</button>
+    <button onclick="autoScriptCallSheet(20,'backups')" class="btn btn-gold" style="flex:1;font-size:12px;min-height:48px;">📋 20 Backups</button>
     ${normalized.length?`<button onclick="printCallSheet()" class="btn btn-sm" style="min-height:48px;">🖨️ Print</button>
     <button onclick="clearCallSheet()" class="btn btn-danger btn-sm" style="min-height:48px;">Clear</button>`:''}
   </div>`;
@@ -4144,55 +4878,43 @@ function renderCallSheet(el) {
     h += `<div style="padding:24px;text-align:center;background:var(--navy3);border-radius:10px;margin-bottom:14px;">
       <div style="font-size:28px;margin-bottom:8px;">📋</div>
       <div style="font-size:13px;font-weight:600;margin-bottom:6px;">No plays scripted yet</div>
-      <div style="font-size:12px;color:var(--g3);line-height:1.5;">Tap <strong style="color:var(--gold);">⚡ Auto-Script 15 plays</strong> to generate your game plan.<br>The same play will appear multiple times — that is intentional and correct.</div>
+      <div style="font-size:12px;color:var(--g3);line-height:1.5;">Tap <strong style="color:var(--gold);">⚡ 30 plays</strong>, <strong style="color:var(--gold);">⭐ 20 Starters</strong>, or <strong style="color:var(--gold);">📋 20 Backups</strong> to generate your script.</div>
     </div>`;
   } else {
-    const posSize = 5;
-    for(let pi=0; pi < Math.ceil(normalized.length/posSize); pi++) {
-      const poss = normalized.slice(pi*posSize, pi*posSize+posSize);
-      h += `<div style="margin-bottom:16px;">
-        <div style="padding:8px 10px;background:rgba(245,166,35,.06);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;margin-bottom:8px;">
-          <div style="font-size:12px;font-weight:700;color:var(--gold);">Possession ${pi+1}</div>
-          <div style="font-size:10px;color:var(--g3);margin-top:1px;">${possLabels[pi]||''}</div>
-        </div>`;
+    normalized.forEach((slot, idx) => {
+      const p = bank.find(x=>x.id===slot.id);
+      const stats = p ? getPlayStats(p.id) : null;
+      const role = slot.role || (p&&p.pass?'PASS':'RUN');
+      const cue = slot.cue || '';
+      const color = roleColor[role] || 'var(--g3)';
+      const prevSamePlay = p ? normalized.slice(0, slot._idx).some(s=>s.id===slot.id) : false;
+      const playName = p ? p.n : '(play not found)';
 
-      poss.forEach((slot, posInPoss) => {
-        const p = bank.find(x=>x.id===slot.id);
-        if(!p) return;
-        const globalIdx = pi*posSize + posInPoss;
-        const stats = getPlayStats(p.id);
-        const role = slot.role || (p.pass?'PASS':'RUN');
-        const cue = slot.cue || '';
-        const color = roleColor[role] || 'var(--g3)';
-        const prevSamePlay = normalized.slice(0, slot._idx).some(s=>s.id===slot.id);
-
-        h += `<div style="display:flex;align-items:stretch;gap:0;margin-bottom:6px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.05);">
-          <div style="background:var(--navy3);min-width:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <div style="font-size:22px;font-weight:800;color:${color};line-height:1;">${globalIdx+1}</div>
-          </div>
-          <div style="width:3px;background:${color};flex-shrink:0;"></div>
-          <div style="flex:1;padding:10px 10px;background:var(--navy3);min-width:0;">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
-              <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
-                  <span style="font-size:13px;font-weight:700;">${p.n}</span>
-                  ${prevSamePlay?'<span style="font-size:9px;color:var(--g3);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-weight:600;">REPEAT</span>':''}
-                </div>
-                <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">${role}</div>
-                <div style="font-size:11px;color:var(--g3);line-height:1.45;font-style:italic;">${cue}</div>
-                ${stats&&stats.total?`<div style="font-size:9px;color:var(--g3);margin-top:3px;opacity:.7;">${stats.pct}% this season (${stats.total} uses)</div>`:''}
+      h += `<div style="display:flex;align-items:stretch;gap:0;margin-bottom:6px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.05);">
+        <div style="background:var(--navy3);min-width:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="font-size:22px;font-weight:800;color:${color};line-height:1;">${idx+1}</div>
+        </div>
+        <div style="width:3px;background:${color};flex-shrink:0;"></div>
+        <div style="flex:1;padding:10px 10px;background:var(--navy3);min-width:0;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+                <span style="font-size:13px;font-weight:700;">${playName}</span>
+                ${prevSamePlay?'<span style="font-size:9px;color:var(--g3);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-weight:600;">REPEAT</span>':''}
               </div>
-              <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
-                ${globalIdx>0?`<button onclick="moveCallSheet(${globalIdx},-1)" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:10px;touch-action:manipulation;">↑</button>`:''}
-                ${globalIdx<normalized.length-1?`<button onclick="moveCallSheet(${globalIdx},1)" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:10px;touch-action:manipulation;">↓</button>`:''}
-                <button onclick="removeCallSheetAt(${globalIdx})" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:5px;color:var(--red);cursor:pointer;padding:3px 8px;font-size:11px;touch-action:manipulation;">×</button>
-              </div>
+              <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">${role}</div>
+              <div style="font-size:11px;color:var(--g3);line-height:1.45;font-style:italic;">${cue}</div>
+              ${stats&&stats.total?`<div style="font-size:9px;color:var(--g3);margin-top:3px;opacity:.7;">${stats.pct}% this season (${stats.total} uses)</div>`:''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+              ${idx>0?`<button onclick="moveCallSheet(${idx},-1)" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:10px;touch-action:manipulation;">↑</button>`:''}
+              ${idx<normalized.length-1?`<button onclick="moveCallSheet(${idx},1)" style="background:none;border:1px solid var(--navy3);border-radius:5px;color:var(--g3);cursor:pointer;padding:3px 8px;font-size:10px;touch-action:manipulation;">↓</button>`:''}
+              <button onclick="removeCallSheetAt(${idx})" style="background:none;border:1px solid rgba(239,68,68,.3);border-radius:5px;color:var(--red);cursor:pointer;padding:3px 8px;font-size:11px;touch-action:manipulation;">×</button>
             </div>
           </div>
-        </div>`;
-      });
-      h += '</div>';
-    }
+        </div>
+      </div>`;
+    });
     h += `<button onclick="printCallSheet()" class="btn btn-gold" style="width:100%;margin-bottom:14px;">🖨️ Print wristband</button>`;
   }
 
@@ -4253,228 +4975,211 @@ function clearCallSheet() {
   renderPbContent();
 }
 
-function autoScriptCallSheet() {
+function autoScriptCallSheet(scriptLen, mode) {
+  scriptLen = scriptLen || 30;
+  mode = mode || 'full';
+
   const division = state.division;
   const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
   const activeIds = division==='56' ? (state.activePlays56.singlewing||[]) : (state.activePlays[curSystem]||[]);
-  const activePlays = bank.filter(p=>activeIds.includes(p.id));
+  if(!state.customPlays) state.customPlays = {};
+  const custom = state.customPlays[curSystem] || [];
+  const fullBank = [...bank, ...custom];
+  const activePlays = fullBank.filter(p=>activeIds.includes(p.id));
   const gameNum = activeGames().length + 1;
-  const scouting = state.scouting && state.scouting.find(s=>s.gameNum===gameNum&&s.division===division);
+  const weekNum = state.week || gameNum;
 
   if(!activePlays.length){ alert('Add plays to your Active Playbook first.'); return; }
 
-  // ── SCORING ───────────────────────────────────────────────────
-  function playScore(p) {
-    let score = 0;
+  // ── MODE SETTINGS ─────────────────────────────────────────────
+  // starters: best plays, higher misdirection, tricks unlocked from play 10+
+  // backups:  base plays only, simple misdirection, max 2 passes, no tricks
+  // full:     all plays, standard caps
+  const isStarters = mode === 'starters';
+  const isBackups  = mode === 'backups';
+  const passMax    = isBackups ? 2 : 4;
+  const allowTricks = !isBackups;
+  const tricksFrom = isStarters ? 10 : 15; // play number where tricks can first appear
+
+  // ── BASE SCORE ───────────────────────────────────────────────
+  function baseScore(p) {
+    let s = 0;
     const stats = getPlayStats(p.id);
-    if(stats&&stats.total>=3)      score += stats.pct*0.7;
-    else if(stats&&stats.total>=1) score += stats.pct*0.3;
-    else score += p.tier==='Core'?45:p.tier==='Intermediate'?32:p.tier==='Advanced'?20:10;
-    const misVal={'Low':8,'Med':14,'High':18,'Very High':10};
-    score += misVal[p.mis]||8;
-    if(gameNum<(p.wk||1)) score -= 40;
-    if(scouting){
-      const t=(scouting.tendencies||'').toLowerCase();
-      if((t.includes('crash')||t.includes('aggressive'))&&p.mis==='High') score+=12;
-      if((t.includes('soft')||t.includes('zone'))&&(p.mis==='Low'||p.mis==='Med')) score+=8;
+    if(stats&&stats.total>=3)      s += stats.pct * 0.7;
+    else if(stats&&stats.total>=1) s += stats.pct * 0.3;
+    else s += p.tier==='Core'?45 : p.tier==='Intermediate'?32 : p.tier==='Advanced'?20 : 10;
+    const misVal = {'Low':8,'Med':14,'High':18,'Very High':10};
+    s += misVal[p.mis] || 8;
+    if(gameNum < (p.wk||1)) s -= 40;
+
+    // Mode adjustments to scoring
+    if(isStarters) {
+      // Boost advanced and high-misdirection plays
+      if(p.tier==='Advanced') s += 10;
+      if(p.mis==='High') s += 8;
     }
-    return score;
+    if(isBackups) {
+      // Boost core and low-misdirection, penalise complexity
+      if(p.tier==='Core') s += 20;
+      if(p.mis==='Low'||p.mis==='Med') s += 12;
+      if(p.tier==='Advanced'||p.tier==='Trick') s -= 30;
+      if(p.mis==='Very High') s -= 30;
+    }
+    return Math.max(s, 1);
   }
 
-  const s = arr=>[...arr].sort((a,b)=>playScore(b)-playScore(a));
+  const shuffleFactor = Math.min(0.6, 0.15 + (weekNum * 0.04));
 
-  // ── CATEGORIZATION ────────────────────────────────────────────
-  // Base: sweeps, dives — run until they stop it (Shanahan: commit to the run first)
-  const base    = s(activePlays.filter(p=>!p.pass&&(p.mis==='Low'||p.mis==='Med')&&(p.tier==='Core'||p.tier==='Intermediate')));
-  // Counters: punish over-pursuit on base (constraint theory)
-  const counters= s(activePlays.filter(p=>!p.pass&&p.mis==='High'&&p.tier!=='Trick'&&!p.n.toLowerCase().includes('reverse')));
-  // Keepers: QB as third threat once both backs are accounted for
-  const keepers = s(activePlays.filter(p=>!p.pass&&(p.n.toLowerCase().includes('keep')||p.n.toLowerCase().includes('boot')||p.n.toLowerCase().includes('sneak'))));
-  // Passes: Shanahan rule — never before run is established; Johnson: 30-36% rate
-  const passes  = s(activePlays.filter(p=>p.pass&&p.mis!=='Very High'));
-  // Reverses: motion play, use once per game max — McVay: motion reveals man vs zone
-  const reverses= s(activePlays.filter(p=>p.n.toLowerCase().includes('reverse')||p.mis==='Very High'&&!p.pass));
-  // All sorted
-  const all     = s(activePlays);
+  function weightedPick(arr, callCount, maxCalls) {
+    if(!arr.length) return null;
+    let pool = arr.filter(p=>(callCount[p.id]||0) < maxCalls);
+    if(!pool.length) pool = arr;
+    const weights = pool.map(p => Math.max(baseScore(p) * (1 + (Math.random()*2-1)*shuffleFactor), 1));
+    const total = weights.reduce((a,b)=>a+b, 0);
+    let r = Math.random() * total;
+    for(let i=0; i<pool.length; i++) {
+      r -= weights[i];
+      if(r <= 0) return pool[i];
+    }
+    return pool[pool.length-1];
+  }
 
-  const best   = (...arrs) => { for(const a of arrs) if(a.length) return a[0]; return null; };
-  const second = (...arrs) => { for(const a of arrs) if(a.length>1) return a[1]; for(const a of arrs) if(a.length) return a[0]; return null; };
-  const notSame= (arr,...excl) => arr.filter(x=>!excl.some(e=>e&&x.id===e.id));
+  // ── CATEGORIZE ───────────────────────────────────────────────
+  const isBase    = p=>!p.pass&&(p.mis==='Low'||p.mis==='Med')&&(p.tier==='Core'||p.tier==='Intermediate');
+  const isCounter = p=>!p.pass&&p.mis==='High'&&p.tier!=='Trick'&&!p.n.toLowerCase().includes('reverse');
+  const isKeeper  = p=>!p.pass&&(p.n.toLowerCase().includes('keep')||p.n.toLowerCase().includes('boot')||p.n.toLowerCase().includes('sneak'));
+  const isPass    = p=>p.pass&&p.mis!=='Very High';
+  const isTrick   = p=>p.mis==='Very High'||p.tier==='Trick';
 
-  // ── 30-PLAY SCRIPT: 6 POSSESSIONS × 5 PLAYS ──────────────────
-  //
-  // Research basis:
-  // McVay:    motion reveals defense pre-snap — motion plays go EARLY every possession
-  // Shanahan: run before pass, ALWAYS — no pass until run is proven this possession
-  //           OL blocking must look identical on runs and passes
-  // Johnson:  after each possession, call the constraint that punishes what defense took away
-  //           never let them settle — if they adjusted, you already have the answer
-  // Walsh:    script all 30 before game — think clearly Thursday, execute Saturday
+  const base    = activePlays.filter(isBase);
+  const counters= activePlays.filter(isCounter);
+  const keepers = activePlays.filter(isKeeper);
+  const passes  = activePlays.filter(isPass);
+  const tricks  = activePlays.filter(isTrick);
+  const misc    = activePlays.filter(p=>!isBase(p)&&!isCounter(p)&&!isKeeper(p)&&!isPass(p)&&!isTrick(p));
+  const all     = [...activePlays];
 
+  // For backups: only base-level plays in the pool
+  const backupSafe = activePlays.filter(p=>isBase(p)||isCounter(p)||(isPass(p)&&p.mis!=='High'));
+
+  const callCount = {};
+  activePlays.forEach(p=>{ callCount[p.id]=0; });
+
+  let passCount = 0;
+  let playNum = 0;
   const script = [];
-  const add = (p, role, cue) => { if(p) script.push({id:p.id, role, cue}); };
 
-  // Track what we called to apply Johnson adjustment principle across possessions
-  let sw1, sw2, ct1, ps1, ps2, ps3, kp1, rv1;
+  function add(cats, role, cue, maxCallsOverride) {
+    playNum++;
+    const seen = new Set();
+    let pool = [];
 
-  // ══════════════════════════════════════════════════════════════
-  // POSSESSION 1 — Introduction: establish the base, read the defense
-  // McVay: first motion play reveals man vs zone for the rest of the game
-  // Shanahan: run it until they prove they can stop it
-  // ══════════════════════════════════════════════════════════════
+    // Backups: restrict to simpler plays
+    const sourceCats = isBackups ? [backupSafe, base, all] : cats;
+    for(const cat of sourceCats) {
+      for(const p of cat) {
+        if(!seen.has(p.id)) { seen.add(p.id); pool.push(p); }
+      }
+    }
 
-  sw1 = best(base, all);
-  add(sw1, 'ESTABLISH',
-    'Run this. Watch how they defend it. Every call today is built on how they answer this play. Note: do defenders follow motion?');
+    // Block tricks before their unlock play number
+    if(!allowTricks || playNum < tricksFrom) {
+      const noTricks = pool.filter(p=>!isTrick(p));
+      if(noTricks.length) pool = noTricks;
+    }
 
-  sw2 = best(notSame(base,sw1), all) || sw1;
-  add(sw2, 'OPPOSITE SIDE',
-    'Other edge. Force them to defend the whole field. If they shifted to stop '+( sw1?sw1.n.split(' ')[0]:'that')+' the other side is open.');
+    // Hard pass cap
+    if(passCount >= passMax) {
+      const runPool = pool.filter(p=>!p.pass);
+      if(runPool.length) pool = runPool;
+    }
 
-  ct1 = best(counters, keepers, all);
-  add(ct1, 'COUNTER',
-    'They committed to stop the sweep. They moved out of position. Hit directly behind their over-pursuit. This is why you ran the sweep twice first.');
+    const p = weightedPick(pool, callCount, maxCallsOverride||2);
+    if(p) {
+      callCount[p.id] = (callCount[p.id]||0) + 1;
+      if(p.pass) passCount++;
+      script.push({id:p.id, role, cue});
+    }
+  }
 
-  ps1 = best(passes, all);
-  add(ps1, ps1&&ps1.pass?'PASS SHOT':'CONSTRAINT',
-    'Shanahan rule: never throw until the run is proven. You ran it twice and they stopped it. Now they are set for the run — throw before they rotate. First pass of the game.');
+  // ── SCRIPT TEMPLATES ─────────────────────────────────────────
+  // Both 20-play and 30-play share the same arc structure.
+  // 20-play = first 20 slots of the arc.
+  // 30-play = all 30 slots.
 
-  add(sw1, 'RE-ESTABLISH',
-    'End possession 1 back on the base. Make them keep respecting the sweep going into possession 2. They just saw a pass — now run it again.');
+  const slots = [
+    // ── OPENING (plays 1-5) — establish, read, first counter ──
+    [[base,all], 'FIRST PLAY', 'This is us. Run it hard. Watch how they line up.'],
+    [[base,all], 'OTHER SIDE', 'Hit the other edge. Make them defend the whole field.'],
+    [[counters,keepers,all], 'FIRST COUNTER', 'They crashed on the base play. Door is open. Hit it now.'],
+    [[passes,misc,tricks,all], 'FIRST CHANGE-UP', 'First time they see this look. They are set for the run.'],
+    [[base,all], 'CLOSE STRONG', 'Finish on the base. Make them keep respecting it.'],
 
-  // ══════════════════════════════════════════════════════════════
-  // POSSESSION 2 — Exploit: you know their tendency now, punish it
-  // Johnson: after possession 1, what did the defense take away?
-  // If they stopped the sweep → counter opens. If they gave sweep → keep running.
-  // ══════════════════════════════════════════════════════════════
+    // ── FIND THE CRACK (plays 6-10) ──
+    [[keepers,counters,misc,all], 'QB EDGE', 'They forgot about the QB. Both backs set the defender up. Take the edge.'],
+    [[base,all], 'BACK TO THE BASE', 'After the keeper they overcorrected. Sweep is wide open again.'],
+    [[passes,misc,all], 'PLAY ACTION', 'They sold out to stop the run. Throw it before they rotate.'],
+    [[counters,keepers,all], 'CRACK IT OPEN', 'Counter. They have been watching the sweep all possession. Step behind their pursuit.'],
+    [[base,all], 'RESET', 'Back to the base. Do not let them settle into one read.'],
 
-  kp1 = best(keepers, all);
-  add(kp1, 'OPEN WITH QB',
-    'Johnson principle: open possession 2 with something they did not see in P1. They expect the sweep. QB keeper — third threat. They forgot about the QB.');
+    // ── THEY ADJUSTED, PUNISH IT (plays 11-15) ──
+    [[counters,keepers,misc,all], 'NEW WRINKLE', 'Different look. Same fake, different hole. They did not see this one.'],
+    [[base,all], 'BACK TO NUMBER ONE', 'They changed to stop the counter. Base play is wide open again.'],
+    [[passes,all], 'SECOND THROW', 'Different pass. They adjusted to the first one. This hits behind that adjustment.'],
+    [[counters,keepers,all], 'MAKE THEM PAY', 'Counter again. Every adjustment they make opens something else.'],
+    [[tricks,misc,passes,all], 'SPECIAL PLAY', 'Possession 3. They have no clean read. Best moment for something they have not seen.'],
 
-  add(sw1, 'PUNCH BACK',
-    'Counter opened the edge. Now come back to '+(sw1?sw1.n.split(' ')[0]:'the base')+'. They over-corrected. This should go big.');
+    // ── DOUBLE DOWN (plays 16-20) ──
+    [[base,all], 'THE ONE THAT KEEPS WORKING', 'They keep cheating to stop the first sweep. Other side is open every time.'],
+    [[counters,keepers,misc,all], 'DIFFERENT LOOK SAME RESULT', 'Counter variation. They are chasing plays, not stopping them. Keep going.'],
+    [[keepers,counters,all], 'QB TAKES IT AGAIN', 'Keeper. Both backs drew every defender. QB edge is open again.'],
+    [[passes,misc,all], 'THE PASS THAT WORKS', 'This pass has been working. Run it again with confidence.'],
+    [[base,all], 'THIS IS WHO WE ARE', '4 possessions of work made this unstoppable. Trust it.'],
 
-  ps2 = best(notSame(passes,ps1), passes, all);
-  add(ps2, 'PLAY ACTION',
-    'Shanahan: the run sets up the pass. They sold out to stop the run this possession. OL blocked identical to the run — throw behind the LB. This is the window the run created.');
+    // ── HAMMER (plays 21-25) — 30-play only ──
+    [[counters,keepers,all], 'HAMMER', 'Best counter of the day. No hesitation. 4 possessions of setup. Take it.'],
+    [[base,all], 'OVER AND OVER', 'The base play. They know it is coming. Run it anyway. Make them stop it.'],
+    [[tricks,misc,all], 'SECOND TRICK', 'They adjusted for the first one. They forgot this one exists.'],
+    [[passes,misc,all], 'ATTACK THE ADJUSTMENT', 'They sold out on the run this possession. Throw before they rotate.'],
+    [[counters,keepers,misc,all], 'CLOSE POSSESSION 5', 'End on the run. Go into the last possession with momentum.'],
 
-  add(ct1, 'COUNTER 2',
-    'Back to the run after the pass. They adjusted for pass — the counter is open again. Johnson: call the constraint that punishes what they gave up.');
+    // ── FINISH (plays 26-30) — 30-play only ──
+    [[base,all], 'LAST OPENER', 'Open the last possession on the edge. They are still cheating. Make them pay.'],
+    [[counters,keepers,all], 'COUNTER ALL GAME', 'You know this works. They have not stopped it. Run it one more time.'],
+    [[keepers,counters,all], 'QB ONE MORE TIME', 'Last keeper of the game. They forgot about the QB again.'],
+    [[passes,misc,all], 'LAST THROW', '6 possessions of running set this throw up. Defense is tired. This is open.'],
+    [[all], 'THE CLOSER', 'You chose this play before the game. This is the call. Run it.', 99],
+  ];
 
-  add(sw2, 'CLOSE POSSESSION',
-    'End on the base. Make them defend both sides again before possession 3. Never let them settle into a single read.');
+  // Run only the slots we need
+  const slotsToRun = slots.slice(0, scriptLen);
+  slotsToRun.forEach(slot => {
+    add(slot[0], slot[1], slot[2], slot[3]);
+  });
 
-  // ══════════════════════════════════════════════════════════════
-  // POSSESSION 3 — Tighten: full information, call with conviction
-  // McVay: motion play here reveals if they adjusted their coverage since P1
-  // ══════════════════════════════════════════════════════════════
-
-  const ct2 = best(notSame(counters,ct1), counters, all);
-  add(ct2, 'MISDIRECTION',
-    'Open P3 with a different counter. They have seen ct1 twice — hit them from a new angle. They do not know which counter is coming.');
-
-  add(sw1, 'RE-ESTABLISH BASE',
-    'Back to the sweep. After counters and passes they have been reacting to you. Reset. Make them prove they can stop the base again.');
-
-  ps3 = best(notSame(passes,ps1,ps2), passes, all);
-  add(ps3, ps3&&ps3.pass?'PASS SHOT 3':'MISDIRECTION',
-    ps3&&ps3.pass
-      ? 'Third pass. Different concept from P1 and P2. McVay principle: same motion, different play. Defense adjusted to your first two passes — this one hits behind that adjustment.'
-      : 'Misdirection. By possession 3 the defense has no clean read on you.');
-
-  add(ct1, 'EXPLOIT',
-    'They have been adjusting to your passes. The counter is wide open again. Johnson: after every pass adjustment, the counter behind it is automatically available.');
-
-  rv1 = best(reverses, all);
-  add(rv1, 'REVERSE / TRICK',
-    'McVay: motion reveals man vs zone. If they follow the motion — keep it. If they do not — this goes for big yards. Only call if defense is chasing. Possession 3 is the right moment.');
-
-  // ══════════════════════════════════════════════════════════════
-  // POSSESSION 4 — Adjust: what has worked? Double it. What has not? Abandon it.
-  // Johnson: never call the same look twice. Teams spend prep on concepts they will never see again.
-  // ══════════════════════════════════════════════════════════════
-
-  add(sw2, 'OPPOSITE BASE',
-    'By now they have shifted to your primary sweep. The other side is open. Four possessions in — they cannot cover both edges plus the QB plus the pass.');
-
-  const ct3 = best(notSame(counters,ct1,ct2), counters, keepers, all);
-  add(ct3, 'NEW COUNTER',
-    'Third different counter. Johnson principle: never call the same look twice. They have prepped for your first two — this one they have not seen. Call it with conviction.');
-
-  const kp2 = best(notSame(keepers,kp1), keepers, all);
-  add(kp2, 'QB KEEPER 2',
-    'Back to the QB keeper. In possession 2 this opened the edge. By possession 4 the defense has forgotten about it. Take it again.');
-
-  add(ps1, 'REPEAT PASS 1',
-    'Same pass concept as possession 1. Johnson: if it worked once and defense has not specifically adjusted for it — run it again. They cannot adjust to everything at once.');
-
-  add(sw1, 'CLOSE WITH BASE',
-    'End possession 4 on the base sweep. You own this play. Every defender knows it is coming and you are still getting yards. That is dominance.');
-
-  // ══════════════════════════════════════════════════════════════
-  // POSSESSION 5 — Hammer: most productive plays from P1-P4
-  // Walsh: by possession 5 you have complete information. Call what you know works.
-  // ══════════════════════════════════════════════════════════════
-
-  add(ct1, 'HAMMER',
-    'Walsh principle: by possession 5 you know exactly what this defense does. This counter has worked all game. Call it with zero hesitation. They know it is coming and cannot stop it.');
-
-  add(sw1, 'BASE',
-    'The base sweep. Four possessions of setup have made this play unstoppable. Trust the system.');
-
-  const rv2 = best(notSame(reverses,rv1), reverses, all);
-  add(rv2||rv1, 'TRICK 2',
-    'Second trick play. McVay: you have been setting this up for four possessions. Defense has been watching for your base plays — they forgot this exists.');
-
-  add(ps2, 'PLAY ACTION 2',
-    'Same play action concept as possession 2. They adjusted for it in P3 but relaxed by P5. This is the second window. Shanahan: the run always opens the pass.');
-
-  add(ct2, 'CLOSE STRONG',
-    'The misdirection counter from possession 3. Close possession 5 strong. Defense is tired of chasing. Hit behind their fatigue.');
-
-  // ══════════════════════════════════════════════════════════════
-  // POSSESSION 6 — Finish: every play for a reason, no improvising
-  // Walsh: know your closer before kickoff. No decisions under pressure.
-  // Johnson: the final possession is where preparation beats athleticism.
-  // ══════════════════════════════════════════════════════════════
-
-  add(sw2, 'FINAL OPPOSITE',
-    'Open the final possession on the other edge. By now they are completely focused on your primary sweep. This side is wide open. Take it.');
-
-  add(ct1, 'FINAL COUNTER',
-    'This counter has been your best play all game. Call it one more time. Johnson: the plays that worked in possession 1 still work in possession 6 if you call them right.');
-
-  add(kp1, 'FINAL QB',
-    'QB keeper to close the run game. You have established every run threat. The defense has to account for all of them. The QB keeper is always available because of the setup.');
-
-  ps3 = ps3 || ps1;
-  add(ps3, 'FINAL PASS',
-    'Last pass of the game. Six possessions of run setup have made this throw as open as it will ever be. Throw it on time. Shanahan: you earn the pass by committing to the run.');
-
-  // Play 30: THE CLOSER — decided before the game, called without hesitation
-  const closer = best(
-    notSame(all, sw1, sw2, ct1, ct2, ps1, ps2),
-    notSame(base, sw1, sw2),
-    base, counters, all
-  );
-  add(closer||sw1, 'CLOSER',
-    'Walsh: your closer is decided on Thursday. When you need a score right now — this is the call. No hesitation, no second-guessing. You chose this before the game.');
-
-  // ── SAVE ─────────────────────────────────────────────────────
   if(!state.callSheet) state.callSheet={'78':[],'56':[]};
   state.callSheet[division] = script;
+
+  const unique = new Set(script.map(s=>s.id)).size;
+  const modeLabel = isStarters ? 'Starters' : isBackups ? 'Backups' : 'Full';
   save();
   renderPbContent();
-  showToast('30-play script — 6 possessions of 5');
+  showToast(modeLabel + ' script — ' + scriptLen + ' plays, ' + unique + ' of ' + activePlays.length + ' used');
 }
+
+
+
+
 
 
 
 
 function printCallSheet() {
   const division = state.division;
-  const bank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  if(!state.customPlays) state.customPlays = {};
+  const custom = state.customPlays[curSystem] || [];
+  const baseBank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
+  const bank = [...baseBank, ...custom];
   const sheet = getCallSheet();
   const plays = sheet.map(s=>bank.find(p=>p.id===(typeof s==='string'?s:s.id))).filter(Boolean);
   const gameNum = activeGames().length+1;
