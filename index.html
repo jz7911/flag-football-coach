@@ -463,14 +463,14 @@ textarea{min-height:80px;resize:none;}
 <div class="toast" id="toast-msg"></div>
 
 <!-- SLOT PICKER MODAL -->
-<div class="modal-overlay" id="modal-slot-picker" onclick="if(event.target===this)closeModal('modal-slot-picker')">
+<div class="modal-overlay" id="modal-slot-picker" onclick="if(event.target===this)closePicker()">
   <div class="modal">
     <div class="modal-handle"></div>
     <input type="hidden" id="slot-picker-pos">
     <input type="hidden" id="slot-picker-str">
     <div id="slot-picker-content"></div>
     <div style="margin-top:12px;">
-      <button class="btn btn-outline" onclick="closeModal('modal-slot-picker')" style="width:100%;">Cancel</button>
+      <button class="btn btn-outline" onclick="closePicker()" style="width:100%;">Cancel</button>
     </div>
   </div>
 </div>
@@ -1748,7 +1748,28 @@ const WINGT_BANK = [
   {id:'wt46',n:'Bootleg Fake Pass Keep',tier:'Intermediate',mis:'High',pass:false,wk:3,
    desc:'QB bootlegs to the edge and fully sells a pass — eyes downfield, arm up like throwing. Defenders drop into coverage. QB tucks and runs. Works because once your bootleg pass is established defenders respect the throw. Now punish them for it.',
    note:'Sell the throw completely. Eyes downfield, hitch the arm. If they drop off the run is wide open.',
-   formation:'Under center, sweep fake, boot and fake throw'}];
+   formation:'Under center, sweep fake, boot and fake throw'},
+
+  // ── Jet Motion series ──────────────────────────────────────
+  {id:'wt47',n:'Jet Motion Sweep',tier:'Core',mis:'Med',pass:false,wk:2,
+   desc:'RB2 goes in full-speed pre-snap motion. QB snaps as RB2 hits the handoff spot and hands off at full speed. The motion gives RB2 a running start before the defense can react. Simplest and most effective of the jet series.',
+   note:'Snap timing is everything — snap it as the moving back hits the handoff point, not early.',
+   formation:'Under center or shotgun, RB2 jet motion'},
+
+  {id:'wt48',n:'Jet Motion Sweep — QB Keep',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Full jet motion by RB2. QB fakes the handoff completely — sells it with both hands extended into RB2. RB2 runs the sweep convincingly. QB pulls and keeps outside the opposite edge. Defense follows the jet motion carrier. QB is alone on the backside.',
+   note:'The fake has to be a full commitment. QB extends both hands, RB2 runs like they have it. Sell it.',
+   formation:'Under center, RB2 jet motion, QB backside keep'},
+
+  {id:'wt49',n:'Jet Motion Counter — Handoff Behind',tier:'Advanced',mis:'Very High',pass:false,wk:5,
+   desc:'RB2 goes in jet motion. QB fakes the jet handoff to RB2 going right. RB1 who was waiting turns and receives a handoff going left behind the fake. Three fakes: the jet motion read, the fake handoff, and the counter direction. Defense commits to the jet motion and leaves the counter side open.',
+   note:'Walk this 20 times. The timing of the fake-then-hand-behind requires both backs and the QB in perfect sync.',
+   formation:'Under center, RB2 jet motion right, RB1 counter left'},
+
+  {id:'wt50',n:'Jet Motion Reverse',tier:'Advanced',mis:'Very High',pass:false,wk:5,
+   desc:'RB2 goes in full-speed jet motion right. QB fakes the jet handoff. RB1 coming from the left takes a handoff from QB going left — opposite of the jet motion. The jet motion pulls every defender right. RB1 runs into vacated space left.',
+   note:'Must run the jet sweep at least twice before this works. The reverse is only as good as the setup.',
+   formation:'Under center, RB2 jet motion right, RB1 reverse left'}];
 
 // ════════════════════════════════════════════
 // PISTOL SPREAD PLAY BANK
@@ -6061,124 +6082,29 @@ function depthTab(tab, el) {
 }
 
 // ── REBELS 7/8 GAME SHEET SYSTEM ─────────────────────────────
-// Structure: 3 fixed skill (QB/RB1/RB2) + 5 rotating (TE/L,TE/R,C,G1,G2)
-// 3 possessions per half, 2 halves per game, 8 games
+// Structure: 3 fixed skill (QB/RB1/RB2) per half
+//            5 rotate every possession (TE/L,TE/R,C,G1,G2)
+// 3 possessions per half, 2 halves, 8 games
+// State stored in state.gameSheets[gameNum] so edits persist
 
-const REBELS_ROSTER = [
+const REBELS_13 = [
   'Logan','Charlie','Miles','Sawyer','Ollie','Noah',
   'Jaxson','Mateo','Henry','Duffy','Dylan','Finn','Danny'
 ];
 
-// Defensive position preferences
-// DL=defensive line, MLB=middle linebacker, CB=cornerback
 const DEF_PREFS = {
-  'Logan': ['DL','MLB'], 'Charlie': ['DL','MLB'],
-  'Ollie': ['CB','MLB'], 'Sawyer': ['CB','MLB'],
-  'Duffy': ['DL'], 'Danny': ['DL'],
-  'Jaxson': ['DL'], 'Henry': ['DL'],
-  'Miles': ['CB','DL'], 'Noah': ['CB','DL'],
-  'Mateo': ['CB','DL'], 'Dylan': ['CB','DL'],
-  'Finn': ['CB','DL']
+  'Logan':['DL','MLB'],'Charlie':['DL','MLB'],
+  'Ollie':['CB','MLB'],'Sawyer':['CB','MLB'],
+  'Duffy':['DL'],'Danny':['DL'],
+  'Jaxson':['DL'],'Henry':['DL'],
+  'Miles':['CB','DL'],'Noah':['CB','DL'],
+  'Mateo':['CB','DL'],'Dylan':['CB','DL'],'Finn':['CB','DL']
 };
 
-// Pre-built 8-game rotation
-// Each game: [H1_fixed3, H1_poss1_5, H1_poss2_5, H1_poss3_5,
-//             H2_fixed3, H2_poss1_5, H2_poss2_5, H2_poss3_5]
-const GAME_ROTATIONS = [
-  // Game 1
-  [['Logan','Charlie','Miles'],
-   ['Jaxson','Henry','Sawyer','Ollie','Noah'],
-   ['Mateo','Dylan','Duffy','Finn','Danny'],
-   ['Ollie','Noah','Sawyer','Jaxson','Henry'],
-   ['Ollie','Sawyer','Noah'],
-   ['Mateo','Dylan','Logan','Charlie','Miles'],
-   ['Jaxson','Henry','Duffy','Finn','Danny'],
-   ['Mateo','Dylan','Charlie','Miles','Logan']],
-  // Game 2
-  [['Logan','Ollie','Miles'],
-   ['Charlie','Sawyer','Noah','Jaxson','Dylan'],
-   ['Mateo','Henry','Duffy','Finn','Danny'],
-   ['Charlie','Noah','Sawyer','Mateo','Henry'],
-   ['Charlie','Sawyer','Noah'],
-   ['Mateo','Finn','Logan','Ollie','Miles'],
-   ['Jaxson','Henry','Duffy','Dylan','Danny'],
-   ['Mateo','Dylan','Ollie','Miles','Logan']],
-  // Game 3
-  [['Sawyer','Noah','Jaxson'],
-   ['Logan','Charlie','Ollie','Mateo','Henry'],
-   ['Miles','Dylan','Duffy','Finn','Danny'],
-   ['Logan','Charlie','Ollie','Noah','Sawyer'],
-   ['Logan','Charlie','Ollie'],
-   ['Sawyer','Noah','Jaxson','Miles','Mateo'],
-   ['Dylan','Henry','Duffy','Finn','Danny'],
-   ['Sawyer','Noah','Miles','Jaxson','Mateo']],
-  // Game 4
-  [['Charlie','Ollie','Miles'],
-   ['Logan','Sawyer','Noah','Jaxson','Dylan'],
-   ['Mateo','Henry','Duffy','Finn','Danny'],
-   ['Logan','Noah','Sawyer','Mateo','Henry'],
-   ['Logan','Sawyer','Noah'],
-   ['Charlie','Ollie','Miles','Jaxson','Finn'],
-   ['Mateo','Henry','Duffy','Dylan','Danny'],
-   ['Charlie','Ollie','Jaxson','Miles','Logan']],
-  // Game 5
-  [['Logan','Noah','Miles'],
-   ['Charlie','Sawyer','Ollie','Jaxson','Henry'],
-   ['Mateo','Dylan','Duffy','Finn','Danny'],
-   ['Charlie','Sawyer','Ollie','Noah','Logan'],
-   ['Charlie','Sawyer','Ollie'],
-   ['Logan','Noah','Miles','Mateo','Jaxson'],
-   ['Dylan','Henry','Duffy','Finn','Danny'],
-   ['Logan','Noah','Mateo','Miles','Charlie']],
-  // Game 6
-  [['Sawyer','Charlie','Jaxson'],
-   ['Logan','Ollie','Miles','Mateo','Dylan'],
-   ['Noah','Henry','Duffy','Finn','Danny'],
-   ['Logan','Ollie','Miles','Noah','Sawyer'],
-   ['Logan','Ollie','Noah'],
-   ['Sawyer','Charlie','Jaxson','Miles','Mateo'],
-   ['Dylan','Henry','Duffy','Finn','Danny'],
-   ['Sawyer','Charlie','Miles','Jaxson','Logan']],
-  // Game 7
-  [['Logan','Charlie','Sawyer'],
-   ['Miles','Jaxson','Ollie','Noah','Mateo'],
-   ['Henry','Dylan','Duffy','Finn','Danny'],
-   ['Ollie','Noah','Mateo','Miles','Jaxson'],
-   ['Ollie','Noah','Mateo'],
-   ['Logan','Charlie','Sawyer','Henry','Miles'],
-   ['Jaxson','Dylan','Duffy','Finn','Danny'],
-   ['Logan','Charlie','Miles','Sawyer','Noah']],
-  // Game 8
-  [['Logan','Charlie','Sawyer'],
-   ['Ollie','Noah','Miles','Jaxson','Mateo'],
-   ['Henry','Dylan','Duffy','Finn','Danny'],
-   ['Ollie','Noah','Miles','Jaxson','Mateo'],
-   ['Miles','Jaxson','Mateo'],
-   ['Logan','Charlie','Sawyer','Ollie','Noah'],
-   ['Henry','Dylan','Duffy','Finn','Danny'],
-   ['Logan','Charlie','Ollie','Sawyer','Noah']],
-];
-
-function getDefPos(name, slot) {
-  // slot 0-7: assign defensive position based on preference
-  const prefs = DEF_PREFS[name] || ['DL'];
-  const defSlots = ['MLB L','DL1','DL2','DL3','DL4','MLB R','CB L','CB R'];
-  // Try to match preference to available slots
-  for(const pref of prefs) {
-    for(const ds of defSlots) {
-      if(ds.startsWith(pref)) return ds;
-    }
-  }
-  return defSlots[slot % defSlots.length];
-}
-
-function assignDefense(players) {
-  // Assign 8 players to 8 defensive positions respecting preferences
+function assignDef(players) {
   const positions = ['MLB L','MLB R','DL1','DL2','DL3','DL4','CB L','CB R'];
-  const assigned = {};
-  const taken = new Set();
-
-  // First pass: assign by top preference
+  const assigned = {}, taken = new Set();
+  // First pass: top preference
   players.forEach(name => {
     const prefs = DEF_PREFS[name] || ['DL'];
     for(const pref of prefs) {
@@ -6186,7 +6112,7 @@ function assignDefense(players) {
       if(match) { assigned[name]=match; taken.add(match); break; }
     }
   });
-  // Second pass: fill unassigned
+  // Second pass: fill remaining
   players.forEach(name => {
     if(!assigned[name]) {
       const open = positions.find(p=>!taken.has(p));
@@ -6196,86 +6122,314 @@ function assignDefense(players) {
   return assigned;
 }
 
-function printGameSheet(gameIdx) {
-  const g = GAME_ROTATIONS[gameIdx];
-  if(!g) return;
-  const gameNum = gameIdx + 1;
-  const offPos = ['QB','RB1','RB2','TE/L','TE/R','C','G1','G2'];
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
 
-  function buildPoss(fixed3, rotating5, halfLabel, possNum) {
-    const players = [...fixed3, ...rotating5];
-    const defAssign = assignDefense(players);
+// Generate a fresh rotation for one game
+function generateGameRotation(gameIdx) {
+  const all = [...REBELS_13];
+  // Pick QB/RB1/RB2 for each half — rotate through kids across games
+  // Use gameIdx to offset which kids get skill positions
+  const offset = (gameIdx * 3) % all.length;
+  const h1Fixed = [all[offset%13], all[(offset+1)%13], all[(offset+2)%13]];
+  const h2Fixed = [all[(offset+3)%13], all[(offset+4)%13], all[(offset+5)%13]];
+
+  // Remaining 10 kids rotate through the 5 positions each possession
+  const h1Others = all.filter(n=>!h1Fixed.includes(n));
+  const h2Others = all.filter(n=>!h2Fixed.includes(n));
+
+  // Each possession: 5 different kids in TE/L,TE/R,C,G1,G2
+  // Spread fairly across 3 possessions (10 kids, 5 per poss, 3 poss = some repeat)
+  const sh1 = shuffle(h1Others);
+  const sh2 = shuffle(h2Others);
+
+  return {
+    h1Fixed,
+    h1Poss: [
+      sh1.slice(0,5),
+      sh1.slice(5).concat(sh1.slice(0, Math.max(0, 5-(sh1.length-5)))),
+      shuffle(h1Others).slice(0,5)
+    ],
+    h2Fixed,
+    h2Poss: [
+      sh2.slice(0,5),
+      sh2.slice(5).concat(sh2.slice(0, Math.max(0, 5-(sh2.length-5)))),
+      shuffle(h2Others).slice(0,5)
+    ]
+  };
+}
+
+function getGameSheet(gameIdx) {
+  if(!state.gameSheets) state.gameSheets = {};
+  if(!state.gameSheets[gameIdx]) {
+    state.gameSheets[gameIdx] = generateGameRotation(gameIdx);
+    save();
+  }
+  return state.gameSheets[gameIdx];
+}
+
+function regenGameSheet(gameIdx) {
+  if(!state.gameSheets) state.gameSheets = {};
+  state.gameSheets[gameIdx] = generateGameRotation(gameIdx);
+  save();
+  renderGameSheets(document.getElementById('depth-content'));
+  showToast('Game '+(gameIdx+1)+' rotation regenerated');
+}
+
+function swapGameSheetPlayer(gameIdx, half, possIdx, playerIdx) {
+  const sheet = getGameSheet(gameIdx);
+  const poss = half==='h1' ? sheet.h1Poss[possIdx] : sheet.h2Poss[possIdx];
+  const fixed = half==='h1' ? sheet.h1Fixed : sheet.h2Fixed;
+  const current = poss[playerIdx];
+
+  // Show a picker of players not already in this possession
+  const inPoss = new Set([...fixed, ...poss]);
+  const available = REBELS_13.filter(n=>!inPoss.has(n)||n===current);
+
+  // Build a simple inline picker
+  const el = document.getElementById('depth-content');
+  const pickerHtml = '<div class="modal-title">Swap '+current+'</div>'
+    + '<div style="font-size:12px;color:var(--g3);margin-bottom:12px;">Pick a replacement:</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px;">'
+    + available.map(name =>
+        '<button data-gi="'+gameIdx+'" data-h="'+half+'" data-pi="'+possIdx+'" data-li="'+playerIdx+'" data-n="'+name+'" onclick="doSwapPlayerBtn(this)" '
+        + 'class="btn '+(name===current?'btn-gold':'btn-sm')+'" style="width:100%;min-height:44px;font-size:14px;">'
+        + name + (name===current?' (current)':'')
+        + '</button>'
+      ).join('')
+    + '<button onclick="closeModal("modal-slot-picker")" class="btn btn-sm" style="width:100%;margin-top:8px;">Cancel</button>'
+    + '</div>';
+
+  document.getElementById('slot-picker-content').innerHTML = pickerHtml;
+  document.getElementById('slot-picker-pos').value = 'gamesheet';
+  openModal('modal-slot-picker');
+}
+
+function swapGSP(el){ swapGameSheetPlayer(parseInt(el.dataset.gi),el.dataset.h,parseInt(el.dataset.pi),parseInt(el.dataset.li)); }
+function swapFixedD(el){ swapFixed(parseInt(el.dataset.gi),el.dataset.h,parseInt(el.dataset.fi)); }
+function renderGS(){ renderGameSheets(document.getElementById('depth-content')); }
+function closePicker(){ closeModal('modal-slot-picker'); }
+
+function doSwapPlayerBtn(el) {
+  doSwapPlayer(parseInt(el.dataset.gi), el.dataset.h, parseInt(el.dataset.pi), parseInt(el.dataset.li), el.dataset.n);
+}
+
+function doSwapPlayer(gameIdx, half, possIdx, playerIdx, newName) {
+  const sheet = getGameSheet(gameIdx);
+  const poss = half==='h1' ? sheet.h1Poss[possIdx] : sheet.h2Poss[possIdx];
+  const old = poss[playerIdx];
+  poss[playerIdx] = newName;
+  // If the new name was in another possession of this half, swap them
+  const allPoss = half==='h1' ? sheet.h1Poss : sheet.h2Poss;
+  allPoss.forEach((p, pi) => {
+    if(pi !== possIdx) {
+      const idx = p.indexOf(newName);
+      if(idx >= 0) p[idx] = old;
+    }
+  });
+  save();
+  closeModal('modal-slot-picker');
+  renderGameSheets(document.getElementById('depth-content'));
+}
+
+function swapFixed(gameIdx, half, playerIdx) {
+  const sheet = getGameSheet(gameIdx);
+  const fixed = half==='h1' ? sheet.h1Fixed : sheet.h2Fixed;
+  const current = fixed[playerIdx];
+  const roles = ['QB','RB1','RB2'];
+
+  const pickerHtml = '<div class="modal-title">Swap '+roles[playerIdx]+': '+current+'</div>'
+    + '<div style="font-size:12px;color:var(--g3);margin-bottom:12px;">Pick a replacement:</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px;">'
+    + REBELS_13.filter(n=>n!==current).map(name =>
+        '<button data-gi="'+gameIdx+'" data-h="'+half+'" data-pi="'+playerIdx+'" data-n="'+name+'" onclick="doSwapFixedBtn(this)" '
+        + 'class="btn btn-sm" style="width:100%;min-height:44px;font-size:14px;">'
+        + name + '</button>'
+      ).join('')
+    + '<button onclick="closePicker()" class="btn btn-sm" style="width:100%;margin-top:8px;">Cancel</button>'
+    + '</div>';
+
+  document.getElementById('slot-picker-content').innerHTML = pickerHtml;
+  document.getElementById('slot-picker-pos').value = 'gamesheet';
+  openModal('modal-slot-picker');
+}
+
+function doSwapFixedBtn(el) {
+  doSwapFixed(parseInt(el.dataset.gi), el.dataset.h, parseInt(el.dataset.pi), el.dataset.n);
+}
+
+function doSwapFixed(gameIdx, half, playerIdx, newName) {
+  const sheet = getGameSheet(gameIdx);
+  const fixed = half==='h1' ? sheet.h1Fixed : sheet.h2Fixed;
+  const old = fixed[playerIdx];
+  fixed[playerIdx] = newName;
+  // Remove newName from rotating poss if it appears there
+  const allPoss = half==='h1' ? sheet.h1Poss : sheet.h2Poss;
+  allPoss.forEach(p => {
+    const idx = p.indexOf(newName);
+    if(idx >= 0) p[idx] = old;
+  });
+  save();
+  closeModal('modal-slot-picker');
+  renderGameSheets(document.getElementById('depth-content'));
+}
+
+let _activeGameSheet = 0;
+
+function renderGameSheets(el) {
+  // List all 8 games with current sheet summary
+  let h = '<div class="card card-gold" style="margin-bottom:12px;">'
+    + '<div class="card-title">Game sheets</div>'
+    + '<div class="card-sub">3 fixed skill (QB/RB1/RB2) per half. 5 positions rotate every possession. Tap any name to swap. Regenerate anytime.</div>'
+    + '</div>';
+
+  // Game selector
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">';
+  for(let i=0;i<8;i++) {
+    h += '<button onclick="_activeGameSheet='+i+';renderGS()" '
+      + 'style="padding:8px 14px;border-radius:8px;border:2px solid '+(_activeGameSheet===i?'var(--gold)':'var(--navy3)')+';'
+      + 'background:'+(_activeGameSheet===i?'rgba(245,166,35,.15)':'var(--navy2)')+';'
+      + 'color:'+(_activeGameSheet===i?'var(--gold)':'var(--g3)')+';font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;">'
+      + 'G'+(i+1)+'</button>';
+  }
+  h += '</div>';
+
+  const gameIdx = _activeGameSheet;
+  const sheet = getGameSheet(gameIdx);
+  const offPos = ['TE/L','TE/R','C','G1','G2'];
+  const fixedRoles = ['QB','RB1','RB2'];
+
+  // Action buttons
+  h += '<div style="display:flex;gap:8px;margin-bottom:14px;">'
+    + '<button onclick="regenGameSheet('+gameIdx+')" class="btn btn-gold" style="flex:1;min-height:44px;">&#8635; Regenerate</button>'
+    + '<button onclick="printGameSheet('+gameIdx+')" class="btn btn-sm" style="min-height:44px;">&#128424; Print</button>'
+    + '</div>';
+
+  function buildHalf(halfLabel, fixed, poss, halfKey) {
+    let s = '<div style="margin-bottom:20px;">'
+      + '<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">'
+      + halfLabel + '</div>'
+      + '<div style="padding:8px 10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:8px;margin-bottom:10px;">'
+      + '<div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Fixed all half</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    fixed.forEach((name, fi) => {
+      s += '<div data-gi="'+gameIdx+'" data-h="'+halfKey+'" data-fi="'+fi+'" onclick="swapFixedD(this)" '
+        + 'style="display:flex;flex-direction:column;align-items:center;padding:6px 10px;background:var(--navy2);'
+        + 'border:1px solid var(--gold);border-radius:8px;cursor:pointer;touch-action:manipulation;min-width:60px;">'
+        + '<div style="font-size:9px;color:var(--gold);font-weight:700;">' + fixedRoles[fi] + '</div>'
+        + '<div style="font-size:13px;font-weight:700;">' + name + '</div>'
+        + '</div>';
+    });
+    s += '</div></div>';
+
+    // Possessions
+    poss.forEach((players, pi) => {
+      const allPlayers = [...fixed, ...players];
+      const def = assignDef(allPlayers);
+      s += '<div style="margin-bottom:10px;">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">Possession '+(pi+1)+'</div>'
+        + '<div style="background:var(--navy2);border:1px solid var(--navy3);border-radius:8px;overflow:hidden;">'
+        // Header
+        + '<div style="display:grid;grid-template-columns:1fr 60px 70px;gap:0;padding:5px 10px;background:var(--navy3);font-size:9px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.5px;">'
+        + '<div>Player</div><div>Off</div><div>Def</div></div>';
+
+      // Fixed players (not tappable for swap in this possession)
+      fixed.forEach((name, fi) => {
+        s += '<div style="display:grid;grid-template-columns:1fr 60px 70px;gap:0;padding:7px 10px;border-top:1px solid var(--navy3);align-items:center;">'
+          + '<div style="font-size:13px;font-weight:600;color:var(--gold);">' + name + '</div>'
+          + '<div style="font-size:11px;color:var(--gold);font-weight:700;">' + fixedRoles[fi] + '</div>'
+          + '<div style="font-size:11px;color:var(--g3);">' + (def[name]||'DL') + '</div>'
+          + '</div>';
+      });
+
+      // Rotating players (tappable)
+      players.forEach((name, oi) => {
+        s += '<div onclick="swapGSP(this)" '
+          + 'style="display:grid;grid-template-columns:1fr 60px 70px;gap:0;padding:7px 10px;border-top:1px solid var(--navy3);align-items:center;cursor:pointer;touch-action:manipulation;background:rgba(255,255,255,.02);">'
+          + '<div style="font-size:13px;font-weight:600;">' + name + ' <span style="font-size:9px;color:var(--g3);">tap to swap</span></div>'
+          + '<div style="font-size:11px;color:var(--g3);font-weight:700;">' + offPos[oi] + '</div>'
+          + '<div style="font-size:11px;color:var(--g3);">' + (def[name]||'DL') + '</div>'
+          + '</div>';
+      });
+
+      s += '</div></div>';
+    });
+
+    return s + '</div>';
+  }
+
+  h += buildHalf('Half 1', sheet.h1Fixed, sheet.h1Poss, 'h1');
+  h += buildHalf('Half 2', sheet.h2Fixed, sheet.h2Poss, 'h2');
+
+  el.innerHTML = h;
+}
+
+function printGameSheet(gameIdx) {
+  const sheet = getGameSheet(gameIdx);
+  const offPos = ['TE/L','TE/R','C','G1','G2'];
+  const fixedRoles = ['QB','RB1','RB2'];
+
+  function buildPossHtml(fixed, players, halfLabel, possNum) {
+    const allPlayers = [...fixed, ...players];
+    const def = assignDef(allPlayers);
     let rows = '';
-    players.forEach((name, i) => {
-      rows += '<tr>'
-        + '<td style="padding:5px 8px;font-weight:600;">' + name + '</td>'
-        + '<td style="padding:5px 8px;color:#1a6b4a;font-weight:600;">' + offPos[i] + '</td>'
-        + '<td style="padding:5px 8px;color:#8b2020;font-weight:600;">' + (defAssign[name]||'DL') + '</td>'
+    fixed.forEach((name, fi) => {
+      rows += '<tr style="background:#fffbea;">'
+        + '<td style="padding:5px 8px;font-weight:700;color:#8b6000;">' + name + '</td>'
+        + '<td style="padding:5px 8px;color:#1a6b4a;font-weight:700;">' + fixedRoles[fi] + '</td>'
+        + '<td style="padding:5px 8px;color:#8b2020;">' + (def[name]||'DL') + '</td>'
         + '</tr>';
     });
-    return '<div style="margin-bottom:16px;">'
+    players.forEach((name, oi) => {
+      rows += '<tr>'
+        + '<td style="padding:5px 8px;font-weight:600;">' + name + '</td>'
+        + '<td style="padding:5px 8px;color:#1a6b4a;font-weight:600;">' + offPos[oi] + '</td>'
+        + '<td style="padding:5px 8px;color:#8b2020;">' + (def[name]||'DL') + '</td>'
+        + '</tr>';
+    });
+    return '<div style="margin-bottom:14px;">'
       + '<div style="font-weight:700;font-size:13px;background:#1a3a2a;color:white;padding:5px 8px;border-radius:4px 4px 0 0;">'
       + halfLabel + ' — Possession ' + possNum + '</div>'
-      + '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ddd;">'
       + '<tr style="background:#f0f0f0;"><th style="padding:4px 8px;text-align:left;">Player</th>'
       + '<th style="padding:4px 8px;text-align:left;color:#1a6b4a;">Offense</th>'
       + '<th style="padding:4px 8px;text-align:left;color:#8b2020;">Defense</th></tr>'
       + rows + '</table></div>';
   }
 
-  const html = '<!DOCTYPE html><html><head><title>Game ' + gameNum + ' Sheet</title>'
+  const html = '<!DOCTYPE html><html><head><title>Game '+(gameIdx+1)+' Sheet</title>'
     + '<style>body{font-family:Arial,sans-serif;padding:16px;max-width:600px;margin:0 auto;}'
-    + 'h1{font-size:20px;margin-bottom:4px;}h2{font-size:15px;color:#555;margin:16px 0 8px;}'
-    + 'table{border:1px solid #ddd;border-radius:4px;overflow:hidden;}'
-    + 'tr:nth-child(even){background:#f9f9f9;}'
+    + 'h2{font-size:15px;color:#555;margin:16px 0 8px;border-bottom:2px solid #1a3a2a;padding-bottom:4px;}'
     + '.fixed-bar{background:#fffbea;border:1px solid #d4a017;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;}'
-    + '.fixed-bar strong{color:#8b6000;}'
-    + '@media print{.no-print{display:none}}</style></head><body>'
-    + '<h1>Ole Miss Rebels — Game ' + gameNum + '</h1>'
-    + '<div style="font-size:11px;color:#888;margin-bottom:16px;">3 fixed skill per half · 5 rotate every possession</div>'
-
+    + 'table{border:1px solid #ddd;border-radius:0 0 4px 4px;overflow:hidden;width:100%;}'
+    + 'tr:nth-child(even){background:#f9f9f9;}</style></head><body>'
+    + '<h1 style="font-size:20px;margin-bottom:4px;">Ole Miss Rebels — Game '+(gameIdx+1)+'</h1>'
+    + '<div style="font-size:11px;color:#888;margin-bottom:16px;">3 fixed skill per half · 5 rotate every possession · tap names in app to swap</div>'
     + '<h2>HALF 1</h2>'
-    + '<div class="fixed-bar"><strong>Fixed all half:</strong> ' + g[0][0] + ' (QB) · ' + g[0][1] + ' (RB1) · ' + g[0][2] + ' (RB2)</div>'
-    + buildPoss(g[0], g[1], 'H1', 1)
-    + buildPoss(g[0], g[2], 'H1', 2)
-    + buildPoss(g[0], g[3], 'H1', 3)
-
+    + '<div class="fixed-bar"><strong>Fixed:</strong> '+sheet.h1Fixed[0]+' (QB) · '+sheet.h1Fixed[1]+' (RB1) · '+sheet.h1Fixed[2]+' (RB2)</div>'
+    + buildPossHtml(sheet.h1Fixed, sheet.h1Poss[0], 'H1', 1)
+    + buildPossHtml(sheet.h1Fixed, sheet.h1Poss[1], 'H1', 2)
+    + buildPossHtml(sheet.h1Fixed, sheet.h1Poss[2], 'H1', 3)
     + '<h2>HALF 2</h2>'
-    + '<div class="fixed-bar"><strong>Fixed all half:</strong> ' + g[4][0] + ' (QB) · ' + g[4][1] + ' (RB1) · ' + g[4][2] + ' (RB2)</div>'
-    + buildPoss(g[4], g[5], 'H2', 1)
-    + buildPoss(g[4], g[6], 'H2', 2)
-    + buildPoss(g[4], g[7], 'H2', 3)
-
-    + '<div style="margin-top:20px;font-size:11px;color:#888;border-top:1px solid #ddd;padding-top:8px;">'
-    + 'Sideline: count possessions. After each one, swap in next rotation group. That is it.</div>'
+    + '<div class="fixed-bar"><strong>Fixed:</strong> '+sheet.h2Fixed[0]+' (QB) · '+sheet.h2Fixed[1]+' (RB1) · '+sheet.h2Fixed[2]+' (RB2)</div>'
+    + buildPossHtml(sheet.h2Fixed, sheet.h2Poss[0], 'H2', 1)
+    + buildPossHtml(sheet.h2Fixed, sheet.h2Poss[1], 'H2', 2)
+    + buildPossHtml(sheet.h2Fixed, sheet.h2Poss[2], 'H2', 3)
+    + '<div style="margin-top:16px;font-size:11px;color:#888;border-top:1px solid #ddd;padding-top:8px;">'
+    + 'Count possessions on sideline. Swap rotation after each one.</div>'
     + '</body></html>';
 
   const w = window.open('','_blank','width=700,height=900');
-  if(w) { w.document.write(html); w.document.close(); }
-  else alert('Allow pop-ups to print the game sheet.');
+  if(w){w.document.write(html);w.document.close();}
+  else alert('Allow pop-ups to print.');
 }
 
-function renderGameSheets(el) {
-  let h = '<div class="card card-gold" style="margin-bottom:12px;">'
-    + '<div class="card-title">Game sheets</div>'
-    + '<div class="card-sub">3 fixed skill (QB/RB1/RB2) per half. 5 positions rotate every possession. Tap any game to print.</div>'
-    + '</div>';
-
-  GAME_ROTATIONS.forEach((g, i) => {
-    const gameNum = i + 1;
-    const h1fixed = g[0].join(', ');
-    const h2fixed = g[4].join(', ');
-    h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;'
-      + 'background:var(--navy2);border:1px solid var(--navy3);border-radius:10px;margin-bottom:6px;">'
-      + '<div>'
-      + '<div style="font-size:13px;font-weight:700;">Game ' + gameNum + '</div>'
-      + '<div style="font-size:10px;color:var(--g3);margin-top:2px;">H1: ' + h1fixed + ' · H2: ' + h2fixed + '</div>'
-      + '</div>'
-      + '<button onclick="printGameSheet(' + i + ')" class="btn btn-gold btn-sm" style="font-size:12px;">Print</button>'
-      + '</div>';
-  });
-  el.innerHTML = h;
-}
 
 function renderDepthContent() {
   const el = document.getElementById('depth-content');
