@@ -6187,20 +6187,23 @@ function generateGameRotation(gameIdx) {
   };
 }
 
+function gsKey(gameIdx) { return state.division + '_' + gameIdx; }
+
 function getGameSheet(gameIdx) {
   if(!state.gameSheets) state.gameSheets = {};
-  if(!state.gameSheets[gameIdx]) {
-    state.gameSheets[gameIdx] = generateGameRotation(gameIdx);
+  const k = gsKey(gameIdx);
+  if(!state.gameSheets[k]) {
+    state.gameSheets[k] = generateGameRotation(gameIdx);
     save();
   }
-  return state.gameSheets[gameIdx];
+  return state.gameSheets[k];
 }
 
 function regenGameSheet(gameIdx) {
   if(!state.gameSheets) state.gameSheets = {};
-  state.gameSheets[gameIdx] = generateGameRotation(gameIdx);
+  state.gameSheets[gsKey(gameIdx)] = generateGameRotation(gameIdx);
   save();
-  renderGameSheets(document.getElementById('depth-content'));
+  renderGS();
   showToast('Game '+(gameIdx+1)+' rotation regenerated');
 }
 
