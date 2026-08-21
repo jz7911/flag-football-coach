@@ -380,6 +380,7 @@ textarea{min-height:80px;resize:none;}
   <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px;">Depth Chart</div>
   <div class="tab-row">
     <div class="tab active" onclick="depthTab('chart',this)">Depth Chart</div>
+    <div class="tab" onclick="depthTab('gamesheets',this)">Game Sheets</div>
     <div class="tab" onclick="depthTab('autoroster',this)">Game Roster</div>
     <div class="tab" onclick="depthTab('history',this)">Touch History</div>
     <div class="tab" onclick="depthTab('gameplan',this)">Carries</div>
@@ -6059,10 +6060,228 @@ function depthTab(tab, el) {
   renderDepthContent();
 }
 
+// ── REBELS 7/8 GAME SHEET SYSTEM ─────────────────────────────
+// Structure: 3 fixed skill (QB/RB1/RB2) + 5 rotating (TE/L,TE/R,C,G1,G2)
+// 3 possessions per half, 2 halves per game, 8 games
+
+const REBELS_ROSTER = [
+  'Logan','Charlie','Miles','Sawyer','Ollie','Noah',
+  'Jaxson','Mateo','Henry','Duffy','Dylan','Finn','Danny'
+];
+
+// Defensive position preferences
+// DL=defensive line, MLB=middle linebacker, CB=cornerback
+const DEF_PREFS = {
+  'Logan': ['DL','MLB'], 'Charlie': ['DL','MLB'],
+  'Ollie': ['CB','MLB'], 'Sawyer': ['CB','MLB'],
+  'Duffy': ['DL'], 'Danny': ['DL'],
+  'Jaxson': ['DL'], 'Henry': ['DL'],
+  'Miles': ['CB','DL'], 'Noah': ['CB','DL'],
+  'Mateo': ['CB','DL'], 'Dylan': ['CB','DL'],
+  'Finn': ['CB','DL']
+};
+
+// Pre-built 8-game rotation
+// Each game: [H1_fixed3, H1_poss1_5, H1_poss2_5, H1_poss3_5,
+//             H2_fixed3, H2_poss1_5, H2_poss2_5, H2_poss3_5]
+const GAME_ROTATIONS = [
+  // Game 1
+  [['Logan','Charlie','Miles'],
+   ['Jaxson','Henry','Sawyer','Ollie','Noah'],
+   ['Mateo','Dylan','Duffy','Finn','Danny'],
+   ['Ollie','Noah','Sawyer','Jaxson','Henry'],
+   ['Ollie','Sawyer','Noah'],
+   ['Mateo','Dylan','Logan','Charlie','Miles'],
+   ['Jaxson','Henry','Duffy','Finn','Danny'],
+   ['Mateo','Dylan','Charlie','Miles','Logan']],
+  // Game 2
+  [['Logan','Ollie','Miles'],
+   ['Charlie','Sawyer','Noah','Jaxson','Dylan'],
+   ['Mateo','Henry','Duffy','Finn','Danny'],
+   ['Charlie','Noah','Sawyer','Mateo','Henry'],
+   ['Charlie','Sawyer','Noah'],
+   ['Mateo','Finn','Logan','Ollie','Miles'],
+   ['Jaxson','Henry','Duffy','Dylan','Danny'],
+   ['Mateo','Dylan','Ollie','Miles','Logan']],
+  // Game 3
+  [['Sawyer','Noah','Jaxson'],
+   ['Logan','Charlie','Ollie','Mateo','Henry'],
+   ['Miles','Dylan','Duffy','Finn','Danny'],
+   ['Logan','Charlie','Ollie','Noah','Sawyer'],
+   ['Logan','Charlie','Ollie'],
+   ['Sawyer','Noah','Jaxson','Miles','Mateo'],
+   ['Dylan','Henry','Duffy','Finn','Danny'],
+   ['Sawyer','Noah','Miles','Jaxson','Mateo']],
+  // Game 4
+  [['Charlie','Ollie','Miles'],
+   ['Logan','Sawyer','Noah','Jaxson','Dylan'],
+   ['Mateo','Henry','Duffy','Finn','Danny'],
+   ['Logan','Noah','Sawyer','Mateo','Henry'],
+   ['Logan','Sawyer','Noah'],
+   ['Charlie','Ollie','Miles','Jaxson','Finn'],
+   ['Mateo','Henry','Duffy','Dylan','Danny'],
+   ['Charlie','Ollie','Jaxson','Miles','Logan']],
+  // Game 5
+  [['Logan','Noah','Miles'],
+   ['Charlie','Sawyer','Ollie','Jaxson','Henry'],
+   ['Mateo','Dylan','Duffy','Finn','Danny'],
+   ['Charlie','Sawyer','Ollie','Noah','Logan'],
+   ['Charlie','Sawyer','Ollie'],
+   ['Logan','Noah','Miles','Mateo','Jaxson'],
+   ['Dylan','Henry','Duffy','Finn','Danny'],
+   ['Logan','Noah','Mateo','Miles','Charlie']],
+  // Game 6
+  [['Sawyer','Charlie','Jaxson'],
+   ['Logan','Ollie','Miles','Mateo','Dylan'],
+   ['Noah','Henry','Duffy','Finn','Danny'],
+   ['Logan','Ollie','Miles','Noah','Sawyer'],
+   ['Logan','Ollie','Noah'],
+   ['Sawyer','Charlie','Jaxson','Miles','Mateo'],
+   ['Dylan','Henry','Duffy','Finn','Danny'],
+   ['Sawyer','Charlie','Miles','Jaxson','Logan']],
+  // Game 7
+  [['Logan','Charlie','Sawyer'],
+   ['Miles','Jaxson','Ollie','Noah','Mateo'],
+   ['Henry','Dylan','Duffy','Finn','Danny'],
+   ['Ollie','Noah','Mateo','Miles','Jaxson'],
+   ['Ollie','Noah','Mateo'],
+   ['Logan','Charlie','Sawyer','Henry','Miles'],
+   ['Jaxson','Dylan','Duffy','Finn','Danny'],
+   ['Logan','Charlie','Miles','Sawyer','Noah']],
+  // Game 8
+  [['Logan','Charlie','Sawyer'],
+   ['Ollie','Noah','Miles','Jaxson','Mateo'],
+   ['Henry','Dylan','Duffy','Finn','Danny'],
+   ['Ollie','Noah','Miles','Jaxson','Mateo'],
+   ['Miles','Jaxson','Mateo'],
+   ['Logan','Charlie','Sawyer','Ollie','Noah'],
+   ['Henry','Dylan','Duffy','Finn','Danny'],
+   ['Logan','Charlie','Ollie','Sawyer','Noah']],
+];
+
+function getDefPos(name, slot) {
+  // slot 0-7: assign defensive position based on preference
+  const prefs = DEF_PREFS[name] || ['DL'];
+  const defSlots = ['MLB L','DL1','DL2','DL3','DL4','MLB R','CB L','CB R'];
+  // Try to match preference to available slots
+  for(const pref of prefs) {
+    for(const ds of defSlots) {
+      if(ds.startsWith(pref)) return ds;
+    }
+  }
+  return defSlots[slot % defSlots.length];
+}
+
+function assignDefense(players) {
+  // Assign 8 players to 8 defensive positions respecting preferences
+  const positions = ['MLB L','MLB R','DL1','DL2','DL3','DL4','CB L','CB R'];
+  const assigned = {};
+  const taken = new Set();
+
+  // First pass: assign by top preference
+  players.forEach(name => {
+    const prefs = DEF_PREFS[name] || ['DL'];
+    for(const pref of prefs) {
+      const match = positions.find(p=>p.startsWith(pref)&&!taken.has(p));
+      if(match) { assigned[name]=match; taken.add(match); break; }
+    }
+  });
+  // Second pass: fill unassigned
+  players.forEach(name => {
+    if(!assigned[name]) {
+      const open = positions.find(p=>!taken.has(p));
+      if(open) { assigned[name]=open; taken.add(open); }
+    }
+  });
+  return assigned;
+}
+
+function printGameSheet(gameIdx) {
+  const g = GAME_ROTATIONS[gameIdx];
+  if(!g) return;
+  const gameNum = gameIdx + 1;
+  const offPos = ['QB','RB1','RB2','TE/L','TE/R','C','G1','G2'];
+
+  function buildPoss(fixed3, rotating5, halfLabel, possNum) {
+    const players = [...fixed3, ...rotating5];
+    const defAssign = assignDefense(players);
+    let rows = '';
+    players.forEach((name, i) => {
+      rows += '<tr>'
+        + '<td style="padding:5px 8px;font-weight:600;">' + name + '</td>'
+        + '<td style="padding:5px 8px;color:#1a6b4a;font-weight:600;">' + offPos[i] + '</td>'
+        + '<td style="padding:5px 8px;color:#8b2020;font-weight:600;">' + (defAssign[name]||'DL') + '</td>'
+        + '</tr>';
+    });
+    return '<div style="margin-bottom:16px;">'
+      + '<div style="font-weight:700;font-size:13px;background:#1a3a2a;color:white;padding:5px 8px;border-radius:4px 4px 0 0;">'
+      + halfLabel + ' — Possession ' + possNum + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
+      + '<tr style="background:#f0f0f0;"><th style="padding:4px 8px;text-align:left;">Player</th>'
+      + '<th style="padding:4px 8px;text-align:left;color:#1a6b4a;">Offense</th>'
+      + '<th style="padding:4px 8px;text-align:left;color:#8b2020;">Defense</th></tr>'
+      + rows + '</table></div>';
+  }
+
+  const html = '<!DOCTYPE html><html><head><title>Game ' + gameNum + ' Sheet</title>'
+    + '<style>body{font-family:Arial,sans-serif;padding:16px;max-width:600px;margin:0 auto;}'
+    + 'h1{font-size:20px;margin-bottom:4px;}h2{font-size:15px;color:#555;margin:16px 0 8px;}'
+    + 'table{border:1px solid #ddd;border-radius:4px;overflow:hidden;}'
+    + 'tr:nth-child(even){background:#f9f9f9;}'
+    + '.fixed-bar{background:#fffbea;border:1px solid #d4a017;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;}'
+    + '.fixed-bar strong{color:#8b6000;}'
+    + '@media print{.no-print{display:none}}</style></head><body>'
+    + '<h1>Ole Miss Rebels — Game ' + gameNum + '</h1>'
+    + '<div style="font-size:11px;color:#888;margin-bottom:16px;">3 fixed skill per half · 5 rotate every possession</div>'
+
+    + '<h2>HALF 1</h2>'
+    + '<div class="fixed-bar"><strong>Fixed all half:</strong> ' + g[0][0] + ' (QB) · ' + g[0][1] + ' (RB1) · ' + g[0][2] + ' (RB2)</div>'
+    + buildPoss(g[0], g[1], 'H1', 1)
+    + buildPoss(g[0], g[2], 'H1', 2)
+    + buildPoss(g[0], g[3], 'H1', 3)
+
+    + '<h2>HALF 2</h2>'
+    + '<div class="fixed-bar"><strong>Fixed all half:</strong> ' + g[4][0] + ' (QB) · ' + g[4][1] + ' (RB1) · ' + g[4][2] + ' (RB2)</div>'
+    + buildPoss(g[4], g[5], 'H2', 1)
+    + buildPoss(g[4], g[6], 'H2', 2)
+    + buildPoss(g[4], g[7], 'H2', 3)
+
+    + '<div style="margin-top:20px;font-size:11px;color:#888;border-top:1px solid #ddd;padding-top:8px;">'
+    + 'Sideline: count possessions. After each one, swap in next rotation group. That is it.</div>'
+    + '</body></html>';
+
+  const w = window.open('','_blank','width=700,height=900');
+  if(w) { w.document.write(html); w.document.close(); }
+  else alert('Allow pop-ups to print the game sheet.');
+}
+
+function renderGameSheets(el) {
+  let h = '<div class="card card-gold" style="margin-bottom:12px;">'
+    + '<div class="card-title">Game sheets</div>'
+    + '<div class="card-sub">3 fixed skill (QB/RB1/RB2) per half. 5 positions rotate every possession. Tap any game to print.</div>'
+    + '</div>';
+
+  GAME_ROTATIONS.forEach((g, i) => {
+    const gameNum = i + 1;
+    const h1fixed = g[0].join(', ');
+    const h2fixed = g[4].join(', ');
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;'
+      + 'background:var(--navy2);border:1px solid var(--navy3);border-radius:10px;margin-bottom:6px;">'
+      + '<div>'
+      + '<div style="font-size:13px;font-weight:700;">Game ' + gameNum + '</div>'
+      + '<div style="font-size:10px;color:var(--g3);margin-top:2px;">H1: ' + h1fixed + ' · H2: ' + h2fixed + '</div>'
+      + '</div>'
+      + '<button onclick="printGameSheet(' + i + ')" class="btn btn-gold btn-sm" style="font-size:12px;">Print</button>'
+      + '</div>';
+  });
+  el.innerHTML = h;
+}
+
 function renderDepthContent() {
   const el = document.getElementById('depth-content');
   if(!el) return;
   if(curDepthTab === 'chart') renderDepthChart(el);
+  else if(curDepthTab === 'gamesheets') renderGameSheets(el);
   else if(curDepthTab === 'autoroster') renderAutoRoster(el);
   else if(curDepthTab === 'gameplan') renderGamePlan(el);
   else if(curDepthTab === 'history') renderTouchHistory(el);
