@@ -6092,14 +6092,28 @@ const REBELS_13 = [
   'Jaxson','Mateo','Henry','Duffy','Dylan','Finn','Danny'
 ];
 
+const TAR_HEELS_10 = [
+  'Hudson','Flynn','Ames','Atlas','Luka',
+  'Elijah','Luke','Nick','Owen','Otto'
+];
+
 const DEF_PREFS = {
   'Logan':['DL','MLB'],'Charlie':['DL','MLB'],
   'Ollie':['CB','MLB'],'Sawyer':['CB','MLB'],
   'Duffy':['DL'],'Danny':['DL'],
   'Jaxson':['DL'],'Henry':['DL'],
   'Miles':['CB','DL'],'Noah':['CB','DL'],
-  'Mateo':['CB','DL'],'Dylan':['CB','DL'],'Finn':['CB','DL']
+  'Mateo':['CB','DL'],'Dylan':['CB','DL'],'Finn':['CB','DL'],
+  // Tar Heels defaults
+  'Hudson':['DL','MLB'],'Flynn':['DL','MLB'],
+  'Ames':['CB','DL'],'Atlas':['CB','DL'],'Luka':['CB','DL'],
+  'Elijah':['DL'],'Luke':['CB','DL'],'Nick':['CB','DL'],
+  'Owen':['CB','DL'],'Otto':['DL']
 };
+
+function activeRosterNames() {
+  return state.division === '56' ? TAR_HEELS_10 : REBELS_13;
+}
 
 function assignDef(players) {
   const positions = ['MLB L','MLB R','DL1','DL2','DL3','DL4','CB L','CB R'];
@@ -6133,35 +6147,43 @@ function shuffle(arr) {
 
 // Generate a fresh rotation for one game
 function generateGameRotation(gameIdx) {
-  const all = [...REBELS_13];
-  // Pick QB/RB1/RB2 for each half — rotate through kids across games
-  // Use gameIdx to offset which kids get skill positions
+  const all = [...activeRosterNames()];
+  const is56 = state.division === '56';
+
+  if(is56) {
+    // Tar Heels 5/6: 6v6 format
+    // 3 skill positions (QB, RB1, RB2) rotate every half
+    // 3 line positions (TE/L, C, TE/R) rotate every possession
+    // 3 possessions per half, 2 halves
+    const offset = (gameIdx * 2) % all.length;
+    const h1Fixed = [all[offset%10], all[(offset+1)%10], all[(offset+2)%10]];
+    const h2Fixed = [all[(offset+3)%10], all[(offset+4)%10], all[(offset+5)%10]];
+    const h1Others = all.filter(n=>!h1Fixed.includes(n));
+    const h2Others = all.filter(n=>!h2Fixed.includes(n));
+    const sh1 = shuffle(h1Others);
+    const sh2 = shuffle(h2Others);
+    return {
+      is56: true,
+      h1Fixed, h2Fixed,
+      h1Poss: [sh1.slice(0,3), sh1.slice(3).concat(sh1.slice(0,Math.max(0,3-(sh1.length-3)))), shuffle(h1Others).slice(0,3)],
+      h2Poss: [sh2.slice(0,3), sh2.slice(3).concat(sh2.slice(0,Math.max(0,3-(sh2.length-3)))), shuffle(h2Others).slice(0,3)]
+    };
+  }
+
+  // Rebels 7/8: 8v8 format
+  // 3 fixed all half (QB/RB1/RB2), 5 rotate every possession
   const offset = (gameIdx * 3) % all.length;
   const h1Fixed = [all[offset%13], all[(offset+1)%13], all[(offset+2)%13]];
   const h2Fixed = [all[(offset+3)%13], all[(offset+4)%13], all[(offset+5)%13]];
-
-  // Remaining 10 kids rotate through the 5 positions each possession
   const h1Others = all.filter(n=>!h1Fixed.includes(n));
   const h2Others = all.filter(n=>!h2Fixed.includes(n));
-
-  // Each possession: 5 different kids in TE/L,TE/R,C,G1,G2
-  // Spread fairly across 3 possessions (10 kids, 5 per poss, 3 poss = some repeat)
   const sh1 = shuffle(h1Others);
   const sh2 = shuffle(h2Others);
-
   return {
-    h1Fixed,
-    h1Poss: [
-      sh1.slice(0,5),
-      sh1.slice(5).concat(sh1.slice(0, Math.max(0, 5-(sh1.length-5)))),
-      shuffle(h1Others).slice(0,5)
-    ],
-    h2Fixed,
-    h2Poss: [
-      sh2.slice(0,5),
-      sh2.slice(5).concat(sh2.slice(0, Math.max(0, 5-(sh2.length-5)))),
-      shuffle(h2Others).slice(0,5)
-    ]
+    is56: false,
+    h1Fixed, h2Fixed,
+    h1Poss: [sh1.slice(0,5), sh1.slice(5).concat(sh1.slice(0,Math.max(0,5-(sh1.length-5)))), shuffle(h1Others).slice(0,5)],
+    h2Poss: [sh2.slice(0,5), sh2.slice(5).concat(sh2.slice(0,Math.max(0,5-(sh2.length-5)))), shuffle(h2Others).slice(0,5)]
   };
 }
 
@@ -6190,7 +6212,7 @@ function swapGameSheetPlayer(gameIdx, half, possIdx, playerIdx) {
 
   // Show a picker of players not already in this possession
   const inPoss = new Set([...fixed, ...poss]);
-  const available = REBELS_13.filter(n=>!inPoss.has(n)||n===current);
+  const available = activeRosterNames().filter(n=>!inPoss.has(n)||n===current);
 
   // Build a simple inline picker
   const el = document.getElementById('depth-content');
@@ -6247,7 +6269,7 @@ function swapFixed(gameIdx, half, playerIdx) {
   const pickerHtml = '<div class="modal-title">Swap '+roles[playerIdx]+': '+current+'</div>'
     + '<div style="font-size:12px;color:var(--g3);margin-bottom:12px;">Pick a replacement:</div>'
     + '<div style="display:flex;flex-direction:column;gap:6px;">'
-    + REBELS_13.filter(n=>n!==current).map(name =>
+    + activeRosterNames().filter(n=>n!==current).map(name =>
         '<button data-gi="'+gameIdx+'" data-h="'+half+'" data-pi="'+playerIdx+'" data-n="'+name+'" onclick="doSwapFixedBtn(this)" '
         + 'class="btn btn-sm" style="width:100%;min-height:44px;font-size:14px;">'
         + name + '</button>'
@@ -6285,8 +6307,8 @@ let _activeGameSheet = 0;
 function renderGameSheets(el) {
   // List all 8 games with current sheet summary
   let h = '<div class="card card-gold" style="margin-bottom:12px;">'
-    + '<div class="card-title">Game sheets</div>'
-    + '<div class="card-sub">3 fixed skill (QB/RB1/RB2) per half. 5 positions rotate every possession. Tap any name to swap. Regenerate anytime.</div>'
+    + '<div class="card-title">'+teamLabel+' game sheets</div>'
+    + '<div class="card-sub">3 fixed skill (QB/RB1/RB2) per half. Remaining positions rotate every possession. Tap any name to swap.</div>'
     + '</div>';
 
   // Game selector
@@ -6302,8 +6324,10 @@ function renderGameSheets(el) {
 
   const gameIdx = _activeGameSheet;
   const sheet = getGameSheet(gameIdx);
-  const offPos = ['TE/L','TE/R','C','G1','G2'];
+  const is56 = sheet.is56 || state.division === '56';
+  const offPos = is56 ? ['TE/L','C','TE/R'] : ['TE/L','TE/R','C','G1','G2'];
   const fixedRoles = ['QB','RB1','RB2'];
+  const teamLabel = is56 ? 'Tar Heels (5/6)' : 'Rebels (7/8)';
 
   // Action buttons
   h += '<div style="display:flex;gap:8px;margin-bottom:14px;">'
