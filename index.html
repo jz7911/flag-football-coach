@@ -1779,7 +1779,7 @@ const WINGT_BANK = [
    note:'If a team is overplaying the right sweep, this opens everything to the left.',
    formation:'Under center, wing left, flex back'},
   {id:'wt3',n:'Fullback Dive',tier:'Core',mis:'Low',pass:false,wk:1,
-   desc:'Flex back (fullback) takes handoff and hits the A-gap between center and guard. Short yardage. QB fakes outside.',
+   desc:'Flex back (fullback) takes handoff and hits the B-gap between guard and tackle. Short yardage with more running room than the A gap. QB fakes outside.',
    note:'"Hit the gap fast and low." Best on 4th and 1 or inside the 5.',
    formation:'Under center, QB fakes outside'},
   {id:'wt4',n:'Counter Slant Pass',tier:'Core',mis:'High',pass:true,wk:2,
@@ -1819,7 +1819,7 @@ const WINGT_BANK = [
    note:'Walk-through 10x before any live rep. 3 consecutive clean reps before using in a game. Once per game max.',
    formation:'Pre-snap motion both sides'},
   {id:'wt13',n:'Counter Dive (Counter-Counter)',tier:'Advanced',mis:'High',pass:false,wk:3,
-   desc:'Fake the reverse (defense chasing it), QB keeps the ball and hits the A/B gap opposite the reverse fake.',
+   desc:'Fake the reverse (defense chasing it), QB keeps the ball and hits the B-gap opposite the reverse fake. The B gap gives more room to read the block and cut.',
    note:'Use when defense has started over-pursuing your reverses. Punishes their adjustment.',
    formation:'Under center, reverse fake'},
   {id:'wt14',n:'Wing Seam Route',tier:'Advanced',mis:'Low',pass:true,wk:3,
@@ -1896,7 +1896,7 @@ const WINGT_BANK = [
    note:'"Drop back slow, run fast." Works when defense is rushing hard on passing downs. The middle opens when LBs drop into coverage.',
    formation:'Under center, pass fake, QB runs middle gap'},
   {id:'wt32',n:'Sweep Fake — QB Keep Middle',tier:'Advanced',mis:'Very High',pass:false,wk:7,
-   desc:'QB fakes the sweep to the wing back (everyone chases outside), then hands OFF to the flex back hitting the A-gap, OR QB keeps up the middle himself if the gap opens. Double-option read.',
+   desc:'QB fakes the sweep to the wing back (everyone chases outside), then hands OFF to the flex back hitting the B-gap, OR QB keeps up the middle himself if the gap opens. Double-option read.',
    note:'Defense must choose: stop the sweep or stop the middle. They cannot do both. QB reads which gap is open at the snap.',
    formation:'Under center, sweep fake, inside option'},
   {id:'wt33',n:'Reverse Fake — QB Bootleg',tier:'Advanced',mis:'Very High',pass:false,wk:8,
@@ -1935,7 +1935,7 @@ const WINGT_BANK = [
    formation:'Under center, fly motion full width'},
 
   {id:'wt40',n:'Fullback Lead Dive',tier:'Core',mis:'Low',pass:false,wk:2,
-   desc:'Both RBs aligned close. RB1 leads through the A gap as a blocker. RB2 follows directly behind. No fakes, no misdirection — a downhill double-team. Most defenses at this age do not assign anyone to the lead blocker.',
+   desc:'Both RBs aligned close. RB1 leads through the B gap (between guard and tackle) as a blocker. RB2 follows directly behind. B gap gives more room than A gap. No fakes, no misdirection — a downhill double-team. Most defenses at this age do not assign anyone to the lead blocker.',
    note:'RB1 hits the first defender inside. RB2 follows the block. Simple and physical.',
    formation:'Under center, both backs tight, RB1 leads'},
 
@@ -2017,7 +2017,7 @@ const WINGT_BANK = [
    formation:'Under center, both backs counter fake, QB keeps backside'},
 
   {id:'wt56',n:'Isolation Dive',tier:'Core',mis:'Low',pass:false,wk:2,
-   desc:'Fullback dives into the A gap with one RB leading as a blocker through the same hole. No fakes, no misdirection. Two kids hitting the same hole hard and fast. Physical play that works when the defense is spread out watching for sweeps. Commitment and speed are the whole play.',
+   desc:'Fullback dives into the B gap (between guard and tackle) with one RB leading as a blocker. B gap gives a better running lane than A gap. No fakes, no misdirection. Two kids hitting the same hole hard and fast. Physical play that works when the defense is spread out watching for sweeps. Commitment and speed are the whole play.',
    note:'Lead back hits the first inside defender. Dive back follows through the same hole immediately.',
    formation:'Under center, both backs tight, RB1 leads into A gap'},
 
@@ -2043,7 +2043,7 @@ const WINGT_BANK = [
    formation:'Heavy left — both TEs and one back strong side'},
 
   {id:'wt61',n:'Tight Wing-T Power Dive',tier:'Core',mis:'Low',pass:false,wk:2,
-   desc:'Both wings aligned tight to the line instead of split out. More bodies at the line of scrimmage, shorter block distances, harder reads for the defense. Run the isolation dive from this tight formation. Physical and direct. Works when the defense is expecting spread formation.',
+   desc:'Both wings aligned tight to the line instead of split out. More bodies at the line of scrimmage, shorter block distances, harder reads for the defense. Run the B-gap dive from this tight formation. Tight alignment shortens the block distance to the B gap. Physical and direct. Works when the defense is expecting spread formation.',
    note:'Tight alignment makes every play look the same pre-snap. Sweeps, dives, and counters all look identical.',
    formation:'Both wings tight to line, under center'},
 
@@ -2112,7 +2112,12 @@ const WINGT_BANK = [
   {id:'wt74',n:'Boot Pass — TE Cross',tier:'Intermediate',mis:'Med',pass:true,wk:3,
    desc:'QB bootlegs right. TE on the left releases and runs across the field in the same direction the QB is rolling. By the time the TE gets across the field the QB has cleared defenders and the TE is open in the middle or far flat. Short throw to a moving target the whole bootleg action sets up. The defense follows the bootleg and leaves the TE completely alone.',
    note:'TE runs hard across the field from the start. QB rolls right and throws when the TE clears the middle. Short throw — do not overthrow.',
-   formation:'Under center, QB bootleg right, TE crosses left to right'}];
+   formation:'Under center, QB bootleg right, TE crosses left to right'},
+
+  {id:'wt75',n:'Jet Motion — QB Edge Run',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'RB2 goes in full-speed jet motion. QB fakes the jet handoff completely — sells it with both hands extended. RB2 runs hard like they have the ball. Every defender flows to the jet motion. QB pulls and runs the opposite edge with no one to beat. Identical look to Jet Motion Sweep — only difference is the QB keeps instead of handing off. Works best after running the actual jet sweep 2-3 times.',
+   note:'The fake must be a full commitment — both hands extended, eyes on RB2. Defense must believe the handoff happened. Run the real jet sweep first.',
+   formation:'Under center or shotgun, RB2 jet motion, QB keeps backside edge'}];
 
 // ════════════════════════════════════════════
 // PISTOL SPREAD PLAY BANK
