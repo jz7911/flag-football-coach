@@ -375,6 +375,7 @@ textarea{min-height:80px;resize:none;}
   <div class="tab-row">
     <div class="tab active" onclick="pbTab('active',this)">Active</div>
     <div class="tab" onclick="pbTab('bank',this)">Play Bank</div>
+    <div class="tab" onclick="pbTab('newplays',this)">New Plays</div>
     <div class="tab" onclick="pbTab('defense',this)">Defense</div>
     <div class="tab" onclick="pbTab('formation',this)">Formations</div>
     <div class="tab" onclick="pbTab('playlog',this)">Log</div>
@@ -1666,6 +1667,57 @@ const DRILLS = [
   {id:'gn7',cat:'QB Skills',name:'Faster Fakes — Commit or Do Not',time:6,group:'QB + both RBs',equip:'Ball',level:'All',
    desc:'QB and both backs run every misdirection play mesh point. Coach grades the fake on one standard: did the defender NOT know who had the ball for the first two steps? If yes it is a good fake. If no it is a bad fake and they run it again. Speed of the fake matters less than commitment. A slow committed fake beats a fast uncommitted one every time. Run 10 mesh points. Grade every one.',
    cue:'Commit to the fake. Slow committed beats fast lazy every time.',
+   type:'sk'},
+
+  // ── New Drills — watch the ball, gaps, edges ─────────────
+  {id:'nd1',cat:'New Drills',name:'Watch the Ball — Defensive Read',time:8,group:'Defense',equip:'Ball,Flags',level:'All',
+   desc:'Coach walks through 5 scenarios with the whole defense watching. (1) Ball goes wide — LBs flow, CB pursues. (2) Ball goes up the middle — LBs attack. (3) QB fakes, ball stays hidden — nobody moves until ball is visible. (4) Ball goes backward — it is a pass, CBs find their receiver immediately. (5) Ball disappears after mesh — find it fast, every defender. Run each scenario 3 times at walk speed then full speed. The ball never lies.',
+   cue:'Watch the ball. The ball tells you everything.',
+   type:'sk'},
+
+  {id:'nd2',cat:'New Drills',name:'Flow and Hold — LBs and Backside CB',time:8,group:'Defense',equip:'Ball,Flags',level:'All',
+   desc:'Run the sweep live. Near-side LB flows hard to the point of attack — attacks the LOS at the sweep. Far-side LB takes a pursuit angle, runs to where the ball carrier will be. Backside CB holds their position and does not move until the ball crosses the LOS. After 5 sweep reps, run a bootleg or reverse — the backside CB makes the play because they stayed home. This teaches the rule by showing the consequence of breaking it.',
+   cue:'Near LB attack. Far LB pursue. Backside CB — do not move until the ball crosses.',
+   type:'sk'},
+
+  {id:'nd3',cat:'New Drills',name:'Backside CB Stay Home — Bootleg Rep',time:6,group:'Defense',equip:'Ball,Flags',level:'All',
+   desc:'Run the sweep 3 times with backside CB watching and holding. Then without warning run the bootleg or reverse. Backside CB must make the stop. If they chased on a previous rep and are out of position they cannot make this play — and the whole defense sees it immediately. The lesson is felt, not explained. Repeat until the CB holds every single rep regardless of how convincing the sweep fake is.',
+   cue:'You own the back side. Do not move until you see the ball cross.',
+   type:'sk'},
+
+  {id:'nd4',cat:'New Drills',name:'Pass Recognition — Ball Goes Backward',time:7,group:'Defense',equip:'Ball,Flags',level:'All',
+   desc:'QB takes the snap and either hands off or drops back. Defense must identify pass or run within 1 second of snap. Rule: ball going backward = pass, find your receiver immediately. LBs drop 3 steps and locate receivers. CBs run with their man. No one watches the QB after the read. Run 10 reps alternating run and pass randomly. Any defender who is still watching the QB 2 seconds after the snap gets called out — they lost their receiver.',
+   cue:'Ball goes backward = pass. Stop watching the QB. Find your receiver.',
+   type:'sk'},
+
+  {id:'nd5',cat:'New Drills',name:'DE Edge Contain — Outside Leverage',time:8,group:'DE vs OL',equip:'Ball,Flags,Cones',level:'Intermediate',
+   desc:'DE vs blocker 1v1. Set a cone 1 yard outside the blocker — the DE must stay outside that cone at all times. Blocker tries to reach or seal inside. DE maintains outside leverage. Then ball carrier runs the sweep — DE must force the play inside using outside leverage. If the ball gets outside the DE the rep does not count and runs again. Teaches the contain rule physically: your job is the edge, everything else is inside.',
+   cue:'Stay outside the cone. Force everything inside. The edge is yours.',
+   type:'sk'},
+
+  {id:'nd6',cat:'New Drills',name:'DE Bootleg Read — QB Back Foot Key',time:6,group:'DE',equip:'Ball',level:'Intermediate',
+   desc:'QB lines up and either hands off on a sweep or boots to the DE side. DE reads the QB back foot only. Back foot steps toward DE = bootleg, DE flattens and contains. Back foot steps away = handoff, DE can crash inside. Walk through 10 reps at half speed — coach calls the play after the snap and DE calls the read out loud. Then run full speed. DE must call the read before taking a step. Wrong read = stop and walk through again.',
+   cue:'Watch the QB back foot. Toward you = bootleg, flatten. Away = handoff, crash.',
+   type:'sk'},
+
+  {id:'nd7',cat:'New Drills',name:'A and B Gap Walk-Through — RBs and QB',time:6,group:'QB + RBs',equip:'Cones',level:'All',
+   desc:'Set 5 cones representing the OL: C, G, G, T, T. Walk RBs through each gap physically — step through and say the name out loud. A gap = between C and G (donut hole). B gap = between G and T (second space). Do 5 walk-throughs per back. Then call plays by gap: coach says A gap, back runs to the A gap cone immediately. Coach says B gap, back runs there. No hesitation. Build to full reps where the back reads the block and hits the open gap.',
+   cue:'A gap is the donut hole. B gap is the second space. Know before the snap.',
+   type:'sk'},
+
+  {id:'nd8',cat:'New Drills',name:'Upfield Cut — Cone Drill for RBs',time:7,group:'RBs',equip:'Ball,Cones',level:'All',
+   desc:'Set one cone at the corner — exactly where the blocker ends the sweep block. RB takes the handoff, reaches the cone, plants the outside foot and cuts upfield. If they run past the cone toward the sideline the rep stops. Run it again from the top. The cone makes the cut point physical and visible. The sideline is not their friend. North-south yards beat east-west yards every time. Do 8 reps each direction.',
+   cue:'Plant at the cone. Cut upfield. The sideline is a dead end.',
+   type:'sk'},
+
+  {id:'nd9',cat:'New Drills',name:'Swim Move — Three-Step Teach',time:8,group:'DL',equip:'Partner',level:'Intermediate',
+   desc:'Step 1 (no contact): stand still, practice the arm swing — elbow high, arm goes up and over like a freestyle swim stroke, opposite shoulder drives through. 10 reps each side until automatic. Step 2 (slow): engage the blocker with both hands, then execute the swim. Walk speed, 5 reps. Step 3 (full speed): fire out, engage, swim, get to the cone behind the blocker in under 2 seconds. Time it. Under 2 = good rep. Over 2 = run it again. The arm that swims goes OVER the blocker arm, not under.',
+   cue:'Touch first. Elbow up. Drive the opposite shoulder. Get to the cone.',
+   type:'sk'},
+
+  {id:'nd10',cat:'New Drills',name:'Push-Pull Counter — Use Their Weight',time:7,group:'DL',equip:'Partner',level:'Intermediate',
+   desc:'Step 1 (demo): two kids push each other, then the defender suddenly stops and pulls. The blocker falls forward every time. Do 5 reps so they feel how little force it takes when the blocker is leaning. Step 2 (slow): DL engages with both hands, waits one beat for the push, grabs and pulls hard to one side, steps around the opposite direction simultaneously. Pull right, step left. Always opposite. Step 3 (full speed): fire out, wait for push, pull-and-step, get to the cone. 2-second standard.',
+   cue:'Feel the push. Pull and step opposite. Use their weight against them.',
    type:'sk'}];
 
 
@@ -3493,6 +3545,7 @@ function pbTab(tab, el) {
 function renderPbContent() {
   const el = document.getElementById('pb-content');
   if(curPbSub === 'callsheet') { renderCallSheet(el); return; }
+  if(curPbSub === 'newplays') { renderNewPlays(el); return; }
   if(state.division === '56') {
     renderPbContent56(el);
     return;
@@ -3822,6 +3875,99 @@ function deleteCustomPlay(id) {
   renderPbContent();
 }
 
+function renderNewPlays(el) {
+  if(!state.customPlays) state.customPlays = {};
+  const customForSys = state.customPlays[curSystem] || [];
+  const baseBank = curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK;
+  const bank = [...baseBank, ...customForSys];
+  const active = state.activePlays[curSystem] || [];
+  const selCount = _bankSelected.size;
+
+  // New plays = wt35 and above, plus any custom plays
+  const newPlays = bank.filter(p => {
+    if(p.custom) return true;
+    const num = parseInt((p.id||'').replace(/[^\d]/g,''));
+    return num >= 35;
+  });
+
+  let h = `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--gold);">New this week — ${newPlays.length} plays</div>
+      <div style="font-size:10px;color:var(--g3);margin-top:2px;">wt35-wt74 · Easy passes · Jet motion series · Reverses · Formations</div>
+    </div>
+    <button onclick="_bankSelectMode=!_bankSelectMode;_bankSelected.clear();renderPbContent()"
+      style="padding:6px 12px;border-radius:8px;border:2px solid ${_bankSelectMode?'var(--gold)':'var(--navy3)'};background:${_bankSelectMode?'rgba(245,166,35,.15)':'transparent'};color:${_bankSelectMode?'var(--gold)':'var(--g3)'};font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;">
+      ${_bankSelectMode?'Cancel':'Select multiple'}
+    </button>
+  </div>`;
+
+  if(_bankSelectMode) {
+    h += `<div style="position:sticky;top:0;z-index:10;margin-bottom:10px;">
+      <button onclick="_addSelectedPlays()" style="width:100%;min-height:48px;padding:12px;border-radius:9px;border:none;
+        background:${selCount>0?'var(--gold)':'var(--navy3)'};color:${selCount>0?'var(--navy)':'var(--g3)'};
+        font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;">
+        ${selCount>0?'Add '+selCount+' play'+(selCount>1?'s':'')+' to playbook':'Tap plays to select'}
+      </button>
+    </div>`;
+  }
+
+  // Group by category
+  const groups = [
+    { label:'Jet Motion Series', ids:['wt47','wt48','wt49','wt50'] },
+    { label:'Physical Run Plays', ids:['wt51','wt52','wt53','wt54','wt55','wt56','wt57','wt58'] },
+    { label:'Misdirection', ids:['wt35','wt36','wt37','wt38','wt39','wt40','wt41','wt59','wt60','wt61','wt62','wt63'] },
+    { label:'Reverse and Fake Reverse', ids:['wt64','wt65'] },
+    { label:'Easy Completion Passes', ids:['wt66','wt67','wt68','wt69','wt70','wt71','wt72','wt73','wt74'] },
+    { label:'Trick Plays', ids:['wt42','wt43','wt44','wt45','wt46'] },
+    { label:'Custom', filter: p=>p.custom },
+  ];
+
+  groups.forEach(grp => {
+    const plays = grp.filter
+      ? newPlays.filter(grp.filter)
+      : newPlays.filter(p=>grp.ids.includes(p.id));
+    if(!plays.length) return;
+
+    h += `<div class="sec-hdr">${grp.label}</div>`;
+    plays.forEach(p => {
+      const isActive = active.includes(p.id);
+      const isSel = _bankSelected.has(p.id);
+      if(_bankSelectMode) {
+        h += `<div onclick="_toggleBankSelect('${p.id}')"
+          style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:6px;
+          border:2px solid ${isSel?'var(--gold)':isActive?'rgba(245,166,35,.3)':'var(--navy3)'};
+          background:${isSel?'rgba(245,166,35,.12)':isActive?'rgba(245,166,35,.04)':'var(--navy2)'};
+          cursor:pointer;touch-action:manipulation;">
+          <div style="width:26px;height:26px;border-radius:7px;border:2px solid ${isSel?'var(--gold)':'var(--navy3)'};
+            background:${isSel?'var(--gold)':'transparent'};display:flex;align-items:center;justify-content:center;
+            font-size:12px;font-weight:800;color:var(--navy);flex-shrink:0;">${isSel?'✓':''}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:${isActive?700:600};color:${isActive?'var(--gold)':'var(--white)'};">${p.n}</div>
+            <div style="font-size:10px;color:var(--g3);margin-top:2px;">${p.tier} · ${p.pass?'Pass':'Run'} · ${p.mis} mis · Wk ${p.wk||1}+</div>
+          </div>
+          ${isActive?'<span class="badge b-green" style="flex-shrink:0;">Active</span>':''}
+        </div>`;
+      } else {
+        h += `<div class="drill-card ${isActive?'selected':''}" onclick="showPlayDetail('${p.id}')">
+          <div class="dc-header">
+            <div class="dc-title">${p.n}</div>
+            ${isActive?'<span class="badge b-green">Active</span>':''}
+          </div>
+          <div class="dc-body">${(p.desc||'').substring(0,90)}...</div>
+          <div class="dc-footer">
+            <span class="badge b-${p.tier==='Core'?'green':p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
+            ${p.pass?'<span class="badge b-blue">Pass</span>':'<span class="badge b-gray">Run</span>'}
+            <span class="badge b-gray">Wk ${p.wk||1}+</span>
+          </div>
+        </div>`;
+      }
+    });
+  });
+
+  el.innerHTML = h;
+}
+
+
 function renderPlayBank(el) {
   if(!state.customPlays) state.customPlays = {};
   const customForSys = state.customPlays[curSystem] || [];
@@ -3880,7 +4026,7 @@ function renderPlayBank(el) {
             <div class="dc-title">${p.n}</div>
             ${isActive?'<span class="badge b-green">In playbook</span>':''}
           </div>
-          <div class="dc-body">${p.desc.substring(0,90)}...</div>
+          <div class="dc-body">${(p.desc||'').substring(0,90)}...</div>
           <div class="dc-footer">
             <span class="badge b-${p.tier==='Core'?'green':p.tier==='Intermediate'?'amber':'purple'}">${p.tier}</span>
             ${p.pass?'<span class="badge b-blue">Pass</span>':'<span class="badge b-gray">Run</span>'}
