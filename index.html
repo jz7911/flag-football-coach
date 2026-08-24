@@ -1770,11 +1770,11 @@ const ACTIVITIES = [
 // WING-T PLAY BANK
 // ════════════════════════════════════════════
 const WINGT_BANK = [
-  {id:'wt1',n:'HB Sweep Right',tier:'Core',mis:'Low',pass:false,wk:1,
+  {id:'wt1',n:'HB Sweep',tier:'Core',mis:'Low',pass:false,wk:1,
    desc:'QB hands to wing back sweeping right edge. OL seals inside. Fastest back uses speed advantage around the corner.',
    note:'"Seal and go." Run this enough that defense fears it — that\'s when your fakes start working.',
    formation:'Under center, wing right, flex back'},
-  {id:'wt2',n:'HB Sweep Left',tier:'Core',mis:'Low',pass:false,wk:1,
+  {id:'wt2',n:'HB Sweep Left',tier:'Mirror',mis:'Low',pass:false,wk:1,
    desc:'Mirror of HB Sweep Right. Wing back sweeps left edge. Essential to run both directions so defense can\'t key on one side.',
    note:'If a team is overplaying the right sweep, this opens everything to the left.',
    formation:'Under center, wing left, flex back'},
@@ -1786,19 +1786,19 @@ const WINGT_BANK = [
    desc:'RB takes convincing run fake (HB Sweep look), defense bites. QB throws slant to back-side eligible T.',
    note:'The fake is everything. If RB doesn\'t sell it, defense doesn\'t bite. Walk through 6x.',
    formation:'Under center, HB sweep fake'},
-  {id:'wt5',n:'Bootleg Pass Right',tier:'Core',mis:'High',pass:true,wk:2,
+  {id:'wt5',n:'Bootleg Pass',tier:'Core',mis:'High',pass:true,wk:2,
    desc:'QB fakes inside run (fullback dive), boots right outside the tackle box, throws to flat route or runs if open.',
    note:'"Shoulders to the sideline." If LB holds edge = dump to flat. If LB drops = run.',
    formation:'Under center, boot right'},
-  {id:'wt6',n:'Bootleg Pass Left',tier:'Core',mis:'High',pass:true,wk:2,
+  {id:'wt6',n:'Bootleg Pass Left',tier:'Mirror',mis:'High',pass:true,wk:2,
    desc:'Mirror of Bootleg Right. QB boots left. Run both directions so defense can\'t key the boot side.',
    note:'Run against the grain of your power sweep. Defense over-pursues sweep, boot opens.',
    formation:'Under center, boot left'},
-  {id:'wt7',n:'Reverse Right',tier:'Core',mis:'Very High',pass:false,wk:3,
+  {id:'wt7',n:'Reverse',tier:'Core',mis:'Very High',pass:false,wk:3,
    desc:'Eligible T/WR goes in pre-snap motion. QB fakes to wing back going left, hands to T/WR going right. Two fakes.',
    note:'Walk-through 8x before live rep. Clean handoff is critical. Motion man must take the hand decisively.',
    formation:'Pre-snap motion, under center'},
-  {id:'wt8',n:'Curl Route Right',tier:'Core',mis:'Low',pass:true,wk:2,
+  {id:'wt8',n:'Curl Route',tier:'Core',mis:'Low',pass:true,wk:2,
    desc:'Right eligible T runs 8-yard curl. QB reads: if LB is deep, throw curl. If LB holds, check down to flat.',
    note:'Look off first. Come back to the curl. Works great after you\'ve run the sweep a few times.',
    formation:'Under center'},
@@ -1806,11 +1806,11 @@ const WINGT_BANK = [
    desc:'Wing back drifts to flat. OL allows rush (engaged, then release). QB dumps to wing in open space.',
    note:'OL must engage DL one full second before releasing. QB sells pocket pressure first.',
    formation:'Under center, wing drifts flat'},
-  {id:'wt10',n:'Play-Action Deep Right',tier:'Advanced',mis:'Very High',pass:true,wk:2,
+  {id:'wt10',n:'Play-Action Deep',tier:'Advanced',mis:'Very High',pass:true,wk:2,
    desc:'Fake HB Sweep Right convincingly. RB sells the run fake. QB boots left (back side) and throws deep go route to left eligible T.',
    note:'Use only after defense is committing to the sweep. Requires great RB fake. Your explosive play.',
    formation:'Under center, boot opposite sweep'},
-  {id:'wt11',n:'Play-Action Deep Left',tier:'Advanced',mis:'Very High',pass:true,wk:2,
+  {id:'wt11',n:'Play-Action Deep Left',tier:'Mirror',mis:'Very High',pass:true,wk:2,
    desc:'Fake HB Sweep Left. QB boots right. Throws deep go route to right eligible T.',
    note:'Run both directions. If defense adjusts to one boot side, the other opens.',
    formation:'Under center, boot opposite sweep'},
@@ -1871,11 +1871,11 @@ const WINGT_BANK = [
    note:'Timing: QB releases as WR plants. Best used when defense is rushing QB hard.',
    formation:'Under center'},
   // ── QB FAKE & BOOTLEG RUNS ──
-  {id:'wt26',n:'QB Bootleg Run Right',tier:'Core',mis:'High',pass:false,wk:2,
+  {id:'wt26',n:'QB Bootleg Run',tier:'Core',mis:'High',pass:false,wk:2,
    desc:'QB fakes handoff to RB going left (sweep fake), then tucks the ball and runs right outside the tackle box. No pass — QB is the ball carrier. The sweep fake freezes the defense while QB runs the opposite edge.',
    note:'"Sell the fake to your RB first. Then go." QB cannot run up the middle from under center — must get outside the tackle box. This is your most reliable QB run.',
    formation:'Under center, RB sweep fake left, QB keeps right'},
-  {id:'wt27',n:'QB Bootleg Run Left',tier:'Core',mis:'High',pass:false,wk:2,
+  {id:'wt27',n:'QB Bootleg Run Left',tier:'Mirror',mis:'High',pass:false,wk:2,
    desc:'Mirror of Bootleg Run Right. QB fakes sweep right, keeps and runs left edge. Run both directions so defense cannot key the bootleg side.',
    note:'Alternate sides every few games. If defense starts cheating to stop the right bootleg, hit them left.',
    formation:'Under center, RB sweep fake right, QB keeps left'},
@@ -1909,7 +1909,7 @@ const WINGT_BANK = [
    formation:'Under center, sweep fake, boot with flat option'},
 
   // ── New misdirection and constraint plays ──
-  {id:'wt35',n:'Rocket Motion Sweep Right',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+  {id:'wt35',n:'Rocket Motion Sweep',tier:'Intermediate',mis:'Med',pass:false,wk:3,
    desc:'RB2 goes in full-speed pre-snap motion toward RB1. QB snaps it as RB2 hits the handoff point already at full speed. Ball carrier has momentum before the play starts. Blocking identical to Sweep Right.',
    note:'The motion is the play. Snap it when the moving back is at the handoff spot — not before, not after.',
    formation:'Under center, RB2 jet motion right'},
@@ -1991,22 +1991,22 @@ const WINGT_BANK = [
    formation:'Under center, RB2 jet motion right, RB1 reverse left'},
 
   // ── Physical and speed plays ──────────────────────────────
-  {id:'wt51',n:'Lead Sweep Right',tier:'Core',mis:'Low',pass:false,wk:2,
+  {id:'wt51',n:'Lead Sweep',tier:'Core',mis:'Low',pass:false,wk:2,
    desc:'Sweep Right with a TE crack block inside and a back leading outside. More physical than the standard sweep — the crack clears the linebacker and a back leads the ball carrier around the edge.',
    note:'TE cracks inside on the linebacker. Back leads outside. Two blocks on the edge instead of one.',
    formation:'Under center, backside guard pulls right'},
 
-  {id:'wt52',n:'Lead Sweep Left',tier:'Core',mis:'Low',pass:false,wk:2,
+  {id:'wt52',n:'Lead Sweep Left',tier:'Mirror',mis:'Low',pass:false,wk:2,
    desc:'Sweep Left with a TE crack block inside and a back leading outside.',
    note:'TE cracks inside on the linebacker. Back leads outside.',
    formation:'Under center, backside guard pulls left'},
 
-  {id:'wt53',n:'Quick Pitch Right',tier:'Core',mis:'Med',pass:false,wk:1,
+  {id:'wt53',n:'Quick Pitch',tier:'Core',mis:'Med',pass:false,wk:1,
    desc:'QB takes the snap and immediately pitches to RB running wide right. No exchange, no mesh, no delay. Ball is outside before the defense can react. Fastest play in the playbook — gets the ball to the edge in under one second. Physical and quick.',
    note:'Pitch must be immediate. Any hesitation kills the play. QB catches and throws in one motion.',
    formation:'Under center or shotgun, RB2 wide right'},
 
-  {id:'wt54',n:'Quick Pitch Left',tier:'Core',mis:'Med',pass:false,wk:1,
+  {id:'wt54',n:'Quick Pitch Left',tier:'Mirror',mis:'Med',pass:false,wk:1,
    desc:'Mirror of Quick Pitch Right. Immediate pitch left. Gets the ball outside before the defense can set.',
    note:'Pitch must be immediate. Any hesitation kills the play.',
    formation:'Under center or shotgun, RB2 wide left'},
@@ -2021,23 +2021,23 @@ const WINGT_BANK = [
    note:'Lead back hits the first inside defender. Dive back follows through the same hole immediately.',
    formation:'Under center, both backs tight, RB1 leads into A gap'},
 
-  {id:'wt57',n:'Sweep Crack Right',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+  {id:'wt57',n:'Sweep Crack',tier:'Intermediate',mis:'Med',pass:false,wk:3,
    desc:'Standard sweep right but the TE cracks inside on the linebacker instead of releasing for a route. The crack block removes the most dangerous defender from the sweep lane. With the LB blocked inside the sweep has no one to beat on the edge. Physical TE block that changes the whole geometry of the play.',
    note:'TE crack block must be PHYSICAL. No soft contact. The crack removes the most dangerous defender — if it is soft the sweep dies. Most physical block on the field on this play.',
    formation:'Under center, TE crack block inside, sweep right'},
 
-  {id:'wt58',n:'Sweep Crack Left',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+  {id:'wt58',n:'Sweep Crack Left',tier:'Mirror',mis:'Med',pass:false,wk:3,
    desc:'Mirror of Sweep Crack Right. TE cracks inside on the linebacker, sweep goes left.',
    note:'TE must commit to the crack block. This is a physical block — no half measures.',
    formation:'Under center, TE crack block inside, sweep left'},
 
   // ── Formations (coded as formation-focus plays) ───────────
-  {id:'wt59',n:'Heavy Right Formation Sweep',tier:'Intermediate',mis:'Low',pass:false,wk:3,
+  {id:'wt59',n:'Heavy Formation Sweep',tier:'Intermediate',mis:'Low',pass:false,wk:3,
    desc:'Both TEs and one back shift to the right side pre-snap — four blockers on one side. Run the sweep into the heavy side. The defense cannot match four blockers without showing their alignment before the snap. Physical and simple. No misdirection needed when you have a numbers advantage.',
    note:'Shift before the snap and let them set. The numbers advantage is on the right every time.',
    formation:'Heavy right — both TEs and one back strong side'},
 
-  {id:'wt60',n:'Heavy Left Formation Sweep',tier:'Intermediate',mis:'Low',pass:false,wk:3,
+  {id:'wt60',n:'Heavy Left Formation Sweep',tier:'Mirror',mis:'Low',pass:false,wk:3,
    desc:'Mirror of Heavy Right. Both TEs and one back shift left. Four blockers on the left side. Sweep into the heavy side.',
    note:'Shift and let them set. Attack the numbers advantage.',
    formation:'Heavy left — both TEs and one back strong side'},
@@ -2069,17 +2069,17 @@ const WINGT_BANK = [
    formation:'Under center, RB1 sweep fake right, RB2 reverse fake left, QB keep middle'},
 
   // ── Easy completion pass plays ────────────────────────────
-  {id:'wt66',n:'Flat Route — RB Right',tier:'Core',mis:'Low',pass:true,wk:1,
+  {id:'wt66',n:'Flat Route — RB',tier:'Core',mis:'Low',pass:true,wk:1,
    desc:'RB leaks out of the backfield to the flat, 3-5 yards outside the right tackle. QB flips it immediately. Ball is gone in under a second. Defense at this age almost never covers a back in the flat — they are watching for the run. Get the ball into space and let the back run. Throw it before anyone moves.',
    note:'Throw it immediately. Do not wait. The back will be open the moment they clear the line.',
    formation:'Under center or shotgun, RB leaks right flat'},
 
-  {id:'wt67',n:'Flat Route — RB Left',tier:'Core',mis:'Low',pass:true,wk:1,
+  {id:'wt67',n:'Flat Route — RB Left',tier:'Mirror',mis:'Low',pass:true,wk:1,
    desc:'Mirror of Flat Route Right. RB leaks left to the flat. Same immediate throw. Same concept. Defense cannot cover both flats when they are watching the run.',
    note:'Throw it before the defense reacts. Under one second from snap to release.',
    formation:'Under center or shotgun, RB leaks left flat'},
 
-  {id:'wt68',n:'TE Out Route Right',tier:'Core',mis:'Low',pass:true,wk:2,
+  {id:'wt68',n:'TE Out Route',tier:'Core',mis:'Low',pass:true,wk:2,
    desc:'TE releases off the line, runs 5 yards upfield then breaks hard to the sideline. QB throws to the outside where only the TE can go. Short throw, defined target area, no traffic. Youth defenders play soft coverage — the out route beats it every time. The sideline is the extra defender so the throw does not need to be perfect.',
    note:'5 yards then break outside. QB throws to the sideline — not to the player, to the spot. Let the TE run to it.',
    formation:'Under center, TE splits right, out route'},
@@ -2089,12 +2089,12 @@ const WINGT_BANK = [
    note:'Throw in front of the receiver. Lead them. Do not throw to where they are — throw to where they are going.',
    formation:'Under center, TE crosses from right to left'},
 
-  {id:'wt70',n:'Swing Pass Right',tier:'Core',mis:'Low',pass:true,wk:1,
+  {id:'wt70',n:'Swing Pass',tier:'Core',mis:'Low',pass:true,wk:1,
    desc:'RB swings wide right. QB throws immediately on the catch route before the defense can react. Basically a pitch but with a legal forward pass. Goes for positive yards almost every time because it gets outside so fast. Good substitute for any sweep when the edge is loaded. Throw it before the back even fully sets their route.',
    note:'Throw it early. The back should catch it running at full speed — not standing still waiting.',
    formation:'Under center or shotgun, RB swings wide right'},
 
-  {id:'wt71',n:'Bubble Screen Right',tier:'Core',mis:'Low',pass:true,wk:2,
+  {id:'wt71',n:'Bubble Screen',tier:'Core',mis:'Low',pass:true,wk:2,
    desc:'Shotgun. TE or wing lines up a yard outside the right tackle. On the snap they immediately run a flat route toward the sideline — the bubble. QB flips it before any rush arrives. Blockers in front of the bubble receiver run downfield on the snap. Ball gets to the receiver with blockers already in place. Easiest completion in football — throw it before anything develops.',
    note:'Throw it immediately. The whole play happens before the defense can process it. If you wait it does not work.',
    formation:'Shotgun, TE/wing split right, bubble flat route'},
@@ -5536,7 +5536,7 @@ function autoScriptCallSheet(scriptLen, mode) {
   if(!state.customPlays) state.customPlays = {};
   const custom = state.customPlays[curSystem] || [];
   const fullBank = [...bank, ...custom];
-  const activePlays = fullBank.filter(p=>activeIds.includes(p.id));
+  const activePlays = fullBank.filter(p=>activeIds.includes(p.id) && p.tier!=='Mirror');
   const gameNum = activeGames().length + 1;
   const weekNum = state.week || gameNum;
 
@@ -5623,6 +5623,10 @@ function autoScriptCallSheet(scriptLen, mode) {
 
   let passCount = 0;
   let playNum = 0;
+  const directionalPlays = new Set(['wt1','wt5','wt7','wt8','wt10','wt26',
+    'wt35','wt51','wt53','wt57','wt59','wt66','wt68','wt70','wt71','wt75']);
+  const lastDir = {}; // last direction called per play
+
   const script = [];
 
   function add(cats, role, cue, maxCallsOverride) {
@@ -5654,7 +5658,17 @@ function autoScriptCallSheet(scriptLen, mode) {
     if(p) {
       callCount[p.id] = (callCount[p.id]||0) + 1;
       if(p.pass) passCount++;
-      script.push({id:p.id, role, cue});
+      // Add Left/Right direction for directional plays — alternate each call
+      let finalCue = cue;
+      let finalRole = role;
+      if(directionalPlays.has(p.id)) {
+        const prev = lastDir[p.id] || 'Left';
+        const dir = prev === 'Right' ? 'Left' : 'Right';
+        lastDir[p.id] = dir;
+        finalRole = role + ' · ' + dir.toUpperCase();
+        finalCue = dir + '. ' + cue;
+      }
+      script.push({id:p.id, role:finalRole, cue:finalCue});
     }
   }
 
