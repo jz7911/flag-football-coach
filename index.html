@@ -4094,122 +4094,93 @@ function renderPlaySheet(el) {
   if(!state.customPlays) state.customPlays = {};
   const custom = state.customPlays[curSystem] || [];
   const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...custom];
-  const active = state.activePlays[curSystem] || [];
+  const activeIds = state.activePlays[curSystem] || [];
+  const activePlays = bank.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror');
 
-  const tiers = [
-    {
-      label:'TIER 1 — ESTABLISH',
-      sub:'Call these first, every game. Read the defense.',
-      color:'#1a3a5c', bg:'rgba(26,58,92,.12)',
-      plays:[
-        {id:'wt1', situation:'Read space. Cut upfield at the cone. Hit the open edge.'},
-        {id:'wt56', situation:'Fullback leads. Hit the B gap. Physical downhill run.'},
-        {id:'wt26', situation:'Sell the sweep fake. QB takes the edge.'},
-        {id:'wt46', situation:'Bootleg and fake the throw. Then keep running.'},
-      ]
-    },
-    {
-      label:'TIER 2 — COUNTER',
-      sub:'Call after establishing the sweep. Punish their adjustment.',
-      color:'#2a4a6c', bg:'rgba(42,74,108,.10)',
-      plays:[
-        {id:'wt3', situation:'They crashed on the sweep. Hit the B gap opposite.'},
-        {id:'wt47', situation:'Same as sweep but ball carrier has speed at the snap.'},
-        {id:'wt57', situation:'TE cracks the LB. Sweep hits the open edge.'},
-        {id:'wt76', situation:'Show pass twice first. Wait for the rush lane. Go.'},
-        {id:'wt77', situation:'Snap and go wide. No fake. Beat them with speed.'},
-        {id:'wt84', situation:'Twins as blockers. QB runs into the strength. 5 blockers.'},
-      ]
-    },
-    {
-      label:'TIER 3 — MISDIRECTION',
-      sub:'Call after they adjust. Use their read against them.',
-      color:'#1a5c2a', bg:'rgba(26,92,42,.10)',
-      plays:[
-        {id:'wt48', situation:'Full jet fake. QB keeps backside. After 2 jet sweeps.'},
-        {id:'wt64', situation:'Sweep fake right. Handoff left. After 3 sweeps right.'},
-        {id:'wt55', situation:'Both backs fake inside. QB keeps the edge.'},
-        {id:'wt45', situation:'QB holds throw fake. RB takes handoff from extended arm.'},
-        {id:'wt79', situation:'Twins pull coverage one side. QB sweeps opposite.'},
-        {id:'wt87', situation:'Sweep fake pulls them left. QB keeps right into twins.'},
-        {id:'wt49', situation:'Jet fake right. Handoff left behind. Very high misdirection.'},
-        {id:'wt65', situation:'Sweep fake + reverse fake + QB keeps the middle.'},
-      ]
-    },
-    {
-      label:'TIER 4 — PASS',
-      sub:'Max 4 per game. Set up by the run. Throw before they stop.',
-      color:'#1a3a6c', bg:'rgba(26,58,108,.10)',
-      plays:[
-        {id:'wt66', situation:'Immediate flip. RB leaks flat. Gone in 1 count.'},
-        {id:'wt68', situation:'5 yards, break outside. Throw to the spot not the player.'},
-        {id:'wt73', situation:'Sweep fake. Boot opposite. RB wide open in the flat.'},
-        {id:'wt80', situation:'Twins draw coverage right. Screen left into open space.'},
-        {id:'wt42', situation:'Hand off on sweep. HB plants feet and throws to crossing TE.'},
-        {id:'wt89', situation:'Boot right into twins. Both TEs run routes. Read corner or keep.'},
-      ]
-    },
-    {
-      label:'TIER 5 — TRICK',
-      sub:'1 per game maximum. Set it up first. Call it with confidence.',
-      color:'#8b0000', bg:'rgba(139,0,0,.08)',
-      plays:[
-        {id:'wt43', situation:'Run sweep twice first. Hand off, pitch back, throw deep.'},
-        {id:'wt83', situation:'Sweep fake, HB throws back to crossing TE. Walk it 20 times.'},
-        {id:'wt90', situation:'Fake boot right, all coverage flows right. Pass left to open back.'},
-      ]
-    },
+  // Tier buckets by play tier field
+  const tierDefs = [
+    { label:'TIER 1 — ESTABLISH',  sub:'Call first, every game. Read the defense.',  color:'#1a3a5c', tiers:['Core'],                       situations:{ establish:'Read space. Cut upfield. Hit the open edge.', default:'Run it. Physical.' } },
+    { label:'TIER 2 — COUNTER',    sub:'After Tier 1 reps. Punish their adjustment.', color:'#1e3a5f', tiers:['Intermediate'],                situations:{ default:'They adjusted. Hit the opposite.' } },
+    { label:'TIER 3 — MISDIRECTION',sub:'After they adjust. Use their read against them.',color:'#1a5c2a',tiers:['Advanced'],               situations:{ default:'Set it up first. Then call it.' } },
+    { label:'TIER 4 — PASS',        sub:'Max 4 per game. Run sets these up.',          color:'#1a3a6c', tiers:['Core','Intermediate','Advanced'], passOnly:true, situations:{ default:'Throw before they stop.' } },
+    { label:'TIER 5 — TRICK',       sub:'1 per game max. Set it up first.',            color:'#7f1d1d', tiers:['Trick'],                      situations:{ default:'Set it up. Call it with confidence.' } },
   ];
 
-  let h = '<div class="card card-gold" style="margin-bottom:10px;">'
-    + '<div class="card-title">Play Sheet</div>'
-    + '<div class="card-sub">Priority order for calling plays. Tap any play for full detail. Active plays highlighted.</div>'
+  // Assign each active play to a tier bucket
+  const buckets = tierDefs.map(() => []);
+  activePlays.forEach(p => {
+    if(p.pass) {
+      // Passes go to Tier 4 unless Trick
+      if(p.tier === 'Trick') buckets[4].push(p);
+      else buckets[3].push(p);
+    } else if(p.tier === 'Trick') {
+      buckets[4].push(p);
+    } else if(p.tier === 'Core') {
+      buckets[0].push(p);
+    } else if(p.tier === 'Intermediate') {
+      buckets[1].push(p);
+    } else if(p.tier === 'Advanced') {
+      buckets[2].push(p);
+    } else {
+      buckets[1].push(p); // fallback
+    }
+  });
+
+  // Play number counter across all tiers
+  let playNum = 0;
+
+  let h = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">'
+    + '<div style="padding:5px 10px;background:rgba(26,58,92,.15);border-radius:7px;font-size:11px;font-weight:700;color:#1a3a5c;">'
+    + activePlays.length + ' plays active</div>'
+    + '<div style="padding:5px 10px;background:rgba(139,0,0,.1);border-radius:7px;font-size:11px;font-weight:700;color:#8b0000;">Max 4 passes</div>'
+    + '<div style="padding:5px 10px;background:rgba(26,92,42,.1);border-radius:7px;font-size:11px;font-weight:700;color:#1a5c2a;">1 trick max</div>'
+    + '<div style="padding:5px 10px;background:rgba(245,166,35,.15);border-radius:7px;font-size:11px;font-weight:700;color:var(--gold);">LBs wait for ball</div>'
     + '</div>';
 
-  // Rules bar
-  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">'
-    + '<div style="padding:6px 10px;background:rgba(26,58,92,.15);border-radius:8px;font-size:11px;font-weight:700;color:#1a3a5c;">Run first</div>'
-    + '<div style="padding:6px 10px;background:rgba(139,0,0,.1);border-radius:8px;font-size:11px;font-weight:700;color:#8b0000;">Max 4 passes</div>'
-    + '<div style="padding:6px 10px;background:rgba(26,92,42,.1);border-radius:8px;font-size:11px;font-weight:700;color:#1a5c2a;">1 trick max</div>'
-    + '<div style="padding:6px 10px;background:rgba(245,166,35,.15);border-radius:8px;font-size:11px;font-weight:700;color:var(--gold);">LBs wait for the ball</div>'
-    + '</div>';
+  if(activePlays.length === 0) {
+    h += '<div class="empty-state"><div class="es-icon">📋</div><div class="es-text">No active plays yet. Add plays from the Play Bank.</div></div>';
+    el.innerHTML = h;
+    return;
+  }
 
-  tiers.forEach(tier => {
-    h += '<div style="margin-bottom:14px;">'
-      + '<div style="padding:8px 10px;background:' + tier.color + ';border-radius:8px 8px 0 0;">'
-      + '<div style="font-size:13px;font-weight:800;color:white;letter-spacing:.5px;">' + tier.label + '</div>'
-      + '<div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:2px;">' + tier.sub + '</div>'
+  tierDefs.forEach((tier, ti) => {
+    const plays = buckets[ti];
+    if(!plays.length) return;
+
+    h += '<div style="margin-bottom:10px;">'
+      + '<div style="padding:7px 10px;background:' + tier.color + ';border-radius:8px 8px 0 0;">'
+      + '<div style="font-size:12px;font-weight:800;color:white;letter-spacing:.4px;">' + tier.label + '</div>'
+      + '<div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:1px;">' + tier.sub + '</div>'
       + '</div>'
       + '<div style="border:1px solid ' + tier.color + ';border-top:none;border-radius:0 0 8px 8px;overflow:hidden;">';
 
-    tier.plays.forEach((ps, i) => {
-      const p = bank.find(x => x.id === ps.id);
-      if(!p) return;
-      const isActive = active.includes(p.id);
-      const border = i > 0 ? 'border-top:1px solid rgba(0,0,0,.06);' : '';
+    plays.forEach((p, pi) => {
+      playNum++;
+      const border = pi > 0 ? 'border-top:1px solid rgba(0,0,0,.06);' : '';
+      // Build situation from play note or default
+      const sit = p.note ? p.note.split('.')[0] + '.' : tier.situations.default;
       h += '<div onclick="showPlayDetail(\'' + p.id + '\')" '
-        + 'style="display:flex;align-items:center;gap:10px;padding:9px 10px;'
-        + 'background:' + (isActive ? tier.bg : 'var(--navy2)') + ';'
-        + border + 'cursor:pointer;touch-action:manipulation;">'
-        + '<div style="width:22px;height:22px;border-radius:5px;background:' + tier.color + ';'
+        + 'style="display:flex;align-items:center;gap:10px;padding:8px 10px;'
+        + 'background:rgba(255,255,255,.03);' + border + 'cursor:pointer;touch-action:manipulation;">'
+        + '<div style="width:20px;height:20px;border-radius:5px;background:' + tier.color + ';'
         + 'display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
-        + '<span style="font-size:9px;font-weight:800;color:white;">' + (isActive ? '★' : '') + '</span>'
+        + '<span style="font-size:10px;font-weight:800;color:white;">' + playNum + '</span>'
         + '</div>'
         + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-size:13px;font-weight:700;color:' + (isActive ? 'var(--gold)' : 'var(--white)') + ';">' + p.n + '</div>'
-        + '<div style="font-size:10px;color:var(--g3);margin-top:1px;font-style:italic;">' + ps.situation + '</div>'
+        + '<div style="font-size:13px;font-weight:700;color:var(--gold);">' + p.n + '</div>'
+        + '<div style="font-size:10px;color:var(--g3);margin-top:1px;font-style:italic;">' + sit.substring(0,80) + '</div>'
         + '</div>'
-        + '<div style="font-size:9px;color:var(--g3);flex-shrink:0;">' + (p.pass ? 'PASS' : 'RUN') + '</div>'
+        + '<div style="font-size:9px;color:var(--g3);flex-shrink:0;">' + (p.pass?'PASS':'RUN') + '</div>'
         + '</div>';
     });
 
     h += '</div></div>';
   });
 
-  // LB rule reminder
-  h += '<div style="margin-top:4px;padding:10px 12px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.2);border-radius:8px;">'
-    + '<div style="font-size:11px;font-weight:700;color:#8b0000;margin-bottom:3px;">LB RULE — Non-negotiable</div>'
-    + '<div style="font-size:11px;color:var(--g3);">LBs do not move until the ball is handed off and the carrier is running to the line or tackle box. Wait for the ball. Watch the ball. Move when the ball moves.</div>'
+  // LB rule
+  h += '<div style="margin-top:4px;padding:9px 12px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.2);border-radius:8px;">'
+    + '<div style="font-size:11px;font-weight:700;color:#8b0000;margin-bottom:2px;">LB RULE — Non-negotiable</div>'
+    + '<div style="font-size:11px;color:var(--g3);">LBs do not move until the ball is handed off and the carrier is running to the line or tackle box. No blitzing. Watch the ball.</div>'
     + '</div>';
 
   el.innerHTML = h;
