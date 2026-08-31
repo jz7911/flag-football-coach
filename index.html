@@ -2187,7 +2187,7 @@ const WINGT_BANK = [
    note:'QB reads the coverage before the snap. Corner playing off = throw the hitch. Corner pressing = throw the out. Make the decision before the snap.',
    formation:'Twins right — out and hitch route combination'},
 
-  {id:'wt82',n:'Twins Left — QB Sweep Right',tier:'Intermediate',mis:'High',pass:false,wk:4,
+  {id:'wt82',n:'Twins Left — QB Sweep Right',tier:'Mirror',mis:'High',pass:false,wk:4,
    desc:'Mirror of Twins Right QB Sweep. Both TEs split wide left. Defense shifts left. QB sweeps right into vacated space. Snap it fast.',
    note:'Same rule — snap fast, do not give the defense time to adjust.',
    formation:'Twins left — both TEs wide left, QB sweeps right'},
@@ -2203,7 +2203,7 @@ const WINGT_BANK = [
    note:'The twins are blockers here not receivers. Outside TE seals the edge, inside TE kicks out the first defender. QB follows both blocks.',
    formation:'Twins right as blockers, QB runs right behind them'},
 
-  {id:'wt85',n:'Twins Left — QB Power Run Left',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+  {id:'wt85',n:'Twins Left — QB Power Run Left',tier:'Mirror',mis:'Med',pass:false,wk:3,
    desc:'Mirror of Twins Right QB Power Run. Both TEs wide left as blockers. QB runs left into the strength behind five blockers total.',
    note:'Same rule — outside TE seals edge, inside TE kicks out. QB follows the blocks north-south.',
    formation:'Twins left as blockers, QB runs left behind them'},
@@ -4227,7 +4227,7 @@ function renderPlayBank(el) {
 
   let h = `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
     <div>
-      <div style="font-size:12px;color:var(--g3);"><strong style="color:var(--gold);">${active.length}/16</strong> in your playbook.</div>
+      <div style="font-size:12px;color:var(--g3);"><strong style="color:var(--gold);">${active.length}/20</strong> in your playbook.</div>
       <div style="font-size:10px;color:var(--g3);margin-top:2px;">Physical. Fast. Every play has a job.</div>
     </div>
     <button onclick="_bankSelectMode=!_bankSelectMode;_bankSelected.clear();renderPbContent()"
@@ -4301,7 +4301,7 @@ function _addSelectedPlays() {
   let added = 0;
   _bankSelected.forEach(id => {
     if(!active.includes(id)) {
-      if(active.length >= 16) return;
+      if(active.length >= 20) return;
       active.push(id);
       added++;
     }
@@ -4375,7 +4375,7 @@ function togglePlayActive() {
   if(idx > -1) {
     active.splice(idx,1);
   } else {
-    if(active.length >= 16) { alert('Max 16 plays in your active playbook. Remove one first.'); return; }
+    if(active.length >= 20) { alert('Max 20 plays in your active playbook. Remove one first.'); return; }
     active.push(selectedPlay.id);
   }
   save();
@@ -5866,8 +5866,7 @@ function autoScriptCallSheet(scriptLen, mode) {
 
   let passCount = 0;
   let playNum = 0;
-  const directionalPlays = new Set(['wt1','wt5','wt7','wt8','wt10','wt26',
-    'wt35','wt51','wt53','wt57','wt59','wt66','wt68','wt70','wt71','wt75']);
+  const directionalPlays = new Set(['wt1','wt26','wt51','wt53','wt57','wt66','wt68','wt70','wt71','wt75']);
   const lastDir = {}; // last direction called per play
 
   const script = [];
