@@ -4129,12 +4129,14 @@ function renderPlaySheet(el) {
   // Play number counter across all tiers
   let playNum = 0;
 
-  let h = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">'
+  let h = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
     + '<div style="padding:5px 10px;background:rgba(26,58,92,.15);border-radius:7px;font-size:11px;font-weight:700;color:#1a3a5c;">'
     + activePlays.length + ' plays active</div>'
     + '<div style="padding:5px 10px;background:rgba(139,0,0,.1);border-radius:7px;font-size:11px;font-weight:700;color:#8b0000;">Max 4 passes</div>'
     + '<div style="padding:5px 10px;background:rgba(26,92,42,.1);border-radius:7px;font-size:11px;font-weight:700;color:#1a5c2a;">1 trick max</div>'
-    + '<div style="padding:5px 10px;background:rgba(245,166,35,.15);border-radius:7px;font-size:11px;font-weight:700;color:var(--gold);">LBs wait for ball</div>'
+    + '</div>'
+    + '<button onclick="printPlaySheet()" style="padding:7px 14px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;">🖨️ Print</button>'
     + '</div>';
 
   if(activePlays.length === 0) {
@@ -4377,7 +4379,91 @@ function renderDefense(el) {
   el.innerHTML = h;
 }
 
+function printPlaySheet() {
+  const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...(state.customPlays?.[curSystem]||[])];
+  const activeIds = state.activePlays[curSystem] || [];
+  const activePlays = bank.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror');
+
+  const tierDefs = [
+    {label:'TIER 1 — ESTABLISH', sub:'Call first, every game.', color:'#1a3a5c', bg:'#eef3fa'},
+    {label:'TIER 2 — COUNTER',   sub:'After Tier 1 reps.',      color:'#1e3a5f', bg:'#eef3fa'},
+    {label:'TIER 3 — MISDIRECTION', sub:'After they adjust.',   color:'#1a5c2a', bg:'#f0fdf4'},
+    {label:'TIER 4 — PASS',      sub:'Max 4 per game.',          color:'#1a3a6c', bg:'#eff6ff'},
+    {label:'TIER 5 — TRICK',     sub:'1 per game max.',          color:'#7f1d1d', bg:'#fef2f2'},
+  ];
+
+  const buckets = tierDefs.map(()=>[]);
+  activePlays.forEach(p => {
+    if(p.tier==='Trick') buckets[4].push(p);
+    else if(p.pass) buckets[3].push(p);
+    else if(p.tier==='Core') buckets[0].push(p);
+    else if(p.tier==='Intermediate') buckets[1].push(p);
+    else if(p.tier==='Advanced') buckets[2].push(p);
+    else buckets[1].push(p);
+  });
+
+  let playNum = 0;
+  let tiersHTML = '';
+  tierDefs.forEach((tier, ti) => {
+    const plays = buckets[ti];
+    if(!plays.length) return;
+    let playsHTML = '';
+    plays.forEach(p => {
+      playNum++;
+      const sit = p.note ? p.note.split('.')[0]+'.' : '';
+      playsHTML += `<div style="padding:4px 6px;border-bottom:1px solid #e5e7eb;display:flex;gap:6px;align-items:flex-start;">
+        <div style="min-width:16px;font-size:9px;font-weight:800;color:${tier.color};padding-top:1px;">${playNum}</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#111;line-height:1.2;">${p.n}</div>
+          ${sit?`<div style="font-size:9px;color:#666;font-style:italic;margin-top:1px;">${sit.substring(0,80)}</div>`:''}
+        </div>
+        <div style="font-size:8px;font-weight:700;color:${p.pass?'#1565c0':'#2e7d32'};white-space:nowrap;padding-top:2px;">${p.pass?'PASS':'RUN'}</div>
+      </div>`;
+    });
+    tiersHTML += `<div style="flex:1;min-width:0;border:1px solid #d1d5db;border-radius:6px;overflow:hidden;">
+      <div style="background:${tier.color};padding:5px 8px;">
+        <div style="font-size:10px;font-weight:800;color:#fff;letter-spacing:.3px;">${tier.label}</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.7);margin-top:1px;">${tier.sub}</div>
+      </div>
+      <div style="background:#fff;">${playsHTML}</div>
+    </div>`;
+  });
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Rebels Play Sheet</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'Arial Narrow',Arial,sans-serif;background:#fff;padding:6mm;}
+      @media print{@page{size:landscape;margin:6mm;}body{padding:0;}}
+    </style>
+    </head><body>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#1a3a5c;">OLE MISS REBELS — PLAY SHEET</div>
+        <div style="font-size:9px;color:#666;">Priority order · Tier 1 first · Layer up as game develops</div>
+      </div>
+      <div style="display:flex;gap:5px;">
+        <span style="padding:2px 7px;background:#f5a623;color:#0d1b2a;border-radius:4px;font-size:9px;font-weight:700;">Run first</span>
+        <span style="padding:2px 7px;background:#dc2626;color:#fff;border-radius:4px;font-size:9px;font-weight:700;">Max 4 passes</span>
+        <span style="padding:2px 7px;background:#16a34a;color:#fff;border-radius:4px;font-size:9px;font-weight:700;">1 trick max</span>
+        <span style="padding:2px 7px;background:#1e40af;color:#fff;border-radius:4px;font-size:9px;font-weight:700;">LBs wait for ball</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:6px;">${tiersHTML}</div>
+    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:5px;padding:5px 10px;display:flex;gap:8px;align-items:center;">
+      <div style="font-size:9px;font-weight:800;color:#991b1b;white-space:nowrap;">LB RULE</div>
+      <div style="font-size:9px;color:#7f1d1d;font-weight:600;">Do not move until the ball is handed off and the carrier is running to the line or tackle box. No blitzing. Watch the ball.</div>
+    </div>
+    <script>window.onload=function(){window.print();}<\/script>
+    </body></html>`;
+
+  const w = window.open('','_blank','width=1100,height=750');
+  w.document.write(html);
+  w.document.close();
+}
+
 function renderFormations(el) {
+
   el.innerHTML = `
   <div class="card">
     <div class="card-title">Wing-T base formation</div>
