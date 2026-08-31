@@ -380,6 +380,7 @@ textarea{min-height:80px;resize:none;}
     <div class="tab" onclick="pbTab('formation',this)">Formations</div>
     <div class="tab" onclick="pbTab('playlog',this)">Log</div>
     <div class="tab" onclick="pbTab('callsheet',this)">Call Sheet</div>
+    <div class="tab" onclick="pbTab('playsheet',this)">Play Sheet</div>
   </div>
   <div id="pb-content"></div>
 </div>
@@ -1718,6 +1719,42 @@ const DRILLS = [
   {id:'nd10',cat:'New Drills',name:'Push-Pull Counter — Use Their Weight',time:7,group:'DL',equip:'Partner',level:'Intermediate',
    desc:'Step 1 (demo): two kids push each other, then the defender suddenly stops and pulls. The blocker falls forward every time. Do 5 reps so they feel how little force it takes when the blocker is leaning. Step 2 (slow): DL engages with both hands, waits one beat for the push, grabs and pulls hard to one side, steps around the opposite direction simultaneously. Pull right, step left. Always opposite. Step 3 (full speed): fire out, wait for push, pull-and-step, get to the cone. 2-second standard.',
    cue:'Feel the push. Pull and step opposite. Use their weight against them.',
+   type:'sk'},
+
+  // ── Game 2 notes drills ───────────────────────────────────
+  {id:'g2d1',cat:'New Drills',name:'Read Space — Sweep Cut Drill',time:8,group:'RBs',equip:'Ball,Cones,2 defenders',level:'All',
+   desc:'Run the sweep with two defenders positioned at different spots post-snap — one at the edge, one inside. Ball carrier must cut to whichever lane is open. Coach moves defenders to different spots each rep so the carrier cannot pre-determine the cut. Forces a live read at the second level. The read happens when they clear the line — not at the snap. Cue: find the first open lane and hit it.',
+   cue:'Find the open lane. Read it at the line. Not before.',
+   type:'sk'},
+
+  {id:'g2d2',cat:'New Drills',name:'LB Patience — Wait for the Ball',time:8,group:'Defense',equip:'Ball',level:'All',
+   desc:'LBs line up. Coach holds the ball and fakes handoffs in multiple directions — sweep fake, dive fake, bootleg fake. LBs cannot move until the coach actually hands the ball to a carrier. Any LB who moves on a fake runs a sprint immediately. Do 10 reps before every team period. The rule: LBs do not move until the ball is handed off and the carrier is running toward the line or tackle box. Patience is the whole job.',
+   cue:'Wait for the ball. Watch the ball. Move when the ball moves.',
+   type:'sk'},
+
+  {id:'g2d3',cat:'New Drills',name:'Fake Commitment - Three Steps',time:6,group:'QB + RBs',equip:'Ball',level:'All',
+   desc:'Run any misdirection play. Grade each fake on one standard only: does the faking back run hard for three full steps after the fake, protecting nothing, head down like they have the ball? If yes it is a good fake. If the back slows, looks up, or protects after the fake it does not count — run it again. A fake that fools nobody is just a slow handoff. The defense reads the back body language.',
+   cue:'Run like you have it for three steps. Every time. No exceptions.',
+   type:'sk'},
+
+  {id:'g2d4',cat:'New Drills',name:'QB Mesh Timing Count',time:7,group:'QB + RBs',equip:'Ball',level:'All',
+   desc:'Install a hard count for every handoff. Snap — one — two — deliver. QB delivers on two regardless of where the back is. RB must be at the mesh point on count two or the play does not work. Run it 10 times at walk speed with the count said out loud. Then full speed. Any late delivery means the QB is waiting — not allowed. Any RB not at the mesh on two means the RB is late — run it again. The timing is fixed. Both players adapt to the count.',
+   cue:'Snap. One. Two. Deliver. Every time. No waiting.',
+   type:'sk'},
+
+  {id:'g2d5',cat:'New Drills',name:'Substitution Handoff — Sideline System',time:5,group:'Full team',equip:'Game sheet',level:'All',
+   desc:'Practice the sub system before games. Sideline coach holds the possession grid. Between possessions: sideline coach checks who is coming off, taps the outgoing kid on the shoulder, points to the replacement. Replacement is already standing ready. Run this as a drill — simulate a possession ending, sideline coach makes the sub in under 10 seconds. Subs happen between possessions only, never mid-possession. Count possessions: every time your defense gets the ball that is a new possession coming.',
+   cue:'Sideline coach: tap out, point in. Under 10 seconds. Every possession.',
+   type:'gm'},
+
+  {id:'g2d6',cat:'New Drills',name:'Shotgun Passing Platform',time:8,group:'QB + receivers',equip:'Ball,Flags',level:'Intermediate',
+   desc:'QB takes 3 shotgun snaps and throws to: flat route (1 count — immediate flip), out route (2 count — hitch once then throw), crossing route (1 count — throw before receiver clears). No defense. Pure timing and platform. The shotgun gives more time and space — QB must use it by throwing early, not by waiting longer. Run 5 reps of each route. Then add a defender. If the throw comes after the receiver stops it is too late.',
+   cue:'Flat: 1 count. Out: 2 count. Cross: 1 count. Throw before they stop.',
+   type:'sk'},
+
+  {id:'g2d7',cat:'New Drills',name:'Twins Alignment Fast Snap',time:6,group:'Full team',equip:'Ball',level:'Intermediate',
+   desc:'Set twins alignment (both TEs wide to one side). Coach emphasizes: snap it fast before the defense adjusts. Run 5 reps of twins right QB sweep left and 5 reps of twins right screen pass. The whole value of twins is the defense declares toward them. If you wait 5 seconds they reset and the advantage disappears. Snap count starts immediately after alignment. Any delay kills the play.',
+   cue:'Twins are set. Snap it. Do not wait. The advantage disappears.',
    type:'sk'}];
 
 
@@ -2117,7 +2154,84 @@ const WINGT_BANK = [
   {id:'wt75',n:'Jet Motion — QB Edge Run',tier:'Intermediate',mis:'High',pass:false,wk:4,
    desc:'RB2 goes in full-speed jet motion. QB fakes the jet handoff completely — sells it with both hands extended. RB2 runs hard like they have the ball. Every defender flows to the jet motion. QB pulls and runs the opposite edge with no one to beat. Identical look to Jet Motion Sweep — only difference is the QB keeps instead of handing off. Works best after running the actual jet sweep 2-3 times.',
    note:'The fake must be a full commitment — both hands extended, eyes on RB2. Defense must believe the handoff happened. Run the real jet sweep first.',
-   formation:'Under center or shotgun, RB2 jet motion, QB keeps backside edge'}];
+   formation:'Under center or shotgun, RB2 jet motion, QB keeps backside edge'},
+
+  // ── Shotgun and twins formation plays ────────────────────
+  {id:'wt76',n:'Shotgun QB Draw',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+   desc:'QB takes shotgun snap and drops back like a pass. OL pass blocks and lets defenders rush. QB waits for the rush to open a lane then tucks and runs upfield through the B gap. Works best after showing pass from shotgun twice — defenders commit to the rush and the lane opens behind them. Not a sneak — QB takes a drop first so they are not running through the line on a direct snap.',
+   note:'Show shotgun pass first. Then run this. The rush creates the lane. QB must wait for it to open — not run on the snap.',
+   formation:'Shotgun, QB draw through B gap'},
+
+  {id:'wt77',n:'Shotgun Sweep — QB Edge',tier:'Intermediate',mis:'High',pass:false,wk:3,
+   desc:'QB takes shotgun snap and immediately runs wide to the edge — no handoff, no fake. The snap itself is the signal. OL seals inside. QB uses speed to get outside before the defense can set. Different from the bootleg because there is no play-fake first — it is a direct QB run off the snap. Works because the defense expects a handoff from shotgun.',
+   note:'Snap and go. No hesitation. OL seals inside immediately. QB gets outside fast — if they hesitate the play dies.',
+   formation:'Shotgun, QB immediate edge run'},
+
+  {id:'wt78',n:'Shotgun QB Sweep Fake — RB Keep',tier:'Advanced',mis:'High',pass:false,wk:5,
+   desc:'QB takes shotgun snap and runs wide like a QB sweep. Defense flows to the QB. QB fakes turning the corner and hands behind to RB running the opposite direction through the vacated middle. The QB sweep fake pulls everyone outside — the handoff goes back inside where no one is home.',
+   note:'QB must sell the edge run completely — run like they are keeping it. The fake only works if the defense fully commits to the QB.',
+   formation:'Shotgun, QB sweeps wide fake, RB counter inside'},
+
+  {id:'wt79',n:'Twins Right — QB Sweep Left',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Both TEs split wide right (twins). Defense declares toward the twins side. QB takes snap and sweeps left into the vacated space. The twins alignment pulls coverage right and creates a numbers advantage left. No motion needed — the formation does the work. Run the sweep before the defense can shift.',
+   note:'Snap it fast after the twins alignment — do not give the defense time to adjust. The advantage disappears if you wait.',
+   formation:'Twins right — both TEs wide right, QB sweeps left'},
+
+  {id:'wt80',n:'Twins Right — Screen Pass Left',tier:'Intermediate',mis:'Med',pass:true,wk:4,
+   desc:'Both TEs split wide right. Defense shifts right to cover them. QB takes snap, looks right like throwing to the twins, then flips a quick screen pass left to the isolated RB or single receiver. The twins draw coverage right and the screen hits into open space left. Short throw, easy completion, big gain if the block is set.',
+   note:'QB must sell the look right. The fake throw to the twins side holds the defense. Flip it left immediately after the fake.',
+   formation:'Twins right, screen pass left to isolated back'},
+
+  {id:'wt81',n:'Twins Right — Pass to Twins',tier:'Intermediate',mis:'Low',pass:true,wk:3,
+   desc:'Both TEs split wide right. One runs a 5-yard out route, one runs a 5-yard hitch. QB reads which one gets separation and throws immediately. Simple two-option read — out or hitch. The twins alignment creates natural spacing between receivers so one is usually open. This is your easiest twins pass play.',
+   note:'QB reads the coverage before the snap. Corner playing off = throw the hitch. Corner pressing = throw the out. Make the decision before the snap.',
+   formation:'Twins right — out and hitch route combination'},
+
+  {id:'wt82',n:'Twins Left — QB Sweep Right',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Mirror of Twins Right QB Sweep. Both TEs split wide left. Defense shifts left. QB sweeps right into vacated space. Snap it fast.',
+   note:'Same rule — snap fast, do not give the defense time to adjust.',
+   formation:'Twins left — both TEs wide left, QB sweeps right'},
+
+  {id:'wt83',n:'Shotgun Twins — HB Pass',tier:'Advanced',mis:'Very High',pass:true,wk:5,
+   desc:'Shotgun with twins right. Hand off to HB on a sweep left. HB stops and throws back right to the isolated TE who released from the twins side into a crossing route. The twins draw coverage right, the sweep fake pulls everyone left, and the TE crosses back into empty space. Three layers of deception. HB must plant feet before throwing.',
+   note:'Walk this 20 times. HB plants feet completely before throwing — a moving throw from a kid does not work. TE runs hard across on the snap.',
+   formation:'Shotgun twins right, sweep fake left, HB pass back right'},
+
+  // ── More twins plays ──────────────────────────────────
+  {id:'wt84',n:'Twins Right — QB Power Run Right',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+   desc:'Both TEs split wide right as blockers. QB takes snap and runs right into the twins side — now has two extra blockers leading the way in addition to the OL. Defense has to account for five blockers on one side. A power run with numbers. Snap it fast before they can shift. QB follows the outside TE block and turns upfield.',
+   note:'The twins are blockers here not receivers. Outside TE seals the edge, inside TE kicks out the first defender. QB follows both blocks.',
+   formation:'Twins right as blockers, QB runs right behind them'},
+
+  {id:'wt85',n:'Twins Left — QB Power Run Left',tier:'Intermediate',mis:'Med',pass:false,wk:3,
+   desc:'Mirror of Twins Right QB Power Run. Both TEs wide left as blockers. QB runs left into the strength behind five blockers total.',
+   note:'Same rule — outside TE seals edge, inside TE kicks out. QB follows the blocks north-south.',
+   formation:'Twins left as blockers, QB runs left behind them'},
+
+  {id:'wt86',n:'Twins Right — RB Lead QB Follow',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Both TEs wide right as blockers. RB1 runs right first as a lead blocker — takes out the first defender past the line. QB follows immediately behind RB1 into the same lane with the twins already blocking outside. Four blockers and a lead back in front of the QB. The most physical twins run in the playbook.',
+   note:'RB1 goes first and hits the first defender in the hole. QB follows in the same lane one step behind. Tell QB: find RB1 and follow him.',
+   formation:'Twins right, RB1 lead block, QB follows'},
+
+  {id:'wt87',n:'Twins Right — Sweep Fake QB Power Right',tier:'Advanced',mis:'High',pass:false,wk:5,
+   desc:'Both TEs wide right. RB1 runs a sweep fake going left — draws the defense left. QB takes the snap, fakes to RB1 going left, then turns and runs right into the twins side where both TEs are already blocking. The sweep fake pulls everyone left. The twins side is completely undefended. QB runs into an empty right side.',
+   note:'The fake must be convincing — give RB1 the ball all the way. Then pull back and go right. Defense cannot recover in time.',
+   formation:'Twins right, sweep fake left, QB keeps right into twins'},
+
+  {id:'wt88',n:'Twins Right — Counter Into Twins',tier:'Intermediate',mis:'High',pass:false,wk:4,
+   desc:'Both TEs wide right. Fake the sweep away from the twins side to pull the defense. RB keeps the ball and runs right into the twins side where both TEs are blocking. Same concept as Counter but the twins create extra blockers at the point of attack. Defense flows away from the twins on the sweep fake and the counter hits into the numbers advantage.',
+   note:'The fake direction is opposite the twins. Twins pull coverage that way anyway. Counter into the pile of blockers on the twins side.',
+   formation:'Twins right, sweep fake left, RB counter right into twins'},
+
+  {id:'wt89',n:'Twins Right — Boot Pass Into Twins',tier:'Advanced',mis:'High',pass:true,wk:5,
+   desc:'Both TEs wide right. QB bootlegs right into the twins side. Both TEs run routes — inside TE runs a 5-yard hitch, outside TE runs an out route to the corner. Defense has to cover two receivers and contain the QB run threat all in the same area. QB reads: if the corner crashes on the QB run, throw to the outside TE. If the corner drops, throw to the inside hitch. Simple two-option read with the run as the third option.',
+   note:'QB has three options: outside TE out, inside TE hitch, or keep running. Make the decision before the snap by reading the corner.',
+   formation:'Twins right, QB boot right, both TEs run routes'},
+
+  {id:'wt90',n:'Twins Right — Fake Boot Pass Left',tier:'Advanced',mis:'Very High',pass:true,wk:6,
+   desc:'Both TEs wide right. QB fakes a bootleg right toward the twins side — defense and both corners flow right to cover. QB stops and throws back left to the isolated RB who leaked into the left flat completely alone. The twins draw all coverage right and the pass goes back left where no one is. Three layers: twins alignment draws coverage right, boot fake holds it right, pass goes left.',
+   note:'QB must sell the boot completely — run like they are keeping it before stopping to throw. The longer they sell the boot the more open the left flat becomes.',
+   formation:'Twins right, fake boot right, pass left to isolated back'}];
 
 // ════════════════════════════════════════════
 // PISTOL SPREAD PLAY BANK
@@ -3551,6 +3665,7 @@ function renderPbContent() {
   const el = document.getElementById('pb-content');
   if(curPbSub === 'callsheet') { renderCallSheet(el); return; }
   if(curPbSub === 'newplays') { renderNewPlays(el); return; }
+  if(curPbSub === 'playsheet') { renderPlaySheet(el); return; }
   if(state.division === '56') {
     renderPbContent56(el);
     return;
@@ -3919,6 +4034,8 @@ function renderNewPlays(el) {
   // Group by category
   const groups = [
     { label:'Jet Motion Series', ids:['wt47','wt48','wt49','wt50','wt75'] },
+    { label:'Shotgun Plays', ids:['wt76','wt77','wt78'] },
+    { label:'Twins Formation', ids:['wt79','wt80','wt81','wt82','wt83','wt84','wt85','wt86','wt87','wt88','wt89','wt90'] },
     { label:'Physical Run Plays', ids:['wt51','wt52','wt53','wt54','wt55','wt56','wt57','wt58'] },
     { label:'Misdirection', ids:['wt35','wt36','wt37','wt38','wt39','wt40','wt41','wt59','wt60','wt61','wt62','wt63'] },
     { label:'Reverse and Fake Reverse', ids:['wt64','wt65'] },
@@ -3968,6 +4085,132 @@ function renderNewPlays(el) {
       }
     });
   });
+
+  el.innerHTML = h;
+}
+
+
+function renderPlaySheet(el) {
+  if(!state.customPlays) state.customPlays = {};
+  const custom = state.customPlays[curSystem] || [];
+  const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...custom];
+  const active = state.activePlays[curSystem] || [];
+
+  const tiers = [
+    {
+      label:'TIER 1 — ESTABLISH',
+      sub:'Call these first, every game. Read the defense.',
+      color:'#1a3a5c', bg:'rgba(26,58,92,.12)',
+      plays:[
+        {id:'wt1', situation:'Read space. Cut upfield at the cone. Hit the open edge.'},
+        {id:'wt56', situation:'Fullback leads. Hit the B gap. Physical downhill run.'},
+        {id:'wt26', situation:'Sell the sweep fake. QB takes the edge.'},
+        {id:'wt46', situation:'Bootleg and fake the throw. Then keep running.'},
+      ]
+    },
+    {
+      label:'TIER 2 — COUNTER',
+      sub:'Call after establishing the sweep. Punish their adjustment.',
+      color:'#2a4a6c', bg:'rgba(42,74,108,.10)',
+      plays:[
+        {id:'wt3', situation:'They crashed on the sweep. Hit the B gap opposite.'},
+        {id:'wt47', situation:'Same as sweep but ball carrier has speed at the snap.'},
+        {id:'wt57', situation:'TE cracks the LB. Sweep hits the open edge.'},
+        {id:'wt76', situation:'Show pass twice first. Wait for the rush lane. Go.'},
+        {id:'wt77', situation:'Snap and go wide. No fake. Beat them with speed.'},
+        {id:'wt84', situation:'Twins as blockers. QB runs into the strength. 5 blockers.'},
+      ]
+    },
+    {
+      label:'TIER 3 — MISDIRECTION',
+      sub:'Call after they adjust. Use their read against them.',
+      color:'#1a5c2a', bg:'rgba(26,92,42,.10)',
+      plays:[
+        {id:'wt48', situation:'Full jet fake. QB keeps backside. After 2 jet sweeps.'},
+        {id:'wt64', situation:'Sweep fake right. Handoff left. After 3 sweeps right.'},
+        {id:'wt55', situation:'Both backs fake inside. QB keeps the edge.'},
+        {id:'wt45', situation:'QB holds throw fake. RB takes handoff from extended arm.'},
+        {id:'wt79', situation:'Twins pull coverage one side. QB sweeps opposite.'},
+        {id:'wt87', situation:'Sweep fake pulls them left. QB keeps right into twins.'},
+        {id:'wt49', situation:'Jet fake right. Handoff left behind. Very high misdirection.'},
+        {id:'wt65', situation:'Sweep fake + reverse fake + QB keeps the middle.'},
+      ]
+    },
+    {
+      label:'TIER 4 — PASS',
+      sub:'Max 4 per game. Set up by the run. Throw before they stop.',
+      color:'#1a3a6c', bg:'rgba(26,58,108,.10)',
+      plays:[
+        {id:'wt66', situation:'Immediate flip. RB leaks flat. Gone in 1 count.'},
+        {id:'wt68', situation:'5 yards, break outside. Throw to the spot not the player.'},
+        {id:'wt73', situation:'Sweep fake. Boot opposite. RB wide open in the flat.'},
+        {id:'wt80', situation:'Twins draw coverage right. Screen left into open space.'},
+        {id:'wt42', situation:'Hand off on sweep. HB plants feet and throws to crossing TE.'},
+        {id:'wt89', situation:'Boot right into twins. Both TEs run routes. Read corner or keep.'},
+      ]
+    },
+    {
+      label:'TIER 5 — TRICK',
+      sub:'1 per game maximum. Set it up first. Call it with confidence.',
+      color:'#8b0000', bg:'rgba(139,0,0,.08)',
+      plays:[
+        {id:'wt43', situation:'Run sweep twice first. Hand off, pitch back, throw deep.'},
+        {id:'wt83', situation:'Sweep fake, HB throws back to crossing TE. Walk it 20 times.'},
+        {id:'wt90', situation:'Fake boot right, all coverage flows right. Pass left to open back.'},
+      ]
+    },
+  ];
+
+  let h = '<div class="card card-gold" style="margin-bottom:10px;">'
+    + '<div class="card-title">Play Sheet</div>'
+    + '<div class="card-sub">Priority order for calling plays. Tap any play for full detail. Active plays highlighted.</div>'
+    + '</div>';
+
+  // Rules bar
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">'
+    + '<div style="padding:6px 10px;background:rgba(26,58,92,.15);border-radius:8px;font-size:11px;font-weight:700;color:#1a3a5c;">Run first</div>'
+    + '<div style="padding:6px 10px;background:rgba(139,0,0,.1);border-radius:8px;font-size:11px;font-weight:700;color:#8b0000;">Max 4 passes</div>'
+    + '<div style="padding:6px 10px;background:rgba(26,92,42,.1);border-radius:8px;font-size:11px;font-weight:700;color:#1a5c2a;">1 trick max</div>'
+    + '<div style="padding:6px 10px;background:rgba(245,166,35,.15);border-radius:8px;font-size:11px;font-weight:700;color:var(--gold);">LBs wait for the ball</div>'
+    + '</div>';
+
+  tiers.forEach(tier => {
+    h += '<div style="margin-bottom:14px;">'
+      + '<div style="padding:8px 10px;background:' + tier.color + ';border-radius:8px 8px 0 0;">'
+      + '<div style="font-size:13px;font-weight:800;color:white;letter-spacing:.5px;">' + tier.label + '</div>'
+      + '<div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:2px;">' + tier.sub + '</div>'
+      + '</div>'
+      + '<div style="border:1px solid ' + tier.color + ';border-top:none;border-radius:0 0 8px 8px;overflow:hidden;">';
+
+    tier.plays.forEach((ps, i) => {
+      const p = bank.find(x => x.id === ps.id);
+      if(!p) return;
+      const isActive = active.includes(p.id);
+      const border = i > 0 ? 'border-top:1px solid rgba(0,0,0,.06);' : '';
+      h += '<div onclick="showPlayDetail(\'' + p.id + '\')" '
+        + 'style="display:flex;align-items:center;gap:10px;padding:9px 10px;'
+        + 'background:' + (isActive ? tier.bg : 'var(--navy2)') + ';'
+        + border + 'cursor:pointer;touch-action:manipulation;">'
+        + '<div style="width:22px;height:22px;border-radius:5px;background:' + tier.color + ';'
+        + 'display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+        + '<span style="font-size:9px;font-weight:800;color:white;">' + (isActive ? '★' : '') + '</span>'
+        + '</div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-size:13px;font-weight:700;color:' + (isActive ? 'var(--gold)' : 'var(--white)') + ';">' + p.n + '</div>'
+        + '<div style="font-size:10px;color:var(--g3);margin-top:1px;font-style:italic;">' + ps.situation + '</div>'
+        + '</div>'
+        + '<div style="font-size:9px;color:var(--g3);flex-shrink:0;">' + (p.pass ? 'PASS' : 'RUN') + '</div>'
+        + '</div>';
+    });
+
+    h += '</div></div>';
+  });
+
+  // LB rule reminder
+  h += '<div style="margin-top:4px;padding:10px 12px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.2);border-radius:8px;">'
+    + '<div style="font-size:11px;font-weight:700;color:#8b0000;margin-bottom:3px;">LB RULE — Non-negotiable</div>'
+    + '<div style="font-size:11px;color:var(--g3);">LBs do not move until the ball is handed off and the carrier is running to the line or tackle box. Wait for the ball. Watch the ball. Move when the ball moves.</div>'
+    + '</div>';
 
   el.innerHTML = h;
 }
