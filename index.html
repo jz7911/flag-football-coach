@@ -1786,7 +1786,38 @@ const DRILLS = [
   {id:'g3d6',cat:'New Drills',name:'Blocking Hold — 4 Second Standard',time:7,group:'OL vs DL',equip:'None',level:'Intermediate',
    desc:'1v1. Blocker must hold the block for 4 full seconds while the defender goes full intensity trying to shed — swim move, push-pull, spin. Coach counts out loud. Blocker holds 4 seconds = blocker wins. Defender sheds in under 3 = defender wins. Keep score. The 4-second standard is game-realistic — most plays develop in 3-4 seconds. Short steps, re-establish on every shed attempt. Never stop driving the feet.',
    cue:'Short steps. Re-establish. Four seconds. Drive through every shed.',
-   type:'sk'}];
+   type:'sk'},
+
+  // ── Route running and QB drills ──────────────────────────────────────
+  {id:'rr1',cat:'New Drills',name:'Route Break — Plant and Cut',time:8,group:'Receivers',equip:'Cones',level:'All',
+   desc:'Receiver runs hard for 3 yards — no counting steps, just run hard — then plants the outside foot and cuts sharply. The break happens when the foot hits the ground, not after. If they round it off, run it again. Eyes stay forward until the foot plants, then snap the head around immediately. The QB should already be throwing as they turn. Run flat routes and out routes. 8 reps each side.',
+   cue:'Run hard. Plant it. Snap your head. Hands up.',type:'sk'},
+
+  {id:'rr2',cat:'New Drills',name:'Look-Back Timing — Eyes Forward Until the Break',time:7,group:'Receivers',equip:'None',level:'All',
+   desc:'Most kids look back too early — it kills speed and tips the route. Run without the ball first. Coach taps them on the shoulder at the break point — that is when they look. Not before. 5 reps without ball, then 5 with a QB. The throw should already be in the air when they turn. If they turn and wait for the ball, the QB is late.',
+   cue:'Eyes forward. Plant. Then look. The ball should already be coming.',type:'sk'},
+
+  {id:'rr3',cat:'New Drills',name:'Flat Route — One Step and Throw',time:8,group:'QB + Receivers',equip:'Ball',level:'All',
+   desc:'The flat route is the most completable pass at this age. Receiver runs 3 yards to the sideline and turns. QB catches the snap, takes ONE step toward the target, and throws before the receiver finishes the break. Do not wait for them to be open — throw on time. 10 reps. If completion rate is low, the QB is holding it too long.',
+   cue:'One step. Throw. Don\'t wait for open — throw on time.',type:'sk'},
+
+  {id:'rr4',cat:'New Drills',name:'Go Route — Trust the Throw',time:7,group:'QB + Receivers',equip:'Ball',level:'Intermediate',
+   desc:'Receiver runs straight. Do NOT look back before 8 yards. At 8 yards look over the inside shoulder. QB throws in front of the receiver at 6 yards — before they look back. Receiver runs to the ball. Most common mistake: QB waits too long and throws behind. 6 reps.',
+   cue:'Run straight. Don\'t look back until 8. QB throws at 6.',type:'sk'},
+
+  {id:'rr5',cat:'New Drills',name:'One-Read Decision — Flat or Keep',time:10,group:'QB + Full offense',equip:'Ball,Flags',level:'Intermediate',
+   desc:'The only read a QB needs at this age. One receiver runs the flat. One defender covers him. QB reads: flat open — throw immediately on count two. Flat covered — QB keeps and runs. 10 reps alternating covered and open. QB must decide by count two. No hesitation. Do not add a second read until this is automatic.',
+   cue:'Count one-two. Flat open — throw. Flat covered — run. No hesitation.',type:'sk'},
+
+  {id:'rr6',cat:'New Drills',name:'QB Footwork — Step Into Every Throw',time:7,group:'QB',equip:'Ball',level:'All',
+   desc:'Most kids throw off the back foot because they are scared of getting their flag pulled. No defense, no rush. Catch the snap, step the front foot toward the target, point the toe at the receiver, throw. 10 reps without a receiver — just footwork and release. Then add a receiver. Front foot must point at the target on release or run it again.',
+   cue:'Step toward the target. Point your toe. Throw. Every rep.',type:'sk'},
+
+  {id:'rr7',cat:'New Drills',name:'Two-Count Clock — Snap to Throw',time:8,group:'QB + Receivers',equip:'Ball',level:'Intermediate',
+   desc:'QB has two counts from snap to throw. Coach counts out loud: ONE — TWO — THROW. If the ball is not in the air by two, it is a penalty in this drill. QB picks his target before the snap and throws on the two count. 10 reps. Once the two-count is locked in, add a second receiver so he has to choose — but only after the count is automatic.',
+   cue:'One. Two. Throw. The ball must be gone by two.',type:'sk'}
+
+];
 
 
 // ════════════════════════════════════════════
@@ -2442,7 +2473,8 @@ const TIPS = [
 // PRACTICE PLANS DATA
 // ════════════════════════════════════════════
 const SNAP_BLOCK = {t:'sk',min:'15-22',name:'Daily snap and skill reps',desc:'5 under-center snaps (C and QB, cue: low hips fire the ball). 5 shotgun snaps. 10 partner passes (thumbs-in/out cue). 5 fake handoff reps — both players commit fully. Same every practice. Motor memory through repetition.'};
-const WU_BLOCK = {t:'wu',min:'0–15',name:'Daily warm-up — physical and fast',desc:'5 under-center snaps · 5 shotgun snaps · QB-to-RB exchange x5 slow then x5 full speed · Fake handoff x5 both players commit fully · 10 partner passes · Drive block 1v1 x5 each (fire low, drive 2 yards, hold) · 1v1 flag pull x5 each (attack the hip, full speed) · Every Man flag pull 2 min full speed. Same order every practice. Never skip. Start fast, finish faster.',cue:'Physical. Fast. Every rep. This is who the Rebels are.'};
+const WU_BLOCK = {t:'wu',min:'0–15',name:'Daily warm-up routine',desc:'Groups of 3 — 5 under-center snaps and handoffs · 5 shotgun snaps and handoffs · C goes to QB, QB goes to RB, RB goes to C · 5 pitches each · 10 partner passes · Partner blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Physical. Fast. Every rep. This is who the Rebels are.'};
+
 const SM_BLOCK = {t:'gm',min:'63–75',name:'Sharks & Minnows — end every practice here',desc:'Every practice ends with Sharks & Minnows. Minnows cross end zone to end zone without flag pulled. Sharks start in the middle. Pulled minnows become sharks. Last minnow standing wins. This is the reward for a hard practice — end on a high every time.'};
 
 // USA Football FDM character themes (rotate through the season)
