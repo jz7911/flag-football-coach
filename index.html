@@ -1755,6 +1755,37 @@ const DRILLS = [
   {id:'g2d7',cat:'New Drills',name:'Twins Alignment Fast Snap',time:6,group:'Full team',equip:'Ball',level:'Intermediate',
    desc:'Set twins alignment (both TEs wide to one side). Coach emphasizes: snap it fast before the defense adjusts. Run 5 reps of twins right QB sweep left and 5 reps of twins right screen pass. The whole value of twins is the defense declares toward them. If you wait 5 seconds they reset and the advantage disappears. Snap count starts immediately after alignment. Any delay kills the play.',
    cue:'Twins are set. Snap it. Do not wait. The advantage disappears.',
+   type:'sk'},
+
+  // ── Game 3 notes drills ──────────────────────────────────
+  {id:'g3d1',cat:'New Drills',name:'Handoff Mesh — Secure the Exchange',time:7,group:'QB + RBs',equip:'Ball',level:'All',
+   desc:'10 reps QB and RB at the exchange point only — no blocking, no defense. QB counts one-two-deliver. RB runs through the mesh and squeezes immediately — two hands, clamp, tuck. Any soft hands stops the rep. Coach watches for the belly pocket: QB should hand it into the pocket not extend it out to the hand. The most common fumble in flag football at this age is a sloppy mesh. Fix it in isolation before adding any other elements.',
+   cue:'Wait for the belly. Two hands. Squeeze and tuck. Every time.',
+   type:'sk'},
+
+  {id:'g3d2',cat:'New Drills',name:'Ball Security Gauntlet',time:7,group:'RBs',equip:'Ball,Flags',level:'All',
+   desc:'Ball carrier runs through 3-5 defenders spaced over 10 yards. Each defender swipes hard at the ball — not a flag pull, a ball-swipe. Carrier must keep two hands on the ball through the entire gauntlet. Any fumble or near-fumble = run it again. Do not go around the defenders — run through them. This is the most game-realistic ball security drill you can run. Carrier who makes it cleanest wins.',
+   cue:'Squeeze like it is the most important thing you own. Two hands all the way through.',
+   type:'sk'},
+
+  {id:'g3d3',cat:'New Drills',name:'LB Read Walk-Through',time:8,group:'Defense',equip:'Ball',level:'All',
+   desc:'LBs line up. Coach holds ball and runs play action in multiple directions — sweep fake left, dive fake, bootleg fake right. LBs must CALL the play direction before moving. Right call = move. Wrong call = freeze, watch the play develop, reset. 10 reps. No live contact — this is pure read training. The read instinct has to be built before adding speed. After 10 walk-through reps add a ball carrier at half speed. Cue: call it before you move.',
+   cue:'Call it before you move. Watch the ball. The ball never lies.',
+   type:'sk'},
+
+  {id:'g3d4',cat:'New Drills',name:'LB Live Read — Sweep Counter Bootleg',time:10,group:'Defense',equip:'Ball,Flags',level:'Intermediate',
+   desc:'Run sweep, counter, and bootleg alternating randomly so LBs cannot predict. Near LB attacks the line at the point of attack. Far LB pursues at an angle to where the ball is going. Backside CB stays home. Grade every read out loud — right call gets named, wrong call gets frozen and corrected on the spot. Coach calls the play AFTER the snap not before. The LBs have to read it live. This is the highest-level defensive drill in the bank.',
+   cue:'Near LB attacks. Far LB angles. Backside CB stays home. Watch the ball.',
+   type:'sk'},
+
+  {id:'g3d5',cat:'New Drills',name:'Pro Set Introduction',time:8,group:'Full team',equip:'Ball,Cones',level:'Intermediate',
+   desc:'One back tight behind QB, one back split wide. Walk through 3 plays from this look: (1) sweep with split back blocking the edge, (2) counter with split back as a decoy, (3) flat pass to the split back immediately on the snap. 5 reps each at walk speed then full speed. The split back creates a conflict for the defense — if they cover him wide the run is open inside. If they ignore him the flat pass is a free completion. Coach points out the conflict before every rep.',
+   cue:'Split back creates the problem. Read what the defense gives you.',
+   type:'sk'},
+
+  {id:'g3d6',cat:'New Drills',name:'Blocking Hold — 4 Second Standard',time:7,group:'OL vs DL',equip:'None',level:'Intermediate',
+   desc:'1v1. Blocker must hold the block for 4 full seconds while the defender goes full intensity trying to shed — swim move, push-pull, spin. Coach counts out loud. Blocker holds 4 seconds = blocker wins. Defender sheds in under 3 = defender wins. Keep score. The 4-second standard is game-realistic — most plays develop in 3-4 seconds. Short steps, re-establish on every shed attempt. Never stop driving the feet.',
+   cue:'Short steps. Re-establish. Four seconds. Drive through every shed.',
    type:'sk'}];
 
 
@@ -2884,18 +2915,47 @@ const PRACTICE_PLANS = [
      cue:'Physical. Fast. Cut upfield. Own the middle. Never stop. Rebels.'},
     SM_BLOCK]}
 ]},
-{w:7,phase:'Development',theme:'75-min format begins: skill sharp scrimmage heavier',prac:[
-  {lbl:'7A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
-    {t:'sk',min:'18-32',name:'Skill stations: flag pull / OL seal / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
-    {t:'sk',min:'32-45',name:'Skill stations: jukes and agility',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Stop and go. Sprint to cone stop on two feet in athletic stance then sprint again. Teaches deceleration and re-acceleration. Cue: stop with balance knees bent weight forward.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.']},
-    {t:'tm',min:'45-65',name:'Scrimmage: 3 possessions each',desc:'Three full possessions per team. Real clock real snap count. Offense must score or get first down each possession. Defense celebrate stops. Track the score.'},
+{w:7,phase:'Execution',theme:'Game 3 fixes — handoffs, blocking, pro set, LB reads',prac:[
+  {lbl:'7A',blocks:[WU_BLOCK,
+    {t:'sk',min:'15-32',name:'Skill stations: Handoff mesh / Drive block with resist / LB read walk-through',
+     desc:'3 stations, 5 min each. Every rep has a standard. No walking through.',
+     stations:[
+       'S1 YOU: Handoff Mesh — 10 reps QB + RB at exchange point. No blocking, no defense. QB counts one-two-deliver. RB runs through the mesh and squeezes immediately — two hands, clamp, tuck. Any soft hands = run it again. Coach watches for the belly pocket not the hand extension. Cue: wait for the belly, hand it in, not out.',
+       'S2 ASST 1: Drive Block with Active Resist. Blocker fires out, defender sheds after 1 second. Blocker must re-establish and drive feet through contact. Stops at first contact = run it again. Blocker holds 3 seconds = blocker wins. Under 2 = defender wins. Short steps. Drive through.',
+       'S3 ASST 2: LB Read Walk-Through. LBs line up. Coach holds ball and runs play action in multiple directions — sweep fake, dive fake, bootleg fake. LBs must call the play (run or pass, which direction) before moving. Right call = move. Wrong call = freeze and reset. 10 reps. Builds read instinct before adding speed.'
+     ]},
+    {t:'sk',min:'32-45',name:'Skill stations: Pro set intro / Securing the ball / Angle flag pull',
+     desc:'3 stations, 5 min each.',
+     stations:[
+       'S1 YOU: Pro Set Introduction. One back tight behind QB, one back split wide. Run your sweep and counter from this look. Coach shows how the split back creates a flat route option automatically. Walk through 3 plays from pro set: sweep with split back blocking edge, counter with split back as decoy, flat pass to split back. 5 reps each.',
+       'S2 ASST 1: Securing the Ball — ball carrier runs through a 3-defender gauntlet 10 yards long. Each defender swipes at the ball. Carrier must keep two hands on it through the gauntlet. Any fumble = run it again. Cue: squeeze like it is the most important thing you own.',
+       'S3 ASST 2: Angle Flag Pull. Carrier runs diagonally. Defender cuts the angle and pulls from the side. Run to where they are going not where they are. 8 reps each side. Full speed on both sides.'
+     ]},
+    {t:'tm',min:'45-65',name:'Team period — pro set and handoff standard',
+     desc:'Run your base plays from both double wing AND pro set. Every handoff graded: coach calls out any soft exchange immediately. Stop the rep and re-run the mesh if the handoff is sloppy. LBs called out by name if they blitz or move before the handoff. Name every physical block. Huddle clock every rep.',
+     cue:'Secure the ball. Drive through the block. Read before you move.'},
     SM_BLOCK]},
-  {lbl:'7B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
-    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / drive block / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: Drive block 1v1. OL fires low drives partner 2 yards. DL fires low engages pad-to-pad then spins or swims to get free. Both sides rep. Cue: touch first then go.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
-    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / vision cones / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide then Roll and Call. QB says Keep or Throw out loud every rep.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
-    {t:'tm',min:'45-65',name:'Scrimmage: call sheet plays only',desc:'Run only plays from your call sheet. No off-script calls. Coach grades execution on each play. Every player carries. Keep score.'},
+  {lbl:'7B',blocks:[WU_BLOCK,
+    {t:'sk',min:'15-32',name:'Skill stations: Handoff championship / LB live read / Blocking hold drill',
+     desc:'3 stations, 5 min each. Standards go up this week.',
+     stations:[
+       'S1 YOU: Handoff Championship. Best exchange of the week — coach grades every single rep. QB and RB graded separately: QB on pocket placement, RB on squeeze and tuck. Perfect rep = team word. 3 perfect reps in a row = winner. If nobody hits 3 in a row the best rep still wins. Post the standard.',
+       'S2 ASST 1: LB Live Read — add a ball carrier. LBs read the play, call it, then react. Near LB attacks the line at the point of attack. Far LB pursues at an angle. Backside CB stays home. Run sweep, counter, and bootleg alternating so they cannot predict. Grade every read. Wrong read = freeze, watch the play develop, then reset.',
+       'S3 ASST 2: Blocking Hold — 1v1, blocker must hold the block for 4 seconds while defender goes full intensity trying to shed. Short steps, re-establish on every shed attempt. Timer runs out loud. Coach scores: blocker holds 4 = blocker wins. Under 3 = defender wins. Competitive, scored, intense.'
+     ]},
+    {t:'sk',min:'32-45',name:'Skill stations: Pro set scrimmage / Ball security gauntlet championship / 4v4 passing',
+     desc:'3 stations, 5 min each.',
+     stations:[
+       'S1 YOU: Pro Set Scrimmage. Full snap from pro set alignment. Run the sweep, counter, and flat pass. Defense must adjust to the wider look. Coach grades: did the split back create a problem for the defense? If defense ignores the split back, throw the flat immediately.',
+       'S2 ASST 1: Ball Security Gauntlet Championship. Best run of the week — carrier goes through 5 defenders all swiping at the ball. Two hands through the whole gauntlet. Any fumble does not count. Best clean run wins.',
+       'S3 ASST 2: 4v4 Passing with LB coverage. Offense runs flat route and out route. Defense: LBs drop on pass read, CBs cover receivers. LBs must read the QB shoulders and drop before the throw comes. First to 5 completions or 5 stops wins.'
+     ]},
+    {t:'tm',min:'45-65',name:'Full scrimmage — game 3 standard raised',
+     desc:'Pro set mixed in every 3rd play. Every handoff at game speed — coach stops play immediately on any soft exchange. LBs rotated through every possession — no kid stays at CB all scrimmage. Name the best block, best handoff, and best flag pull of every possession. Huddle clock every rep.',
+     cue:'Secure it. Drive through it. Read it. This is the Rebels standard.'},
     SM_BLOCK]}
 ]},
+
 {w:8,phase:'Development',theme:'Expand the playbook: pistol package or pass game emphasis',prac:[
   {lbl:'8A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
     {t:'sk',min:'18-32',name:'Skill stations: 2v2 pull / stalk block / flat route',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 2v2 flag pull. One blocker one carrier vs two defenders. Blocker screens, carrier scores. Cue: blocker gets body between defender and ball.','S2 ASST 1: Stalk block 1v1. WR or wing screens DB for 3 full seconds. Wide base hands behind back body between defender and cone. DB scores for getting past. Cue: position wins.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
@@ -6964,7 +7024,7 @@ function activeRosterNames() {
 }
 
 function assignDef(players) {
-  const positions = ['MLB L','MLB R','DL1','DL2','DL3','DL4','CB L','CB R'];
+  const positions = ['MLB','CB','CB','DL','DL','DE','DE','DL'];
   const assigned = {}, taken = new Set();
   // First pass: top preference
   players.forEach(name => {
