@@ -588,7 +588,7 @@ let flashIdx = 0;
 let flashShowAnswer = false;
 
 try {
-  const saved = localStorage.getItem('flagcoach_v4');
+  const saved = localStorage.getItem('flagcoach_v5');
   if(saved) {
     const parsed = JSON.parse(saved);
     state = {...state, ...parsed};
@@ -603,7 +603,7 @@ try {
 } catch(e){}
 
 function save() {
-  try { localStorage.setItem('flagcoach_v4', JSON.stringify(state)); } catch(e){}
+  try { localStorage.setItem('flagcoach_v5', JSON.stringify(state)); } catch(e){}
   const is56 = state.division === '56';
   const roster = is56 ? state.roster56 : state.roster;
   const games  = is56 ? state.games56  : state.games;
