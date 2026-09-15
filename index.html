@@ -576,7 +576,8 @@ let state = {
   scouting:[],
   ratingHistory:[],
   callSheet:{78:[],56:[]},
-  planOverrides:{}  // ordered list of play IDs for game call sheet
+  planOverrides:{},
+  customDrills:[] // custom drills added by coach
 };
 let selectedDrill = null;
 let selectedPlay = null;
@@ -588,7 +589,7 @@ let flashIdx = 0;
 let flashShowAnswer = false;
 
 try {
-  const saved = localStorage.getItem('flagcoach_v5');
+  const saved = localStorage.getItem('flagcoach_v4');
   if(saved) {
     const parsed = JSON.parse(saved);
     state = {...state, ...parsed};
@@ -603,7 +604,7 @@ try {
 } catch(e){}
 
 function save() {
-  try { localStorage.setItem('flagcoach_v5', JSON.stringify(state)); } catch(e){}
+  try { localStorage.setItem('flagcoach_v4', JSON.stringify(state)); } catch(e){}
   const is56 = state.division === '56';
   const roster = is56 ? state.roster56 : state.roster;
   const games  = is56 ? state.games56  : state.games;
@@ -3279,7 +3280,8 @@ function _selectDrillInPicker(id){
 }
 
 function _openDrillPicker(){
-  var cats=['All'].concat([...new Set(DRILLS.concat(state.customDrills||[]).map(function(d){return d.cat;}))]);
+  var allCats=[...new Set(DRILLS.concat(state.customDrills||[]).map(function(d){return d.cat;}))];
+  var cats=['All'].concat(['Custom'].filter(c=>allCats.includes(c))).concat(allCats.filter(c=>c!=='Custom'));
   var allDrills=DRILLS.concat(state.customDrills||[]);
   var filtered=allDrills.filter(function(d){
     if(_addDrillCat!=='All'&&d.cat!==_addDrillCat) return false;
@@ -3385,7 +3387,7 @@ function openAddCustomDrill(){
     +'<input id="cd-name" placeholder="e.g. 2v1 Flag Pull" style="width:100%;margin-top:4px;"></div>'
     +'<div style="display:flex;gap:8px;">'
     +'<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Category</label>'
-    +'<input id="cd-cat" placeholder="e.g. Flag Pulling" style="width:100%;margin-top:4px;"></div>'
+    +'<input id="cd-cat" placeholder="Custom" value="Custom" style="width:100%;margin-top:4px;"></div>'
     +'<div style="flex:1"><label style="font-size:11px;color:var(--g3);font-weight:600;">Time (min)</label>'
     +'<input id="cd-time" type="number" value="8" style="width:100%;margin-top:4px;"></div>'
     +'</div>'
@@ -3629,12 +3631,17 @@ function removePlanBlock(i) { state.customPractice.splice(i,1); save(); renderPr
 function clearPlan() { if(confirm('Clear the custom plan?')) { state.customPractice=[]; save(); renderPracContent(); } }
 
 function renderDrillBank(el) {
-  const cats = ['All',...new Set(DRILLS.map(d=>d.cat))];
-  const filtered = curDrillCat==='All' ? DRILLS : DRILLS.filter(d=>d.cat===curDrillCat);
+  const customDrills = (state.customDrills||[]).map(d=>({...d,custom:true,cat:'Custom'}));
+  const allDrillsBank = [...DRILLS, ...customDrills];
+  const cats = ['All',...new Set(allDrillsBank.map(d=>d.cat))];
+  const filtered = curDrillCat==='All' ? allDrillsBank : allDrillsBank.filter(d=>d.cat===curDrillCat);
   let h = `<div class="tab-row" style="margin-bottom:10px;">
     ${cats.map(c=>`<div class="tab ${c===curDrillCat?'active':''}" onclick="setDrillCat('${c}')">${c}</div>`).join('')}
   </div>
-  <div style="font-size:12px;color:var(--g3);margin-bottom:10px;">Tap a drill to view details and add to your practice plan.</div>`;
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-size:12px;color:var(--g3);">Tap a drill to view details and add to your practice plan.</div>
+    <button onclick="showAddDrillModal()" style="padding:6px 12px;background:var(--gold);color:var(--navy);border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">+ Custom Drill</button>
+  </div>`;
   filtered.forEach(d => {
     h += `<div class="drill-card" onclick="showDrillDetail('${d.id}')">
       <div class="dc-header">
@@ -3659,7 +3666,8 @@ function showDrillDetail(id) {
   // Restore add-to-plan button (may have been hidden by activity view)
   const addBtn = document.querySelector('#modal-drill-detail .btn-gold');
   if(addBtn) addBtn.style.display = '';
-  selectedDrill = DRILLS.find(d=>d.id===id);
+  const allDrillsForDetail = [...DRILLS, ...(state.customDrills||[]).map(d=>({...d,custom:true,cat:'Custom'}))];
+  selectedDrill = allDrillsForDetail.find(d=>d.id===id);
   if(!selectedDrill) return;
   const tc = {wu:'b-green',sk:'b-blue',tm:'b-amber',gm:'b-red'};
   const tl = {wu:'Warm-up',sk:'Skill work',tm:'Team period',gm:'Game'};
