@@ -6802,80 +6802,97 @@ function showSnapGuide() {
 // ════════════════════════════════════════════
 function printPracticePlan() {
   try {
-  const plans = getActivePracticePlans();
-  const wk = plans.find(p=>p.w===curPracWeek);
-  if(!wk) return;
-  const charTheme = CHARACTER_THEMES[(curPracWeek-1) % CHARACTER_THEMES.length];
-  const divLabel = state.division==='56' ? '5/6 Division' : '7/8 Division';
-  const theme = wk.theme || wk.phase || ('Week ' + wk.w);
-  const tl = {wu:'WARM-UP',sk:'SKILL WORK',tm:'TEAM',gm:'GAME/SCRIMMAGE'};
-  const tc = {wu:'#16a34a',sk:'#2563eb',tm:'#9333ea',gm:'#dc2626'};
+    const plans = getActivePracticePlans();
+    const wk = plans.find(p => p.w === curPracWeek);
+    if (!wk) return;
 
-  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Practice Plan Week ${wk.w}</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:Arial,sans-serif;color:#000;background:#fff;padding:20px;font-size:12px;}
-    .header{border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:16px;}
-    .header h1{font-size:20px;font-weight:800;}
-    .header .sub{font-size:13px;color:#444;margin-top:3px;}
-    .theme-box{background:#f5f5f5;border-left:4px solid #333;padding:8px 10px;margin-bottom:14px;font-size:11px;}
-    .practice{margin-bottom:20px;page-break-inside:avoid;}
-    .practice-hdr{background:#222;color:#fff;padding:6px 10px;font-size:13px;font-weight:700;margin-bottom:8px;}
-    .block{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #eee;align-items:flex-start;}
-    .block-type{min-width:80px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;text-align:center;margin-top:2px;}
-    .block-time{min-width:60px;font-size:10px;color:#666;margin-top:4px;}
-    .block-content{flex:1;}
-    .block-name{font-size:12px;font-weight:700;margin-bottom:2px;}
-    .block-desc{font-size:11px;color:#333;line-height:1.5;}
-    .footer{margin-top:20px;padding-top:10px;border-top:1px solid #ccc;font-size:10px;color:#666;text-align:center;}
-    @media print{body{padding:10px;}@page{margin:15mm;}}
-  </style></head>
-  <body onload="window.print()">
-  <div class="header">
-    <h1>Practice Plan — Week ${wk.w}: ${theme}</h1>
-    <div class="sub">${divLabel} · ${new Date().toLocaleDateString()} · Buffalo Grove Park District Flag Football</div>
-  </div>
-  <div class="theme-box">
-    <strong>Character Theme: ${charTheme.theme}</strong> — ${charTheme.tip}
-  </div>`;
+    const divLabel = state.division === '56' ? '5/6' : '7/8';
+    const tl = { wu: 'WARM-UP', sk: 'SKILL WORK', tm: 'TEAM', gm: 'GAME/SCRIMMAGE' };
+    const tc = { wu: '#16a34a', sk: '#2563eb', tm: '#9333ea', gm: '#dc2626' };
 
-  wk.prac.forEach(pr => {
-    html += `<div class="practice"><div class="practice-hdr">Practice ${pr.lbl}</div>`;
-    getPracBlocks(wk, pr).filter(Boolean).forEach(b => {
-      const color = tc[b.t] || '#666';
-      const btype = tl[b.t] || (b.t ? String(b.t).toUpperCase() : 'BLOCK');
-      const bmin = b.min || b.time || '';
-      const bname = b.name || '(unnamed)';
-      const bdesc = b.desc || '';
-      html += '<div class="block">'
-        + '<div class="block-type" style="background:'+color+';color:#fff;">'+btype+'</div>'
-        + '<div class="block-time">'+bmin+' min</div>'
-        + '<div class="block-content">'
-        + '<div class="block-name">'+bname+'</div>';
-      if(b.stations && b.stations.length) {
-        const sc=['#d97706','#16a34a','#2563eb'];
-        const sl=['S1 — YOU','S2 — ASST 1','S3 — ASST 2'];
-        b.stations.forEach(function(s,i){
-          html += '<div style="margin-top:5px;padding:4px 6px;border-left:3px solid '+(sc[i]||'#666')+';background:#f9f9f9;">'
-            + '<div style="font-size:10px;font-weight:700;color:'+(sc[i]||'#666')+'">'+(sl[i]||'S'+(i+1))+'</div>'
-            + '<div class="block-desc">'+(s||'')+'</div></div>';
-        });
-      } else {
-        html += '<div class="block-desc">'+bdesc+'</div>';
-      }
-      html += '</div></div>';
-    });
+    // Build CSS string
+    let css = '<style>';
+    css += '* { box-sizing: border-box; margin: 0; padding: 0; }';
+    css += 'body { font-family: Arial, sans-serif; color: #000; background: #fff; padding: 16px 20px; font-size: 12px; }';
+    css += '.header { background: #14213B; color: #fff; padding: 10px 14px; margin-bottom: 0; }';
+    css += '.h1 { font-size: 18px; font-weight: 800; letter-spacing: .5px; }';
+    css += '.sub { font-size: 11px; color: #ccd; margin-top: 3px; }';
+    css += '.sec-hdr { background: #CE1126; color: #fff; font-size: 11px; font-weight: 700; padding: 5px 10px; text-transform: uppercase; margin-top: 14px; margin-bottom: 0; }';
+    css += 'table { width: 100%; border-collapse: collapse; font-size: 11px; }';
+    css += 'th { background: #14213B; color: #fff; padding: 6px 8px; text-align: left; }';
+    css += 'td { padding: 6px 8px; border-bottom: 1px solid #ddd; vertical-align: top; }';
+    css += 'tr:nth-child(even) td { background: #f4f4f4; }';
+    css += '.btype { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; color: #fff; margin-bottom: 2px; }';
+    css += '.station { margin-bottom: 4px; padding: 3px 6px; border-left: 3px solid #999; background: #f9f9f9; font-size: 10px; }';
+    css += '.slbl { font-weight: 700; }';
+    css += '.footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #ccc; font-size: 10px; color: #666; text-align: center; }';
+    css += '@media print { @page { margin: 12mm; size: landscape; } body { padding: 8px 12px; } }';
+    css += '</style>';
+
+    // Page shell
+    let html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+    html += '<title>Practice Plan Week ' + wk.w + '</title>';
+    html += css;
+    html += '</head><body onload="window.print()">';
+    html += '<div class="header">';
+    html += '<div class="h1">Ole Miss Rebels &#8212; Practice Plan &#8212; Week ' + wk.w + '</div>';
+    html += '<div class="sub">' + divLabel + ' &middot; ' + new Date().toLocaleDateString() + '</div>';
     html += '</div>';
-  });
 
-  html += `<div class="footer">Flag Football Coach App · ${divLabel} · Season Practice Plan</div>
-  </body></html>`;
+    // Practices
+    wk.prac.forEach(function(pr) {
+      html += '<div class="sec-hdr">Practice ' + pr.lbl + '</div>';
+      html += '<table><thead><tr>';
+      html += '<th style="width:90px">Type / Min</th>';
+      html += '<th style="width:180px">Activity</th>';
+      html += '<th>Details</th>';
+      html += '</tr></thead><tbody>';
 
-  const w = window.open('','_blank','width=800,height=900');
-  if(w){w.document.write(html);w.document.close();}
-  else alert('Allow pop-ups to print.');
-  } catch(e) { alert('Print error: ' + e.message); }
+      getPracBlocks(wk, pr).filter(Boolean).forEach(function(b) {
+        var color = tc[b.t] || '#666';
+        var btype = tl[b.t] || (b.t ? String(b.t).toUpperCase() : 'BLOCK');
+        var bmin  = b.min || b.time || '';
+        var bname = b.name || '(unnamed)';
+        var bdesc = b.desc || '';
+        var detail = '';
+
+        if (b.stations && b.stations.length) {
+          var sc = ['#d97706', '#16a34a', '#2563eb'];
+          var sl = ['S1 — YOU', 'S2 — ASST 1', 'S3 — ASST 2'];
+          detail += '<div>';
+          b.stations.forEach(function(s, i) {
+            detail += '<div class="station">';
+            detail += '<span class="slbl" style="color:' + (sc[i] || '#666') + '">' + (sl[i] || 'S' + (i + 1)) + ':</span> ';
+            detail += (s || '');
+            detail += '</div>';
+          });
+          detail += '</div>';
+        } else {
+          detail = bdesc;
+        }
+
+        html += '<tr>';
+        html += '<td><span class="btype" style="background:' + color + '">' + btype + '</span><br>' + bmin + ' min</td>';
+        html += '<td><strong>' + bname + '</strong></td>';
+        html += '<td>' + detail + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+    });
+
+    // Footer
+    html += '<div class="footer">Ole Miss Rebels Flag Football &middot; ' + divLabel + ' &middot; Season Practice Plan</div>';
+    html += '</body></html>';
+
+    var w = window.open('', '_blank', 'width=900,height=900');
+    if (w) { w.document.write(html); w.document.close(); }
+    else alert('Allow pop-ups to print.');
+  } catch (e) {
+    alert('Print error: ' + e.message);
+  }
 }
+
 
 function printGameRoster(gameNum) {
   const roster = activeRoster();
