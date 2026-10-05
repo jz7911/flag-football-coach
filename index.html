@@ -1816,7 +1816,27 @@ const DRILLS = [
 
   {id:'rr7',cat:'QB Skills',name:'Two-Count Clock — Snap to Throw',time:8,group:'QB + Receivers',equip:'Ball',level:'Intermediate',
    desc:'QB has two counts from snap to throw. Coach counts out loud: ONE — TWO — THROW. If the ball is not in the air by two, it is a penalty in this drill. QB picks his target before the snap and throws on the two count. 10 reps. Once the two-count is locked in, add a second receiver so he has to choose — but only after the count is automatic.',
-   cue:'One. Two. Throw. The ball must be gone by two.',type:'sk'}
+   cue:'One. Two. Throw. The ball must be gone by two.',type:'sk'},
+
+  {id:'spin1',cat:'Ball Carrier',name:'Spin Move Basics',time:8,group:'Pairs',equip:'Flags,Cones',level:'Intermediate',
+   desc:'Ball carrier starts 5 yards from defender who is planted. Carrier attacks defender\'s outside shoulder, then spins 360° away from the flag grab at 3 yards out. Emphasis on: planting the foot BEFORE the spin, keeping the ball tucked through the spin, and exploding out the back door. 5 reps each direction. Defender is passive — job is to reach for the flag only, no chasing. Swap roles after 5 reps.',
+   cue:'"Plant and spin — not shuffle and spin. The plant foot is what makes it work."',
+   type:'sk'},
+
+  {id:'spin2',cat:'Ball Carrier',name:'Spin and Accelerate',time:8,group:'Individual',equip:'Cones',level:'Intermediate',
+   desc:'Set 4 cones in a straight line, 3 yards apart. Ball carrier runs the line and executes a spin move at each cone — alternating left spin, right spin. After each spin, they must hit top speed before the next cone. No slowing down into or out of the spin. Coach watches for: head staying up through the spin, ball tucked, immediate burst after the 360. 3 runs per player.',
+   cue:'"Spin to open field, not to slow down. The second you finish the spin your foot should be pushing hard."',
+   type:'sk'},
+
+  {id:'spin3',cat:'Ball Carrier',name:'Spin Through a Live Defender',time:10,group:'Pairs',equip:'Flags,Cones',level:'Advanced',
+   desc:'Full-speed 1-on-1. Defender lines up 5 yards in front of cone. Ball carrier takes handoff and attacks straight at the defender\'s outside shoulder. Defender goes live — grabs for the flag. Carrier must read the grab and spin away from it. If spin is successful, carrier sprints 5 more yards to finish cone. Rotate. Coach tracks: % of successful spins, which side each player favors, and whether they\'re spinning too early or too late. Goal: spin when the hand commits, not before.',
+   cue:'"Wait for the hand. Spin to the open side. Finish the run."',
+   type:'sk'},
+
+  {id:'spin4',cat:'Ball Carrier',name:'Spin Move — Flag Pull Angle Counter',time:10,group:'Groups of 3',equip:'Flags,Cones',level:'Advanced',
+   desc:'Designed to counter the angled flag pull. Defender lines up 4 yards to the SIDE, cutting off the angle. Ball carrier is running at 45 degrees toward the sideline. At 2 yards out, carrier spin-moves BACK INSIDE away from the angled defender, changing direction 180°. Third player acts as a second defender 5 yards upfield. Carrier must avoid both. 4 reps per rotation. Coach keys: carrier must feel the pursuit angle and spin into the open field, not into the sideline.',
+   cue:'"Feel where they\'re coming from. Spin AWAY from the pursuit. Inside cut beats an outside angle every time."',
+   type:'sk'}
 
 ];
 
@@ -3031,16 +3051,16 @@ const PRACTICE_PLANS = [
     {t:'tm',min:'45-65',name:'Full game simulation',desc:'Full game. Real everything. Coaches on sideline. Call sheet from the first play. Every player carries. Track all stats. End with team cheer.'},
     SM_BLOCK]}
 ]},
-{w:10,phase:'Execution',theme:'Perfect reps: quality over quantity every single block',prac:[
+{w:10,phase:'Execution',theme:'Game 5 fixes: faster shotgun, short passing, angled pulls, trick-play awareness',notes:'🎯 Game 5 takeaways: Pull flags at an angle — run to where they\'re going, not where they are. LBs: stay home, do NOT bite on the HB pass. Utilize the TE more — look for him on angle/seam first. More short, high-completion passes before going deep. Add motion (start motion plays with passes). Keep working on blocking. Master up-the-middle runs from shotgun — faster QB–C exchange.',prac:[
   {lbl:'10A',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
-    {t:'sk',min:'18-32',name:'Skill stations: flag pull angles / OL seal / route timing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: 1v1 flag pull with angles. Carrier gets 2-yard head start at 45 degrees. Defender must cut across not chase from behind. Cue: run to where they are going.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Route timing. Flat and crossing route simultaneously. QB reads and calls Flat or Cross out loud before throwing. Cue: call it before you throw it.']},
-    {t:'sk',min:'32-45',name:'Skill stations: jukes / catch on move / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S3 ASST 2: Cone zigzag. 5 cones in zigzag 3 yards apart. Sprint through with ball two hands on it. Make a clean cut at each cone. Cue: plant the outside foot and go.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
-    {t:'tm',min:'45-65',name:'Scrimmage: no sloppy reps',desc:'Any sloppy rep stops play immediately. Coach names what broke. Two clean reps of that play before continuing. Quality over quantity. This is what separates good teams from great ones.'},
+    {t:'sk',min:'18-32',name:'Skill stations: shotgun snap speed / TE routes / short passing',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Shotgun snap speed. QB calls cadence, C snaps and QB immediately hits up-the-middle carrier in 1 second or less. 10 reps. Cue: the faster the exchange the bigger the crease.','S2 ASST 1: TE angle & seam routes. TE runs angle (6 yards, cut across middle) and seam (straight 8 yards up the hash). QB reads TE first then dumps to flat. Cue: TE is open more than you think — look for him.','S3 ASST 2: Short passing gauntlet. QB throws slant, flat, out route back to back. No reads — fast accurate delivery. 3 receivers rotate. Cue: high-percentage first, completion first.']},
+    {t:'sk',min:'32-45',name:'Skill stations: jet motion / OL seal / over-shoulder',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Jet motion into pass. WR goes in motion pre-snap. At snap QB fakes inside then hits moving WR on a quick out or flat. LBs MUST honor the inside fake. Cue: motion creates confusion — throw off it.','S2 ASST 1: OL Seal drill. Cone 3 yards outside last OL. OL body between coach-defender and cone before back arrives. DL: engage then disengage. 5 reps each. Cue: position not push.','S3 ASST 2: Over-the-shoulder catch. Go route full speed. Coach throws deep. Find ball mid-stride without slowing. Cue: get head around early find the tip of the ball.']},
+    {t:'tm',min:'45-65',name:'Scrimmage: motion and short passing emphasis',desc:'Offense must call at least 2 motion plays per possession and hit 3 completions before going deep. Coaches track: number of short completions, TE targets, motion plays called. Defense: flag pull angle check — no chasing from behind.'},
     SM_BLOCK]},
   {lbl:'10B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
-    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / drive block / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
-    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / juke mirrors / vision cones',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide — if you can guess it the system is broken. Fix it before the game.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.']},
-    {t:'tm',min:'45-65',name:'Call sheet scrimmage — 5 possessions',desc:'Five possessions each team. Exact call sheet order. Coaches time each play. Any play taking longer than 45 seconds costs a timeout. Teaching clock discipline.'},
+    {t:'sk',min:'18-32',name:'Skill stations: angled flag pulls / halfback pass read / blocking',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Angled flag pull. Carrier gets 2-yard head start at 45 degrees. Defender must cut across — run to where they ARE GOING not where they are. Chase = loss. Cue: cut the angle not the carrier.','S2 ASST 1: Halfback pass recognition. LBs line up on defense. HB takes handoff then pulls up and throws. LBs must NOT bite on the run fake. Any LB who bites does 2 push-ups. Cue: keep your hands back stay home until you see the flags go up.','S3 ASST 2: Blocking technique. OL drives defender 2-3 yards down field then releases to find the LB at second level. Carrier hits the hole in 1.5 seconds. Cue: finish the first block then find the next one.']},
+    {t:'sk',min:'32-45',name:'Skill stations: trick play package / vision cones / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Trick play rep. Run reverse, HB pass, or flea flicker (1 per rotation). Defense must identify the trick — shout TRICK if they see it before it develops. Cue: trickery only works if the defense is sleeping — make them earn every yard.','S2 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
+    {t:'tm',min:'45-65',name:'Call sheet scrimmage: trick plays and trickery package',desc:'Five possessions each team. Offense must run 1 trick play and 1 motion play per possession. Defense: award a point every time they correctly identify and defend a trick play without LBs biting. Celebrate smart defense.'},
     SM_BLOCK]}
 ]},
 {w:11,phase:'Execution',theme:'Playoff intensity: every play matters, compete for every yard',prac:[
@@ -3559,7 +3579,9 @@ function renderPracPlans(el) {
     + '<div style="display:flex;gap:5px;">'
     + '<button onclick="sharePracticePlan()" class="btn btn-sm" style="font-size:11px;">Share</button>'
     + '<button onclick="printPracticePlan()" class="btn btn-sm" style="font-size:11px;">Print</button>'
-    + '</div></div></div>';
+    + '</div></div>'
+    + (wk.notes ? '<div style="padding:9px 11px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:8px;font-size:11px;line-height:1.55;color:var(--white);">'+wk.notes+'</div>' : '')
+    + '</div>';
   wk.prac.forEach(function(pr) {
     var blocks = getPracBlocks(wk, pr).filter(Boolean);
     var overrideKey = state.division+'_w'+wk.w+'_'+pr.lbl;
