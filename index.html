@@ -3576,9 +3576,16 @@ function renderPracPlans(el) {
     + '<span style="font-size:14px;font-weight:600;">'+theme+'</span>'
     + '<span style="font-size:11px;color:var(--g3);">'+timing+'</span>'
     + '</div>'
-    + '<div style="display:flex;gap:5px;">'
+    + '<div style="display:flex;gap:5px;align-items:center;">'
     + '<button onclick="sharePracticePlan()" class="btn btn-sm" style="font-size:11px;">Share</button>'
-    + '<button onclick="printPracticePlan()" class="btn btn-sm" style="font-size:11px;">Print</button>'
+    + '<div style="position:relative;display:inline-block;" id="prac-export-menu-wrap">'
+    + '<button onclick="togglePracExportMenu()" class="btn btn-sm" style="font-size:11px;">⬇ Export ▾</button>'
+    + '<div id="prac-export-menu" hidden style="position:absolute;right:0;top:calc(100% + 4px);background:var(--navy2);border:1px solid var(--navy3);border-radius:8px;min-width:170px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.4);padding:4px 0;">'
+    + '<div onclick="printPracticePlan(\'landscape\');document.getElementById(\'prac-export-menu\').hidden=true" style="padding:9px 14px;font-size:12px;cursor:pointer;color:var(--white);" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">🖨️ Print landscape</div>'
+    + '<div onclick="printPracticePlan(\'portrait\');document.getElementById(\'prac-export-menu\').hidden=true" style="padding:9px 14px;font-size:12px;cursor:pointer;color:var(--white);" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">🖨️ Print portrait</div>'
+    + '<div style="height:1px;background:var(--navy3);margin:3px 0;"></div>'
+    + '<div onclick="exportPracticePlanWord();document.getElementById(\'prac-export-menu\').hidden=true" style="padding:9px 14px;font-size:12px;cursor:pointer;color:var(--white);" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">📄 Save as Word (.doc)</div>'
+    + '</div></div>'
     + '</div></div>'
     + (wk.notes ? '<div style="padding:9px 11px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:8px;font-size:11px;line-height:1.55;color:var(--white);">'+wk.notes+'</div>' : '')
     + '</div>';
@@ -4276,7 +4283,14 @@ function renderPlaySheet(el) {
     + '<div style="padding:5px 10px;background:rgba(139,0,0,.1);border-radius:7px;font-size:11px;font-weight:700;color:#8b0000;">Max 4 passes</div>'
     + '<div style="padding:5px 10px;background:rgba(26,92,42,.1);border-radius:7px;font-size:11px;font-weight:700;color:#1a5c2a;">1 trick max</div>'
     + '</div>'
-    + '<button onclick="printPlaySheet()" style="padding:7px 14px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;">🖨️ Print</button>'
+    + '<div style="position:relative;display:inline-block;" id="ps-export-menu-wrap">'
+    + '<button onclick="togglePsExportMenu()" style="padding:7px 14px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;">🖨️ Export ▾</button>'
+    + '<div id="ps-export-menu" hidden style="position:absolute;right:0;top:calc(100% + 4px);background:var(--navy2);border:1px solid var(--navy3);border-radius:8px;min-width:170px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.4);padding:4px 0;">'
+    + '<div onclick="printPlaySheet(\'landscape\');document.getElementById(\'ps-export-menu\').hidden=true" style="padding:9px 14px;font-size:12px;cursor:pointer;color:var(--white);" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">🖨️ Print landscape</div>'
+    + '<div onclick="printPlaySheet(\'portrait\');document.getElementById(\'ps-export-menu\').hidden=true" style="padding:9px 14px;font-size:12px;cursor:pointer;color:var(--white);" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">🖨️ Print portrait</div>'
+    + '<div style="height:1px;background:var(--navy3);margin:3px 0;"></div>'
+    + '<div onclick="exportPlaySheetWord();document.getElementById(\'ps-export-menu\').hidden=true" style="padding:9px 14px;font-size:12px;cursor:pointer;color:var(--white);" onmouseover="this.style.background=\'rgba(255,255,255,.07)\'" onmouseout="this.style.background=\'\'">📄 Save as Word (.doc)</div>'
+    + '</div></div>'
     + '</div>';
 
   if(activePlays.length === 0) {
@@ -4519,7 +4533,8 @@ function renderDefense(el) {
   el.innerHTML = h;
 }
 
-function printPlaySheet() {
+function printPlaySheet(orient) {
+  orient = orient || 'landscape';
   const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...(state.customPlays?.[curSystem]||[])];
   const activeIds = state.activePlays[curSystem] || [];
   const activePlays = bank.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror');
@@ -4574,7 +4589,7 @@ function printPlaySheet() {
     <style>
       *{box-sizing:border-box;margin:0;padding:0;}
       body{font-family:'Arial Narrow',Arial,sans-serif;background:#fff;padding:6mm;}
-      @media print{@page{size:landscape;margin:6mm;}body{padding:0;}}
+      @media print{@page{size:${orient};margin:6mm;}body{padding:0;}}
     </style>
     </head><body>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -6822,7 +6837,8 @@ function showSnapGuide() {
 // ════════════════════════════════════════════
 // PRINT FUNCTIONS
 // ════════════════════════════════════════════
-function printPracticePlan() {
+function printPracticePlan(orient) {
+  orient = orient || 'landscape';
   try {
     const plans = getActivePracticePlans();
     const wk = plans.find(p => p.w === curPracWeek);
@@ -6848,7 +6864,7 @@ function printPracticePlan() {
     css += '.station { margin-bottom: 4px; padding: 3px 6px; border-left: 3px solid #999; background: #f9f9f9; font-size: 10px; }';
     css += '.slbl { font-weight: 700; }';
     css += '.footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #ccc; font-size: 10px; color: #666; text-align: center; }';
-    css += '@media print { @page { margin: 12mm; size: landscape; } body { padding: 8px 12px; } }';
+    css += '@media print { @page { margin: 12mm; size: ' + orient + '; } body { padding: 8px 12px; } }';
     css += '</style>';
 
     // Page shell
@@ -6913,6 +6929,187 @@ function printPracticePlan() {
   } catch (e) {
     alert('Print error: ' + e.message);
   }
+}
+
+function togglePracExportMenu() {
+  var m = document.getElementById('prac-export-menu');
+  if (m) m.hidden = !m.hidden;
+}
+function togglePsExportMenu() {
+  var m = document.getElementById('ps-export-menu');
+  if (m) m.hidden = !m.hidden;
+}
+// Close export menus when clicking outside
+document.addEventListener('click', function(e) {
+  ['prac-export-menu-wrap','ps-export-menu-wrap'].forEach(function(id) {
+    var wrap = document.getElementById(id);
+    if (wrap && !wrap.contains(e.target)) {
+      var menu = wrap.querySelector('[id$="-menu"]');
+      if (menu) menu.hidden = true;
+    }
+  });
+});
+
+function exportPracticePlanWord() {
+  try {
+    const plans = getActivePracticePlans();
+    const wk = plans.find(p => p.w === curPracWeek);
+    if (!wk) { alert('Week not found.'); return; }
+
+    const divLabel = state.division === '56' ? '5/6' : '7/8';
+    const tl = { wu: 'WARM-UP', sk: 'SKILL WORK', tm: 'TEAM', gm: 'GAME/SCRIMMAGE' };
+    const tc = { wu: '#16a34a', sk: '#2563eb', tm: '#9333ea', gm: '#dc2626' };
+
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><meta charset="UTF-8">';
+    html += '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>90</w:Zoom></w:WordDocument></xml><![endif]-->';
+    html += '<style>';
+    html += 'body{font-family:Arial,sans-serif;font-size:11pt;margin:0;padding:0;}';
+    html += '.header{background:#14213B;color:#fff;padding:10pt 14pt;margin-bottom:0;}';
+    html += '.h1{font-size:16pt;font-weight:bold;}';
+    html += '.sub{font-size:9pt;color:#ccd;margin-top:3pt;}';
+    html += '.sec-hdr{background:#CE1126;color:#fff;font-size:10pt;font-weight:bold;padding:5pt 10pt;text-transform:uppercase;margin-top:14pt;margin-bottom:0;}';
+    html += 'table{width:100%;border-collapse:collapse;font-size:10pt;}';
+    html += 'th{background:#14213B;color:#fff;padding:5pt 8pt;text-align:left;border:1px solid #14213B;}';
+    html += 'td{padding:5pt 8pt;border:1px solid #ccc;vertical-align:top;}';
+    html += '.btype{font-size:9pt;font-weight:bold;padding:1pt 4pt;color:#fff;display:inline;}';
+    html += '.station{margin-bottom:3pt;padding:2pt 5pt;border-left:3px solid #999;background:#f9f9f9;font-size:9pt;}';
+    html += '.slbl{font-weight:bold;}';
+    html += '.footer{margin-top:14pt;padding-top:6pt;border-top:1px solid #ccc;font-size:9pt;color:#666;text-align:center;}';
+    html += '</style></head><body>';
+
+    html += '<div class="header"><div class="h1">Ole Miss Rebels — Practice Plan — Week ' + wk.w + '</div>';
+    html += '<div class="sub">' + divLabel + ' &middot; ' + new Date().toLocaleDateString() + '</div></div>';
+
+    if (wk.notes) {
+      html += '<div style="margin:10pt 0;padding:8pt 10pt;background:#fffbea;border:1px solid #f5a623;font-size:10pt;">' + (wk.notes || '') + '</div>';
+    }
+
+    wk.prac.forEach(function(pr) {
+      html += '<div class="sec-hdr">Practice ' + pr.lbl + '</div>';
+      html += '<table><thead><tr>';
+      html += '<th style="width:90pt">Type / Min</th>';
+      html += '<th style="width:150pt">Activity</th>';
+      html += '<th>Details</th>';
+      html += '</tr></thead><tbody>';
+
+      getPracBlocks(wk, pr).filter(Boolean).forEach(function(b) {
+        var color = tc[b.t] || '#666';
+        var btype = tl[b.t] || (b.t ? String(b.t).toUpperCase() : 'BLOCK');
+        var bmin  = b.min || b.time || '';
+        var bname = b.name || '(unnamed)';
+        var bdesc = b.desc || '';
+        var detail = '';
+
+        if (b.stations && b.stations.length) {
+          var sc = ['#d97706', '#16a34a', '#2563eb'];
+          var sl = ['S1 — YOU', 'S2 — ASST 1', 'S3 — ASST 2'];
+          b.stations.forEach(function(s, i) {
+            detail += '<div class="station"><span class="slbl" style="color:' + (sc[i] || '#666') + '">' + (sl[i] || 'S' + (i + 1)) + ':</span> ' + (s || '') + '</div>';
+          });
+        } else {
+          detail = bdesc;
+          if (b.cue) detail += '<div style="margin-top:4pt;font-style:italic;color:#555;font-size:9pt;">' + b.cue + '</div>';
+        }
+
+        html += '<tr>';
+        html += '<td><span class="btype" style="background:' + color + '">' + btype + '</span><br>' + bmin + '</td>';
+        html += '<td><strong>' + bname + '</strong></td>';
+        html += '<td>' + detail + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+    });
+
+    html += '<div class="footer">Ole Miss Rebels Flag Football &middot; ' + divLabel + ' &middot; Season Practice Plan</div>';
+    html += '</body></html>';
+
+    var blob = new Blob([html], {type: 'application/msword'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Rebels-Practice-Plan-Week' + wk.w + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  } catch(e) { alert('Export error: ' + e.message); }
+}
+
+function exportPlaySheetWord() {
+  try {
+    const bank = [...(curSystem==='wingt' ? WINGT_BANK : PISTOL_BANK), ...(state.customPlays?.[curSystem]||[])];
+    const activeIds = state.activePlays[curSystem] || [];
+    const activePlays = bank.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror');
+
+    const tierDefs = [
+      {label:'TIER 1 — ESTABLISH', sub:'Call first, every game.', color:'#1a3a5c', bg:'#eef3fa'},
+      {label:'TIER 2 — COUNTER',   sub:'After Tier 1 reps.',      color:'#1e3a5f', bg:'#eef3fa'},
+      {label:'TIER 3 — MISDIRECTION', sub:'After they adjust.',   color:'#1a5c2a', bg:'#f0fdf4'},
+      {label:'TIER 4 — PASS',      sub:'Max 4 per game.',          color:'#1a3a6c', bg:'#eff6ff'},
+      {label:'TIER 5 — TRICK',     sub:'1 per game max.',          color:'#7f1d1d', bg:'#fef2f2'},
+    ];
+
+    const buckets = tierDefs.map(()=>[]);
+    activePlays.forEach(p => {
+      if(p.tier==='Trick') buckets[4].push(p);
+      else if(p.pass) buckets[3].push(p);
+      else if(p.tier==='Core') buckets[0].push(p);
+      else if(p.tier==='Intermediate') buckets[1].push(p);
+      else if(p.tier==='Advanced') buckets[2].push(p);
+      else buckets[1].push(p);
+    });
+
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><meta charset="UTF-8">';
+    html += '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>90</w:Zoom></w:WordDocument></xml><![endif]-->';
+    html += '<style>';
+    html += 'body{font-family:"Arial Narrow",Arial,sans-serif;font-size:10pt;margin:0;padding:10pt;}';
+    html += '.hdr{font-size:15pt;font-weight:bold;color:#1a3a5c;border-bottom:2px solid #1a3a5c;padding-bottom:4pt;margin-bottom:8pt;}';
+    html += '.sub{font-size:8pt;color:#666;margin-top:2pt;margin-bottom:8pt;}';
+    html += 'table{width:100%;border-collapse:collapse;margin-bottom:10pt;font-size:9pt;}';
+    html += 'th{padding:4pt 6pt;text-align:left;color:#fff;font-weight:bold;font-size:9pt;}';
+    html += 'td{padding:3pt 6pt;border-bottom:1px solid #ddd;vertical-align:top;}';
+    html += '.num{font-weight:bold;font-size:8pt;width:16pt;}';
+    html += '.type{font-size:7pt;font-weight:bold;white-space:nowrap;}';
+    html += '.alert{background:#fef2f2;border:1px solid #fca5a5;padding:5pt 8pt;font-size:9pt;margin-top:6pt;}';
+    html += '</style></head><body>';
+
+    html += '<div class="hdr">OLE MISS REBELS — PLAY SHEET</div>';
+    html += '<div class="sub">Priority order &middot; Tier 1 first &middot; Layer up as game develops &middot; Generated ' + new Date().toLocaleDateString() + '</div>';
+
+    let playNum = 0;
+    tierDefs.forEach((tier, ti) => {
+      const plays = buckets[ti];
+      if (!plays.length) return;
+      html += '<table>';
+      html += '<thead><tr><th colspan="3" style="background:' + tier.color + '">' + tier.label + ' &mdash; ' + tier.sub + '</th></tr></thead><tbody>';
+      plays.forEach(p => {
+        playNum++;
+        const sit = p.note ? p.note.split('.')[0] + '.' : '';
+        html += '<tr>';
+        html += '<td class="num" style="color:' + tier.color + '">' + playNum + '</td>';
+        html += '<td><strong>' + p.n + '</strong>' + (sit ? '<br><span style="font-size:8pt;color:#666;font-style:italic;">' + sit.substring(0,100) + '</span>' : '') + '</td>';
+        html += '<td class="type" style="color:' + (p.pass ? '#1565c0' : '#2e7d32') + '">' + (p.pass ? 'PASS' : 'RUN') + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+    });
+
+    html += '<div class="alert"><strong>LB RULE:</strong> Do not move until the ball is handed off and the carrier is running to the line or tackle box. No blitzing. Watch the ball.</div>';
+    html += '</body></html>';
+
+    var blob = new Blob([html], {type: 'application/msword'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Rebels-Play-Sheet.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  } catch(e) { alert('Export error: ' + e.message); }
 }
 
 
