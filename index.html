@@ -4510,31 +4510,50 @@ function renderDefense(el) {
 // Stored in state.gridCallSheet56 so coach can edit in-browser.
 function _defaultGridCS() {
   const is56 = state.division === '56';
-  const B = is56 ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
-  const n = id => { const p = B.find(x=>x.id===id); return p ? p.n : ''; };
+  const customForSys = (state.customPlays && state.customPlays[curSystem]) ? state.customPlays[curSystem] : [];
+  const B = is56
+    ? SINGLEWING_BANK
+    : [...(curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK), ...customForSys];
 
-  if(is56) {
+  // Helper: look up play name by id
+  const n = id => { const p = B.find(x=>x.id===id); return p ? p.n : ''; };
+  // Pad an array to length len with ''
+  const pad = (arr, len) => { const a = arr.slice(0,len); while(a.length<len) a.push(''); return a; };
+
+  if (is56) {
     return {
-      op: [n('sw1'),n('sw2'),n('sw7'),n('sw18'),n('sw5'),n('sw6'),n('sw3'),n('sw4'),n('sw15'),n('sw19')],
-      runL: [n('sw2'),n('sw7'),n('sw6'),n('sw4')],
-      runR: [n('sw1'),n('sw18'),n('sw5'),n('sw3')],
-      passPA: [n('sw19'),n('sw20'),n('sw12')],
-      passDB: [n('sw12'),''],
-      specScr: [n('sw12'),''],
-      specTrk: [n('sw15'),n('sw16'),n('sw14')],
+      op: pad([n('sw1'),n('sw2'),n('sw7'),n('sw18'),n('sw5'),n('sw6'),n('sw3'),n('sw4'),n('sw15'),n('sw19')], 10),
+      runL: pad([n('sw2'),n('sw7'),n('sw6'),n('sw4')], 4),
+      runR: pad([n('sw1'),n('sw18'),n('sw5'),n('sw3')], 4),
+      passPA: pad([n('sw19'),n('sw20'),n('sw12')], 3),
+      passDB: pad([n('sw12'),''], 2),
+      specScr: pad([n('sw12'),''], 2),
+      specTrk: pad([n('sw15'),n('sw16'),n('sw14')], 3),
       bbL: n('sw1'), bbR: n('sw2'),
       bb2L: n('sw3'), bb2R: n('sw4'),
       sit: [
-        [n('sw19'),n('sw12'),n('sw1'),n('sw3')],
-        [n('sw7'),n('sw3'),n('sw1'),n('sw5')],
-        [n('sw19'),n('sw12'),n('sw15'),n('sw20')],
-        [n('sw1'),n('sw3'),n('sw5'),'No tricks'],
-        [n('sw7'),n('sw3'),n('sw5'),n('sw1')],
-        [n('sw15'),n('sw19'),n('sw3'),n('sw14')]
+        pad([n('sw19'),n('sw12'),n('sw1'),n('sw3')], 4),
+        pad([n('sw7'),n('sw3'),n('sw1'),n('sw5')], 4),
+        pad([n('sw19'),n('sw12'),n('sw15'),n('sw20')], 4),
+        pad([n('sw1'),n('sw3'),n('sw5'),'No tricks'], 4),
+        pad([n('sw7'),n('sw3'),n('sw5'),n('sw1')], 4),
+        pad([n('sw15'),n('sw19'),n('sw3'),n('sw14')], 4)
       ],
-      d1: [[n('sw1'),n('sw3'),n('sw6'),n('sw7')],[n('sw1'),n('sw2'),n('sw5'),n('sw7')],[n('sw2'),n('sw4'),n('sw5'),n('sw7')]],
-      d2: [[n('sw3'),n('sw19'),n('sw6')],[n('sw5'),n('sw12'),n('sw1')],[n('sw4'),n('sw20'),n('sw5')]],
-      d3: [[n('sw19'),n('sw12'),n('sw15')],[n('sw12'),n('sw15'),n('sw19')],[n('sw20'),n('sw12'),n('sw15')]],
+      d1: [
+        pad([n('sw1'),n('sw3'),n('sw6'),n('sw7')], 4),
+        pad([n('sw1'),n('sw2'),n('sw5'),n('sw7')], 4),
+        pad([n('sw2'),n('sw4'),n('sw5'),n('sw7')], 4)
+      ],
+      d2: [
+        pad([n('sw3'),n('sw19'),n('sw6')], 3),
+        pad([n('sw5'),n('sw12'),n('sw1')], 3),
+        pad([n('sw4'),n('sw20'),n('sw5')], 3)
+      ],
+      d3: [
+        pad([n('sw19'),n('sw12'),n('sw15')], 3),
+        pad([n('sw12'),n('sw15'),n('sw19')], 3),
+        pad([n('sw20'),n('sw12'),n('sw15')], 3)
+      ],
       mu: [
         ['Logan — Sweep/Counter','Charlie — Dive/Counter','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
         ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
@@ -4546,41 +4565,86 @@ function _defaultGridCS() {
         [n('sw7')+' — A gap open',n('sw15')+' — soft edge',n('sw5')+' — LBs flow',n('sw19')+' — man coverage',n('sw1')+' — need seal block']
       ]
     };
-  } else {
-    // 7/8 Wing-T / Pistol defaults
-    return {
-      op: [n('wt1'),n('wt3'),n('wt17'),n('wt18'),n('wt7'),n('wt8'),n('wt5'),n('wt9'),n('wt4'),n('wt10')],
-      runL: [n('wt2'),n('wt3'),n('wt13'),n('wt18')],
-      runR: [n('wt1'),n('wt17'),n('wt7'),n('wt18')],
-      passPA: [n('wt5'),n('wt6'),n('wt10')],
-      passDB: [n('wt8'),n('wt9')],
-      specScr: [n('wt9'),''],
-      specTrk: [n('wt7'),n('wt16'),n('wt12')],
-      bbL: n('wt2'), bbR: n('wt1'),
-      bb2L: n('wt5'), bb2R: n('wt6'),
-      sit: [
-        [n('wt5'),n('wt9'),n('wt1'),n('wt18')],
-        [n('wt3'),n('wt18'),n('wt1'),n('wt17')],
-        [n('wt5'),n('wt8'),n('wt10'),n('wt9')],
-        [n('wt1'),n('wt18'),n('wt3'),'No tricks'],
-        [n('wt3'),n('wt17'),n('wt18'),n('wt1')],
-        [n('wt10'),n('wt5'),n('wt7'),n('wt15')]
-      ],
-      d1: [[n('wt1'),n('wt18'),n('wt5'),n('wt3')],[n('wt1'),n('wt2'),n('wt3'),n('wt17')],[n('wt2'),n('wt18'),n('wt6'),n('wt3')]],
-      d2: [[n('wt18'),n('wt5'),n('wt13')],[n('wt3'),n('wt8'),n('wt1')],[n('wt18'),n('wt6'),n('wt13')]],
-      d3: [[n('wt5'),n('wt8'),n('wt9')],[n('wt8'),n('wt9'),n('wt5')],[n('wt6'),n('wt8'),n('wt9')]],
-      mu: [
-        ['Logan — Sweep/Dive','Charlie — Sweep/Counter','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
-        ['Sawyer — Curl/Bootleg flat','Ollie — Screen/Seam','Noah — Fly/Bootleg deep','Matteo — Flat/Screen'],
-        ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
-      ],
-      def: [
-        [n('wt1')+' — attack edge',n('wt7')+' — misdirection',n('wt18')+' — QB alley',n('wt5')+' — roll away','Avoid up-middle vs 4-4'],
-        [n('wt18')+' — LBs scraping',n('wt5')+' — Cover 0 flat',n('wt7')+' — beat blitz',n('wt9')+' — RB vs. no one','Quick hits only'],
-        [n('wt3')+' — A gap open',n('wt7')+' — soft edge',n('wt13')+' — LBs flow',n('wt5')+' — man coverage',n('wt1')+' — need seal block']
-      ]
-    };
   }
+
+  // ── 7/8: build from active play bank ──────────────────────────────────────
+  const activeIds = state.activePlays[curSystem] || [];
+  // Get active plays, skip Mirrors
+  const active = B.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror');
+  const runs  = active.filter(p => !p.pass);
+  const passes = active.filter(p => p.pass);
+  const tricks = active.filter(p => p.tier === 'Trick' || p.tier === 'Gimmick');
+  // Separate pass plays by type
+  const passPA = passes.filter(p => /bootleg|play.?action|action/i.test(p.n));
+  const passDB = passes.filter(p => !/bootleg|play.?action/i.test(p.n));
+  const screens = passes.filter(p => /screen/i.test(p.n));
+
+  // Helper: get name by index from array, or ''
+  const g = (arr, i) => arr[i] ? arr[i].n : '';
+
+  // Runs: split into left-tendency and right-tendency by name
+  const runsL = runs.filter(p => /left|L\b/i.test(p.n) || (runs.indexOf(p) % 2 === 1));
+  const runsR = runs.filter(p => !runsL.includes(p));
+
+  // Opening plays: all active runs first, then passes up to 10 total
+  const opPlays = [...runs, ...passes].slice(0, 10).map(p => p.n);
+
+  // Best bread-and-butter: first run right, first run left
+  const bb1R = runsR[0] ? runsR[0].n : (runs[0] ? runs[0].n : '');
+  const bb1L = runsL[0] ? runsL[0].n : (runs[1] ? runs[1].n : '');
+  const bb2R = runsR[1] ? runsR[1].n : (passes[0] ? passes[0].n : '');
+  const bb2L = runsL[1] ? runsL[1].n : (passes[1] ? passes[1].n : '');
+
+  // Situational: use most reliable plays
+  const sit1 = passes[0] ? passes[0].n : '';  // 1st & forever — pass
+  const sit2 = screens[0] ? screens[0].n : (passes[0] ? passes[0].n : '');
+  const sit3 = runs[0] ? runs[0].n : '';
+  const sit4 = runs[1] ? runs[1].n : '';
+
+  return {
+    op: pad(opPlays, 10),
+    runL: pad(runsL.slice(0,4).map(p=>p.n), 4),
+    runR: pad(runsR.slice(0,4).map(p=>p.n), 4),
+    passPA: pad(passPA.slice(0,3).map(p=>p.n), 3),
+    passDB: pad(passDB.slice(0,2).map(p=>p.n), 2),
+    specScr: pad(screens.slice(0,2).map(p=>p.n), 2),
+    specTrk: pad(tricks.slice(0,3).map(p=>p.n), 3),
+    bbL: bb1L, bbR: bb1R,
+    bb2L: bb2L, bb2R: bb2R,
+    sit: [
+      pad([sit1, g(screens,0), g(runs,0), g(runs,1)], 4),           // 1st & forever
+      pad([g(runs,0), g(runs,1), g(runs,2), g(runs,3)], 4),          // 3rd & short
+      pad([g(passes,0), g(passes,1), g(passes,2), g(passes,3)], 4),  // 3rd & long
+      pad([g(runs,0), g(runs,1), g(runs,2), 'No tricks'], 4),        // backed up
+      pad([g(runs,0), g(runs,2), g(runs,1), g(runs,3)], 4),          // goal line
+      pad([g(passes,0), g(runs,0), g(tricks,0), g(tricks,1)], 4)     // big play
+    ],
+    d1: [
+      pad(runs.slice(0,4).map(p=>p.n), 4),
+      pad([...runs.slice(0,2).map(p=>p.n), ...passes.slice(0,2).map(p=>p.n)], 4),
+      pad([...runs.slice(1,3).map(p=>p.n), ...passes.slice(0,2).map(p=>p.n)], 4)
+    ],
+    d2: [
+      pad([g(runs,0), g(passes,0), g(runs,1)], 3),
+      pad([g(runs,2), g(screens,0), g(runs,0)], 3),
+      pad([g(runs,1), g(passes,1), g(runs,2)], 3)
+    ],
+    d3: [
+      pad([g(passes,0), g(screens,0), g(tricks,0)], 3),
+      pad([g(screens,0), g(passes,1), g(passes,0)], 3),
+      pad([g(passes,1), g(screens,0), g(tricks,0)], 3)
+    ],
+    mu: [
+      ['Logan — Sweep/Counter','Charlie — Sweep/Dive','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
+      ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
+      ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
+    ],
+    def: [
+      [g(runs,0)+' — attack edge', g(runs,2)+' — misdirection', g(passes,0)+' — roll away', 'Counter off sweeps', 'Avoid up-middle vs 4-4'],
+      [g(runs,0)+' — LBs scraping', g(passes,0)+' — Cover 0 flat', g(runs,2)+' — beat blitz', g(screens,0)+' — RB vs. no one', 'Quick hits only'],
+      [g(runs,1)+' — A gap open', g(runs,2)+' — soft edge', g(runs,0)+' — LBs flow', g(passes,0)+' — man coverage', g(runs,0)+' — need seal block']
+    ]
+  };
 }
 
 function _getGridCS() {
