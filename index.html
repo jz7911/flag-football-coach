@@ -3038,9 +3038,10 @@ const PRACTICE_PLANS = [
     {t:'tm',min:'45-65',name:'Scrimmage: no sloppy reps',desc:'Any sloppy rep stops play immediately. Coach names what broke. Two clean reps of that play before continuing. Quality over quantity. This is what separates good teams from great ones.'},
     SM_BLOCK]},
   {lbl:'10B',blocks:[{t:'wu',min:'0–12',name:'Daily warm-up routine',desc:'5 under-center snaps · 5 shotgun snaps · 10 partner passes · 10 stalk blocks · Every man for himself flag pull (2 min full speed). Same order every practice. Never skip or abbreviate.',cue:'Fast feet fast hands. Get warm.'},
-    {t:'sk',min:'18-32',name:'Skill stations: gauntlet / drive block / catch on move',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Gauntlet. Carrier runs 15 yards past 3 defenders spaced 5 yards apart. Each tries to pull. Score a point for each beaten. Builds evasion and urgency.','S2 ASST 1: OL fire and release. Drive block 2 yards then release to second level and find the LB. DL reads the block and pursues ball. Cue: OL finishes the block then finds work.','S3 ASST 2: Catch on the move. Out route or flat at full speed. Coach throws in stride. No stopping to catch. Cue: catch it running not waiting.']},
-    {t:'sk',min:'32-45',name:'Skill stations: Ball Hide / juke mirrors / vision cones',desc:'3 stations rotate every 4 min.',stations:['S1 YOU: Ball Hide — if you can guess it the system is broken. Fix it before the game.','S3 ASST 2: Mirror drill. Two players face each other 2 yards apart. One leads one mirrors every lateral move. Stay low head level. Cue: mirror the hips not the shoulders.','S3 ASST 2: Vision cones. 5 cones as defenders. Ball carrier makes one cut per cone. Builds field vision and decisiveness. Cue: see the defender make the cut early not at the last second.']},
-    {t:'tm',min:'45-65',name:'Call sheet scrimmage — 5 possessions',desc:'Five possessions each team. Exact call sheet order. Coaches time each play. Any play taking longer than 45 seconds costs a timeout. Teaching clock discipline.'},
+    {t:'sk',min:'12-22',name:'Punt and return — 10 minutes',desc:'PUNT: Snap to QB, QB punts downfield. Coverage players sprint downfield and stop at the ball (no live tackling). RETURN: Two players set up as returners. Catch and advance as far as possible. Rest of team covers or blocks. 3 reps per team. Cue: coverage lanes stay tight, returner catches it first.'},
+    {t:'gm',min:'22-35',name:'ULTIMATE FOOTBALL — everyone gets the ball',desc:'Split into two teams. No running with the ball (or 3-step limit). Must throw to advance. Score by reaching end zone with a catch. Rotate QBs every 2 minutes. Every player must throw at least once. Coaching cue: read the open man, throw on time. No ball hogs. Fun and fast.'},
+    {t:'sk',min:'35-48',name:'3v3 play series — maximum touches',desc:'Split into groups of 6 (3 offense, 3 defense). Each group runs a 4-play series then rotates. Coach assigns plays from call sheet. Requirement: every player carries the ball in every series. Goal is reps and touches for every kid. Cue: run it fast, reset quick.'},
+    {t:'tm',min:'48-65',name:'Call sheet scrimmage — 5 possessions',desc:'Five possessions each team. Exact call sheet order. Coaches time each play. Any play taking longer than 45 seconds costs a timeout. Teaching clock discipline.'},
     SM_BLOCK]}
 ]},
 {w:11,phase:'Execution',theme:'Playoff intensity: every play matters, compete for every yard',prac:[
@@ -4209,8 +4210,8 @@ function renderNewPlays(el) {
 
 
 function renderPlaySheet(el) {
-  // 5/6 division gets the grid-format offensive call sheet
-  if(state.division === '56') { renderGridCallSheet(el); return; }
+  // Both divisions use the grid-format offensive call sheet
+  renderGridCallSheet(el); return;
 
   if(!state.customPlays) state.customPlays = {};
   const custom = state.customPlays[curSystem] || [];
@@ -4508,71 +4509,84 @@ function renderDefense(el) {
 // Default grid data — auto-populated from SINGLEWING_BANK tiers.
 // Stored in state.gridCallSheet56 so coach can edit in-browser.
 function _defaultGridCS() {
-  const B = SINGLEWING_BANK;
+  const is56 = state.division === '56';
+  const B = is56 ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
   const n = id => { const p = B.find(x=>x.id===id); return p ? p.n : ''; };
-  return {
-    // Opening 10 plays
-    op: [
-      n('sw1'), n('sw2'), n('sw7'), n('sw18'), n('sw5'),
-      n('sw6'), n('sw3'), n('sw4'), n('sw15'), n('sw19')
-    ],
-    // Best Runs: left[0-3], right[0-3]
-    runL: [n('sw2'), n('sw7'), n('sw6'), n('sw4')],
-    runR: [n('sw1'), n('sw18'), n('sw5'), n('sw3')],
-    // Best Passes: playaction[0-2], dropback[0-1]
-    passPA: [n('sw19'), n('sw20'), n('sw12')],
-    passDB: [n('sw12'), ''],
-    // Best Specials: screens[0-1], tricks[0-2]
-    specScr: [n('sw12'), ''],
-    specTrk: [n('sw15'), n('sw16'), n('sw14')],
-    // Bread & Butter
-    bbL: n('sw1'), bbR: n('sw2'),
-    bb2L: n('sw3'), bb2R: n('sw4'),
-    // Situational: [1st&forever, 3rd&short, 3rd&long, backedup, goalline, bigplay]
-    sit: [
-      [n('sw19'), n('sw12'), n('sw1'), n('sw3')],   // 1st & forever
-      [n('sw7'), n('sw3'), n('sw1'), n('sw5')],       // 3rd & short
-      [n('sw19'), n('sw12'), n('sw15'), n('sw20')],   // 3rd & long
-      [n('sw1'), n('sw3'), n('sw5'), 'No tricks'],     // backed up
-      [n('sw7'), n('sw3'), n('sw5'), n('sw1')],         // goal line
-      [n('sw15'), n('sw19'), n('sw3'), n('sw14')]      // big play
-    ],
-    // 1st down hashes: [LH0-3, MID0-3, RH0-3]
-    d1: [
-      [n('sw1'), n('sw3'), n('sw6'), n('sw7')],
-      [n('sw1'), n('sw2'), n('sw5'), n('sw7')],
-      [n('sw2'), n('sw4'), n('sw5'), n('sw7')]
-    ],
-    // 2nd down hashes: [LH0-2, MID0-2, RH0-2]
-    d2: [
-      [n('sw3'), n('sw19'), n('sw6')],
-      [n('sw5'), n('sw12'), n('sw1')],
-      [n('sw4'), n('sw20'), n('sw5')]
-    ],
-    // 3rd down hashes: [LH0-2, MID0-2, RH0-2]
-    d3: [
-      [n('sw19'), n('sw12'), n('sw15')],
-      [n('sw12'), n('sw15'), n('sw19')],
-      [n('sw20'), n('sw12'), n('sw15')]
-    ],
-    // Matchups: RB[0-4], REC[0-3], QB[0-3]
-    mu: [
-      ['Logan — Sweep/Counter', 'Charlie — Dive/Counter', 'Noah — Sweep/Jet', 'Sawyer — Counter/Dive', 'Ollie — Sweep/Screen'],
-      ['Sawyer — Screen/Bootleg flat', 'Ollie — Screen/Sweep out', 'Noah — Jet/Bootleg deep', 'Matteo — Bootleg flat/Screen'],
-      ['Logan — best athlete, use on big downs', 'Charlie — reliable QB', 'Noah — fast, great bootleg', 'Sawyer/Ollie as backups']
-    ],
-    // By defense: 44over[0-4], 34under[0-4], 34tite[0-4]
-    def: [
-      [n('sw1')+' — attack edge', n('sw5')+' — cutback', n('sw3')+' — QB alley', n('sw19')+' — roll away', 'Avoid dive up middle'],
-      [n('sw3')+' — LBs scraping', n('sw19')+' — Cover 0 flat', n('sw15')+' — beat blitz', n('sw12')+' — RB vs. no one', 'Quick hits only'],
-      [n('sw7')+' — A gap open', n('sw15')+' — soft edge', n('sw5')+' — LBs flow', n('sw19')+' — man coverage', n('sw1')+' — need seal block']
-    ]
-  };
+
+  if(is56) {
+    return {
+      op: [n('sw1'),n('sw2'),n('sw7'),n('sw18'),n('sw5'),n('sw6'),n('sw3'),n('sw4'),n('sw15'),n('sw19')],
+      runL: [n('sw2'),n('sw7'),n('sw6'),n('sw4')],
+      runR: [n('sw1'),n('sw18'),n('sw5'),n('sw3')],
+      passPA: [n('sw19'),n('sw20'),n('sw12')],
+      passDB: [n('sw12'),''],
+      specScr: [n('sw12'),''],
+      specTrk: [n('sw15'),n('sw16'),n('sw14')],
+      bbL: n('sw1'), bbR: n('sw2'),
+      bb2L: n('sw3'), bb2R: n('sw4'),
+      sit: [
+        [n('sw19'),n('sw12'),n('sw1'),n('sw3')],
+        [n('sw7'),n('sw3'),n('sw1'),n('sw5')],
+        [n('sw19'),n('sw12'),n('sw15'),n('sw20')],
+        [n('sw1'),n('sw3'),n('sw5'),'No tricks'],
+        [n('sw7'),n('sw3'),n('sw5'),n('sw1')],
+        [n('sw15'),n('sw19'),n('sw3'),n('sw14')]
+      ],
+      d1: [[n('sw1'),n('sw3'),n('sw6'),n('sw7')],[n('sw1'),n('sw2'),n('sw5'),n('sw7')],[n('sw2'),n('sw4'),n('sw5'),n('sw7')]],
+      d2: [[n('sw3'),n('sw19'),n('sw6')],[n('sw5'),n('sw12'),n('sw1')],[n('sw4'),n('sw20'),n('sw5')]],
+      d3: [[n('sw19'),n('sw12'),n('sw15')],[n('sw12'),n('sw15'),n('sw19')],[n('sw20'),n('sw12'),n('sw15')]],
+      mu: [
+        ['Logan — Sweep/Counter','Charlie — Dive/Counter','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
+        ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
+        ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
+      ],
+      def: [
+        [n('sw1')+' — attack edge',n('sw5')+' — cutback',n('sw3')+' — QB alley',n('sw19')+' — roll away','Avoid dive up middle'],
+        [n('sw3')+' — LBs scraping',n('sw19')+' — Cover 0 flat',n('sw15')+' — beat blitz',n('sw12')+' — RB vs. no one','Quick hits only'],
+        [n('sw7')+' — A gap open',n('sw15')+' — soft edge',n('sw5')+' — LBs flow',n('sw19')+' — man coverage',n('sw1')+' — need seal block']
+      ]
+    };
+  } else {
+    // 7/8 Wing-T / Pistol defaults
+    return {
+      op: [n('wt1'),n('wt3'),n('wt17'),n('wt18'),n('wt7'),n('wt8'),n('wt5'),n('wt9'),n('wt4'),n('wt10')],
+      runL: [n('wt2'),n('wt3'),n('wt13'),n('wt18')],
+      runR: [n('wt1'),n('wt17'),n('wt7'),n('wt18')],
+      passPA: [n('wt5'),n('wt6'),n('wt10')],
+      passDB: [n('wt8'),n('wt9')],
+      specScr: [n('wt9'),''],
+      specTrk: [n('wt7'),n('wt16'),n('wt12')],
+      bbL: n('wt2'), bbR: n('wt1'),
+      bb2L: n('wt5'), bb2R: n('wt6'),
+      sit: [
+        [n('wt5'),n('wt9'),n('wt1'),n('wt18')],
+        [n('wt3'),n('wt18'),n('wt1'),n('wt17')],
+        [n('wt5'),n('wt8'),n('wt10'),n('wt9')],
+        [n('wt1'),n('wt18'),n('wt3'),'No tricks'],
+        [n('wt3'),n('wt17'),n('wt18'),n('wt1')],
+        [n('wt10'),n('wt5'),n('wt7'),n('wt15')]
+      ],
+      d1: [[n('wt1'),n('wt18'),n('wt5'),n('wt3')],[n('wt1'),n('wt2'),n('wt3'),n('wt17')],[n('wt2'),n('wt18'),n('wt6'),n('wt3')]],
+      d2: [[n('wt18'),n('wt5'),n('wt13')],[n('wt3'),n('wt8'),n('wt1')],[n('wt18'),n('wt6'),n('wt13')]],
+      d3: [[n('wt5'),n('wt8'),n('wt9')],[n('wt8'),n('wt9'),n('wt5')],[n('wt6'),n('wt8'),n('wt9')]],
+      mu: [
+        ['Logan — Sweep/Dive','Charlie — Sweep/Counter','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
+        ['Sawyer — Curl/Bootleg flat','Ollie — Screen/Seam','Noah — Fly/Bootleg deep','Matteo — Flat/Screen'],
+        ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
+      ],
+      def: [
+        [n('wt1')+' — attack edge',n('wt7')+' — misdirection',n('wt18')+' — QB alley',n('wt5')+' — roll away','Avoid up-middle vs 4-4'],
+        [n('wt18')+' — LBs scraping',n('wt5')+' — Cover 0 flat',n('wt7')+' — beat blitz',n('wt9')+' — RB vs. no one','Quick hits only'],
+        [n('wt3')+' — A gap open',n('wt7')+' — soft edge',n('wt13')+' — LBs flow',n('wt5')+' — man coverage',n('wt1')+' — need seal block']
+      ]
+    };
+  }
 }
 
 function _getGridCS() {
-  if(!state.gridCallSheet56) state.gridCallSheet56 = _defaultGridCS();
-  return state.gridCallSheet56;
+  const key = state.division === '56' ? 'gridCallSheet56' : ('gridCallSheet78_' + curSystem);
+  if(!state[key]) state[key] = _defaultGridCS();
+  return state[key];
 }
 
 function _saveGridCS() {
@@ -4603,14 +4617,16 @@ function _saveGridCS() {
     else if(parts[0]==='mu') { const r=+parts[1],c=+parts[2]; cs.mu[r][c]=val; }
     else if(parts[0]==='def') { const r=+parts[1],c=+parts[2]; cs.def[r][c]=val; }
   });
-  state.gridCallSheet56 = cs;
+  const key = state.division === '56' ? 'gridCallSheet56' : ('gridCallSheet78_' + curSystem);
+  state[key] = cs;
   save();
   showToast('Call sheet saved');
 }
 
 function _resetGridCS() {
   if(!confirm('Reset all entries to defaults?')) return;
-  state.gridCallSheet56 = _defaultGridCS();
+  const key = state.division === '56' ? 'gridCallSheet56' : ('gridCallSheet78_' + curSystem);
+  state[key] = _defaultGridCS();
   save();
   renderPbContent();
 }
@@ -6673,8 +6689,8 @@ function autoScriptCallSheet(scriptLen, mode) {
 
 function printCallSheet() {
   const division = state.division;
-  // 5/6 division uses the full grid format
-  if(division === '56') { printGridCallSheet(); return; }
+  // Both divisions use the full grid format
+  printGridCallSheet(); return;
   if(!state.customPlays) state.customPlays = {};
   const custom = state.customPlays[curSystem] || [];
   const baseBank = division==='56' ? SINGLEWING_BANK : (curSystem==='pistol' ? PISTOL_BANK : WINGT_BANK);
