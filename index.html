@@ -4729,24 +4729,60 @@ function _defaultGridCS() {
   const specScrFinal= pad(screens.slice(0,2).map(p=>p.n), 2);
   const specTrkFinal= pad(tricks.slice(0,3).map(p=>p.n), 3);
 
-  // ── Defense matchup logic ─────────────────────────────────────────────────
+  // ── Defense matchup pools (used for def[] notes section) ─────────────────
   // vs 4-4 Over (8 in box): attack the edge and use screens — inside is congested
   //   Run: edge sweeps, jet motion, counters to boundary
   //   Pass: screens stress flat defenders, bootleg away from the box
   const vs44RunPool  = merge(edgeRuns.filter(isReliable), counterRuns.filter(isReliable), edgeRuns, counterRuns);
   const vs44PassPool = merge(screens, bootlegs.filter(isFlat), flats, bootlegs);
-  const d1_0 = pad(merge(vs44RunPool, vs44PassPool).slice(0,4).map(p=>p.n), 4);
-  const d2_0 = pad(vs44RunPool.slice(0,3).map(p=>p.n), 3);
-  const d3_0 = pad(vs44PassPool.slice(0,3).map(p=>p.n), 3);
 
   // vs 4-3-1 Deep Safety (single high, 7 in box): attack the deep middle — safety is alone
   //   Run: inside runs first (only 3 down linemen so gaps are wider)
   //   Pass: deep seam/post beats the single safety; play-action freezes the linebackers
   const vs431RunPool  = merge(insideRuns.filter(isReliable), edgeRuns.filter(isReliable), insideRuns, edgeRuns);
   const vs431PassPool = merge(deepPasses, bootlegs.filter(isPlayAction), bootlegs, passes);
-  const d1_1 = pad(merge(vs431RunPool, vs431PassPool).slice(0,4).map(p=>p.n), 4);
-  const d2_1 = pad(vs431RunPool.slice(0,3).map(p=>p.n), 3);
-  const d3_1 = pad(vs431PassPool.slice(0,3).map(p=>p.n), 3);
+
+  // ── Down & Distance by Hash Position ─────────────────────────────────────
+  // d1 = 1st Down (4 plays per hash), d2 = 2nd Down (3), d3 = 3rd Down (3)
+  // 3 columns per down: [LEFT HASH, MIDDLE, RIGHT HASH]
+  //
+  // LEFT HASH (boundary side — less space, must hit quickly or attack away from boundary)
+  //   → Counter/misdirection to field side, inside runs, quick passes to space
+  const leftPool = merge(
+    counterRuns.filter(isReliable), insideRuns.filter(isCore),
+    edgeRuns.filter(isReliable), quickPasses, runs, passes
+  );
+  // MIDDLE (anywhere on field — use your bread & butter reliable plays)
+  const midPool = merge(
+    edgeRuns.filter(isCore), insideRuns.filter(isCore),
+    bootlegs.filter(isReliable), edgeRuns.filter(isReliable),
+    insideRuns.filter(isReliable), bootlegs, runs, passes
+  );
+  // RIGHT HASH (field side / wide side — more space, attack the edge and stretch defense)
+  const rightPool = merge(
+    edgeRuns.filter(isReliable), deepPasses.filter(isReliable),
+    bootlegs.filter(isReliable), deepPasses, edgeRuns, passes
+  );
+
+  // 1st Down — establish the run, set up the game plan (4 plays per hash)
+  const d1 = [
+    pad(leftPool.slice(0,4).map(p=>p.n), 4),
+    pad(midPool.slice(0,4).map(p=>p.n), 4),
+    pad(rightPool.slice(0,4).map(p=>p.n), 4)
+  ];
+  // 2nd Down — depend on what you need after 1st down result (3 plays per hash)
+  const d2 = [
+    pad(merge(counterRuns, insideRuns, quickPasses).slice(0,3).map(p=>p.n), 3),
+    pad(merge(insideRuns.filter(isCore), edgeRuns.filter(isCore), bootlegs).slice(0,3).map(p=>p.n), 3),
+    pad(merge(edgeRuns.filter(isReliable), bootlegs, deepPasses).slice(0,3).map(p=>p.n), 3)
+  ];
+  // 3rd Down — must get it (3 plays per hash)
+  // Left hash 3rd: quick pass to field; Middle 3rd: reliable balanced; Right hash 3rd: deep/bootleg
+  const d3 = [
+    pad(merge(quickPasses, screens, flats, bootlegs).slice(0,3).map(p=>p.n), 3),
+    pad(merge(bootlegs, insideRuns.filter(isCore), screens, passes).slice(0,3).map(p=>p.n), 3),
+    pad(merge(deepPasses, bootlegs, edgeRuns.filter(isCore), passes).slice(0,3).map(p=>p.n), 3)
+  ];
 
   return {
     op: opPlays,
@@ -4759,9 +4795,9 @@ function _defaultGridCS() {
     bbL: bbL, bbR: bbR,
     bb2L: bb2L, bb2R: bb2R,
     sit: [sit0, sit1, sit2, sit3_4, sit4, sit5],
-    d1: [d1_0, d1_1],
-    d2: [d2_0, d2_1],
-    d3: [d3_0, d3_1],
+    d1: d1,
+    d2: d2,
+    d3: d3,
     mu: [
       ['Logan — Sweep/Counter','Charlie — Sweep/Dive','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
       ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
@@ -4777,6 +4813,13 @@ function _defaultGridCS() {
 function _getGridCS() {
   const key = state.division === '56' ? 'gridCallSheet56' : ('gridCallSheet78_' + curSystem);
   if(!state[key]) state[key] = _defaultGridCS();
+  // Guard: d1/d2/d3 must be 3-element arrays (LEFT HASH / MIDDLE / RIGHT HASH).
+  // Older saved sheets had 2 elements after a bug. Regenerate if invalid.
+  const cs = state[key];
+  if(!cs.d1 || cs.d1.length !== 3 || !cs.d2 || cs.d2.length !== 3 || !cs.d3 || cs.d3.length !== 3) {
+    state[key] = _defaultGridCS();
+    save();
+  }
   return state[key];
 }
 
