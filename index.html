@@ -4634,10 +4634,11 @@ function _defaultGridCS() {
   const nextGameNum = (_games ? _games.length : 0) + 1;
   const scout = (state.scouting||[]).find(s=>s.gameNum===nextGameNum&&s.division===division) || {};
   // Shorthand for scout fields (default 'unknown' when not filled in)
-  const ath = scout.athleticism || 'unknown';  // outrun | even | contain
-  const def = scout.defStyle    || 'unknown';  // crash | drop | zone | mixed
-  const rot = scout.rotation    || 'unknown';  // yes | no
-  const off = scout.offStyle    || 'unknown';  // runheavy | passheavy | balanced | misdirection
+  const ath = scout.athleticism  || 'unknown';  // burnall | burntop | even | contain | faster
+  const dl  = scout.dLine        || 'unknown';  // bigquick | average | small
+  const lb  = scout.lbSpeed      || 'unknown';  // fasthands | average | slowpoor
+  const def = scout.defFormation || 'unknown';  // 44 | 431
+  const off = scout.offStyle     || 'unknown';  // runheavy | passheavy | balanced | misdirection
   const qbt = scout.qbThreat    || 'unknown';  // runner | pocket | both
   const rec = scout.recThreat   || 'unknown';  // one | spread | none
 
@@ -4649,30 +4650,54 @@ function _defaultGridCS() {
     const score = p => {
       let s = 0;
       // Athleticism: can we outrun them?
-      if(ath === 'outrun') {
-        if(isEdge(p)) s += 3;      // sweep to space — our speed wins
-        if(isBootleg(p)) s += 2;   // QB rollout also exploits speed advantage
+      if(ath === 'burnall') {
+        if(isEdge(p)) s += 4;      // everyone's faster — sweep to space all day
+        if(isBootleg(p)) s += 3;   // QB rollout exploits speed advantage
+      } else if(ath === 'burntop') {
+        if(isEdge(p)) s += 2;      // top guys win on the edge
+        if(isBootleg(p)) s += 2;   // rollout with skill guys
+        if(isInside(p)) s += 1;    // inside still OK
+      } else if(ath === 'even') {
+        if(isCounter(p)) s += 2;   // misdirection creates edge when speed doesn't
+        if(isInside(p)) s += 1;    // inside works fine
       } else if(ath === 'contain') {
         if(isInside(p)) s += 3;    // hit inside — don't rely on speed edge
-        if(isCounter(p)) s += 2;   // misdirection beats athletes too
-        if(isEdge(p)) s -= 1;      // risky if they can match our speed
+        if(isCounter(p)) s += 2;   // misdirection beats athletes
+        if(isEdge(p)) s -= 1;      // risky if they track us down outside
+      } else if(ath === 'faster') {
+        if(isInside(p)) s += 4;    // they beat us outside — attack the middle
+        if(isCounter(p)) s += 3;   // misdirection disguises the direction
+        if(isEdge(p)) s -= 2;      // avoid the perimeter, they'll run us down
+        if(isDeep(p)) s -= 2;      // no deep shots if they're faster deep
       }
-      // Defensive scheme
-      if(def === 'crash') {
-        if(isBootleg(p)||isPlayAction(p)) s += 3;  // they crash = bootleg/PA kills them
-        if(isScreen(p)) s += 2;                    // dump behind crashers
-        if(isCounter(p)) s += 2;                   // crash creates cutback lanes
-      } else if(def === 'drop') {
-        if(isEdge(p)||isInside(p)) s += 3;         // they drop = run it at them
-        if(isQBrun(p)) s += 2;                     // QB scrambles vs soft coverage
-        if(isDeep(p)) s -= 1;                      // they're in coverage — hard to beat deep
-      } else if(def === 'zone') {
-        if(isCounter(p)||isQBrun(p)) s += 2;       // attack zone seams with misdirection
-        if(isScreen(p)) s += 2;                    // screens stress zone underneath
-        if(isDeep(p)) s += 1;                      // over-the-top shots vs zone safeties
+      // D-line size/pressure: are they getting in our backfield?
+      if(dl === 'bigquick') {
+        if(isBootleg(p)||isPlayAction(p)) s += 3;  // get QB moving before they arrive
+        if(isScreen(p)) s += 2;                    // dump it behind the pressure
+        if(isCounter(p)) s += 2;                   // let them penetrate, then cut back
+        if(isInside(p)) s -= 1;                    // tough to run at pressure
+      } else if(dl === 'small') {
+        if(isInside(p)) s += 3;                    // run right at them, we're bigger
+        if(isEdge(p)) s += 2;                      // they can't hold the edge either
       }
-      // Misdirection bump when they're disciplined (zone/mixed)
-      if((def==='zone'||def==='mixed') && isCounter(p)) s += 1;
+      // LB speed and flag pulling
+      if(lb === 'fasthands') {
+        if(isDeep(p)) s += 2;                      // get the ball away from their LBs
+        if(isScreen(p)) s += 1;                    // catch them pursuing and throw behind
+        if(isQBrun(p)) s -= 1;                     // they'll track the QB down
+      } else if(lb === 'slowpoor') {
+        if(isEdge(p)) s += 2;                      // they can't get outside to pull flags
+        if(isQBrun(p)) s += 2;                     // QB slips through misses
+        if(isCounter(p)) s += 1;                   // by the time they react, we're past them
+      }
+      // Formation: 4-4 (8 in box, no safety) vs 4-3-1 (safety over top)
+      if(def === '44') {
+        if(isScreen(p)) s += 2;                    // nobody over the top to bother screens
+        if(isBootleg(p)) s += 1;                   // flat routes open, LBs are committing
+      } else if(def === '431') {
+        if(isDeep(p)||isPlayAction(p)) s += 2;     // safety is alone covering the whole sky
+        if(isInside(p)) s += 1;                    // only 3 LBs, more gaps inside
+      }
       return s;
     };
     return arr.slice().sort((a,b) => score(b)-score(a));
@@ -4841,10 +4866,6 @@ function _defaultGridCS() {
       defLines.push('They spread it around — don\'t single-focus, play zone coverage');
       defLines.push('No bracketing: rotate to the ball, stay in your zones');
     }
-    // Boundary rotation
-    if(rot==='yes') {
-      defLines.push('They rotate to the boundary — attack the open side, they\'re light there');
-    }
     defOff = defLines.slice(0,5);
   }
 
@@ -4935,8 +4956,9 @@ function renderGridCallSheet(el) {
   const _games = _division==='56' ? state.games56 : state.games;
   const _nextGameNum = (_games ? _games.length : 0) + 1;
   const _scout = (state.scouting||[]).find(s=>s.gameNum===_nextGameNum&&s.division===_division);
-  const _athLabel = {outrun:'We outrun them',even:'Even matchup',contain:'They can contain us',unknown:''}[_scout&&_scout.athleticism||'unknown'];
-  const _defLabel = {crash:'Crash the run',drop:'Drop into coverage',zone:'True zone',mixed:'Mixed / disguise',unknown:''}[_scout&&_scout.defStyle||'unknown'];
+  const _athLabel = {burnall:'We burn everyone',burntop:'Top 2-3 burn them',even:'Speed is even',contain:'They can contain us',faster:'They\'re faster',unknown:''}[_scout&&_scout.athleticism||'unknown'];
+  const _dlLabel  = {bigquick:'Big & quick D-line',average:'Average D-line',small:'Small/slow D-line',unknown:''}[_scout&&_scout.dLine||'unknown'];
+  const _lbLabel  = {fasthands:'Fast LBs, good hands',average:'Average LBs',slowpoor:'Slow / poor flag pull',unknown:''}[_scout&&_scout.lbSpeed||'unknown'];
   const _offLabel = {runheavy:'Run heavy',passheavy:'Pass heavy',balanced:'Balanced',misdirection:'Misdirection heavy',unknown:''}[_scout&&_scout.offStyle||'unknown'];
   const _scoutCard = _scout ? `
     <div style="background:var(--navy2);border-radius:10px;border:1px solid rgba(245,166,35,.3);padding:10px 12px;margin-bottom:10px;">
@@ -4947,10 +4969,11 @@ function renderGridCallSheet(el) {
         </div>
         <button onclick="openScoutEdit(${_nextGameNum})" style="padding:4px 10px;background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;">Edit Scout</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;margin-bottom:4px;">
         ${_athLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">SPEED</span>${_athLabel}</div>`:''}
-        ${_defLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">THEIR D</span>${_defLabel}</div>`:''}
         ${_offLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">THEIR O</span>${_offLabel}</div>`:''}
+        ${_dlLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">D-LINE</span>${_dlLabel}</div>`:''}
+        ${_lbLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">LINEBACKERS</span>${_lbLabel}</div>`:''}
       </div>
       ${_scout.bestPlayer?`<div style="margin-top:6px;font-size:11px;color:var(--g3);">⚠️ Watch: <strong style="color:#fff;">${_scout.bestPlayer}</strong></div>`:''}
       <div style="margin-top:6px;font-size:10px;color:var(--g3);">Plays are weighted for this opponent · hit <strong style="color:var(--gold);">⚡ New Sheet</strong> to regenerate</div>
@@ -6581,13 +6604,18 @@ function renderScouting(el) {
       </div>
       ${scout?`
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;margin-bottom:6px;">
-          ${scout.athleticism&&scout.athleticism!=='unknown'?`<div><span style="color:var(--g3);">Speed matchup:</span> <strong>${
-            scout.athleticism==='outrun'?'We outrun them':scout.athleticism==='even'?'Even matchup':'They can contain us'
+          ${scout.athleticism&&scout.athleticism!=='unknown'?`<div><span style="color:var(--g3);">Speed:</span> <strong>${
+            {burnall:'We burn everyone',burntop:'Top 2-3 faster',even:'Even speed',contain:'They contain us',faster:'They\'re faster'}[scout.athleticism]||scout.athleticism
           }</strong></div>`:''}
-          ${scout.defStyle&&scout.defStyle!=='unknown'?`<div><span style="color:var(--g3);">Defense:</span> <strong>${
-            scout.defStyle==='crash'?'Crash the run':scout.defStyle==='drop'?'Drop to coverage':scout.defStyle==='zone'?'Zone halves':'Mixed/disguised'
+          ${scout.defFormation&&scout.defFormation!=='unknown'?`<div><span style="color:var(--g3);">Formation:</span> <strong>${
+            scout.defFormation==='44'?'4-4 (no safety)':scout.defFormation==='431'?'4-3-1 (deep safety)':scout.defFormation
           }</strong></div>`:''}
-          ${scout.rotation&&scout.rotation!=='unknown'?`<div><span style="color:var(--g3);">Boundary rot.:</span> <strong>${scout.rotation==='yes'?'Yes':'No'}</strong></div>`:''}
+          ${scout.dLine&&scout.dLine!=='unknown'?`<div><span style="color:var(--g3);">D-line:</span> <strong>${
+            scout.dLine==='bigquick'?'Big & quick':scout.dLine==='average'?'Average':'Small / slow'
+          }</strong></div>`:''}
+          ${scout.lbSpeed&&scout.lbSpeed!=='unknown'?`<div><span style="color:var(--g3);">Linebackers:</span> <strong>${
+            scout.lbSpeed==='fasthands'?'Fast, good hands':scout.lbSpeed==='average'?'Average':'Slow / poor pullers'
+          }</strong></div>`:''}
           ${scout.offStyle&&scout.offStyle!=='unknown'?`<div><span style="color:var(--g3);">Their offense:</span> <strong>${
             scout.offStyle==='runheavy'?'Run heavy':scout.offStyle==='passheavy'?'Pass heavy':scout.offStyle==='misdirection'?'Misdirection':'Balanced'
           }</strong></div>`:''}
@@ -6612,7 +6640,6 @@ function openScoutEdit(gameNum) {
   editScoutingGame = gameNum;
   const division = state.division;
   const e = state.scouting.find(s=>s.gameNum===gameNum&&s.division===division)||{};
-  // opt(value, currentValue, label) — generates <option> with correct selected state
   const opt = (v, cur, label) => `<option value="${v}"${cur===v?' selected':''}>${label}</option>`;
   document.getElementById('slot-picker-content').innerHTML = `
     <div class="modal-title" style="margin-bottom:12px;">🔍 Game ${gameNum} Opponent Scout</div>
@@ -6620,30 +6647,39 @@ function openScoutEdit(gameNum) {
     <label style="font-size:11px;color:var(--g3);font-weight:600;">OPPONENT NAME</label>
     <input type="text" id="sc-opp" placeholder="e.g. Team Blue" value="${(e.oppName||'').replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
 
-    <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin-bottom:6px;">THEIR DEFENSE</div>
+    <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin:8px 0 6px;">THEIR DEFENSE</div>
 
-    <label style="font-size:11px;color:var(--g3);">Athlete level — can they cover our speed?</label>
-    <select id="sc-athleticism" style="margin-bottom:8px;">
+    <label style="font-size:11px;color:var(--g3);">Defense formation</label>
+    <select id="sc-defformation" style="margin-bottom:8px;">
+      ${opt('unknown', e.defFormation||'unknown', '— Not sure yet')}
+      ${opt('44', e.defFormation, '4-4 — four down linemen, four linebackers')}
+      ${opt('431', e.defFormation, '4-3-1 — four linemen, three LBs, one deep safety')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Their D-line — size and backfield pressure</label>
+    <select id="sc-dline" style="margin-bottom:8px;">
+      ${opt('unknown', e.dLine||'unknown', '— Not sure yet')}
+      ${opt('bigquick', e.dLine, 'Big and quick — getting into our backfield fast')}
+      ${opt('average', e.dLine, 'Average — manageable, our blocking holds up')}
+      ${opt('small', e.dLine, 'Small or slow — we can run at them all day')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Their linebackers — speed and flag pulling</label>
+    <select id="sc-lb" style="margin-bottom:8px;">
+      ${opt('unknown', e.lbSpeed||'unknown', '— Not sure yet')}
+      ${opt('fasthands', e.lbSpeed, 'Fast and good hands — they track everything down')}
+      ${opt('average', e.lbSpeed, 'Average — they make some plays, miss some')}
+      ${opt('slowpoor', e.lbSpeed, 'Slow or poor flag pullers — keep the ball moving')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Speed matchup — can we burn them?</label>
+    <select id="sc-athleticism" style="margin-bottom:12px;">
       ${opt('unknown', e.athleticism||'unknown', '— Not sure yet')}
-      ${opt('outrun', e.athleticism, 'We can outrun them — our speed wins outside')}
-      ${opt('even', e.athleticism, 'Even matchup — use misdirection to create angles')}
-      ${opt('contain', e.athleticism, 'They can cover us — attack inside, don\'t rely on speed')}
-    </select>
-
-    <label style="font-size:11px;color:var(--g3);">How they play defense</label>
-    <select id="sc-defstyle" style="margin-bottom:8px;">
-      ${opt('unknown', e.defStyle||'unknown', '— Not sure yet')}
-      ${opt('crash', e.defStyle, 'Crash the run — they attack at the snap')}
-      ${opt('drop', e.defStyle, 'Drop into coverage — they give up the run, cover routes')}
-      ${opt('zone', e.defStyle, 'True zone halves — they split the field, rotate to ball')}
-      ${opt('mixed', e.defStyle, 'Mixed — hard to read, they disguise')}
-    </select>
-
-    <label style="font-size:11px;color:var(--g3);">Do they rotate to the boundary?</label>
-    <select id="sc-rotation" style="margin-bottom:12px;">
-      ${opt('unknown', e.rotation||'unknown', '— Not sure')}
-      ${opt('yes', e.rotation, 'Yes — they rotate defenders toward the short side')}
-      ${opt('no', e.rotation, 'No — they stay home, play their gaps')}
+      ${opt('burnall', e.athleticism, 'We burn them with everyone — attack the edge all game')}
+      ${opt('burntop', e.athleticism, 'Our top 2-3 are faster — use them on sweeps, rest attack inside')}
+      ${opt('even', e.athleticism, 'Speed is even — misdirection creates the edge, not pure speed')}
+      ${opt('contain', e.athleticism, 'Their athletes can run with our skill guys — stay inside, use counters')}
+      ${opt('faster', e.athleticism, 'They are faster than us — attack inside, protect the ball, no deep shots')}
     </select>
 
     <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin-bottom:6px;">THEIR OFFENSE</div>
@@ -6661,7 +6697,7 @@ function openScoutEdit(gameNum) {
     <select id="sc-qb" style="margin-bottom:8px;">
       ${opt('unknown', e.qbThreat||'unknown', '— Not sure')}
       ${opt('runner', e.qbThreat, 'QB runs a lot — scrambles, keeps on option')}
-      ${opt('pocket', e.qbThreat, 'Stays in pocket — arm only, doesn\'t run')}
+      ${opt('pocket', e.qbThreat, 'Stays in pocket — arm only, does not run')}
       ${opt('both', e.qbThreat, 'Both — can hurt you either way')}
     </select>
 
@@ -6674,10 +6710,10 @@ function openScoutEdit(gameNum) {
     </select>
 
     <label style="font-size:11px;color:var(--g3);">Player to watch (# or name)</label>
-    <input type="text" id="sc-player" placeholder="e.g. #7 — very fast, always gets the ball" value="${(e.bestPlayer||'').replace(/"/g,'&quot;')}" style="margin-bottom:12px;">
+    <input type="text" id="sc-player" placeholder="e.g. #7 — very fast, always gets the ball" value="${(e.bestPlayer||'').replace(/"/g,'&quot;')}" style="margin-bottom:8px;">
 
     <label style="font-size:11px;color:var(--g3);">Other notes</label>
-    <input type="text" id="sc-notes" placeholder="Anything else — formations, trick plays, tendencies" value="${(e.notes||'').replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
+    <input type="text" id="sc-notes" placeholder="Formations, trick plays, tendencies" value="${(e.notes||'').replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
 
     <div style="display:flex;gap:8px;">
       <button class="btn btn-outline" onclick="closeModal('modal-slot-picker')" style="flex:1;">Cancel</button>
@@ -6694,15 +6730,16 @@ function saveScout() {
   const existing = state.scouting.findIndex(s=>s.gameNum===gameNum&&s.division===division);
   const data = {
     gameNum, division,
-    oppName:    document.getElementById('sc-opp').value,
-    athleticism:document.getElementById('sc-athleticism').value,
-    defStyle:   document.getElementById('sc-defstyle').value,
-    rotation:   document.getElementById('sc-rotation').value,
-    offStyle:   document.getElementById('sc-offstyle').value,
-    qbThreat:   document.getElementById('sc-qb').value,
-    recThreat:  document.getElementById('sc-rec').value,
-    bestPlayer: document.getElementById('sc-player').value,
-    notes:      document.getElementById('sc-notes').value,
+    oppName:      document.getElementById('sc-opp').value,
+    defFormation: document.getElementById('sc-defformation').value,
+    dLine:        document.getElementById('sc-dline').value,
+    lbSpeed:      document.getElementById('sc-lb').value,
+    athleticism:  document.getElementById('sc-athleticism').value,
+    offStyle:     document.getElementById('sc-offstyle').value,
+    qbThreat:     document.getElementById('sc-qb').value,
+    recThreat:    document.getElementById('sc-rec').value,
+    bestPlayer:   document.getElementById('sc-player').value,
+    notes:        document.getElementById('sc-notes').value,
   };
   if(existing>=0) state.scouting[existing]=data;
   else state.scouting.push(data);
