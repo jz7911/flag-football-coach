@@ -4569,33 +4569,46 @@ function _defaultGridCS() {
 
   // ── 7/8: build from active play bank with real football strategy logic ──────
   const activeIds = state.activePlays[curSystem] || [];
-  // If nothing active, fall back to Core plays so sheet is never blank
+  // Pool = active plays (non-mirror) → Core tier → everything non-mirror
   const active = activeIds.length
     ? B.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror')
     : B.filter(p => p.tier === 'Core');
-  // Final safety net: if active is still empty, use all plays except mirrors
   const pool = active.length ? active : B.filter(p => p.tier !== 'Mirror');
+  // Full bank (non-mirror) — used as fallback so no category is ever empty
+  const fullBank = B.filter(p => p.tier !== 'Mirror');
+
+  // ── Shuffle for variety on every New Sheet press ──────────────────────────
+  // Fisher-Yates — returns a new shuffled array so originals are unchanged
+  const shuffle = arr => {
+    const a = arr.slice();
+    for(let i = a.length-1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  };
 
   // ── Play classifiers ──────────────────────────────────────────────────────
-  const isTrick   = p => p.tier === 'Trick' || p.tier === 'Gimmick';
-  const isCore    = p => p.tier === 'Core';
-  const isReliable= p => isCore(p) || p.tier === 'Intermediate';
-  const isLowMis  = p => !p.mis || p.mis === 'Low';
-  const isEdge    = p => /sweep|jet|pitch|toss|option|wing.*run|edge|outside/i.test(p.n+' '+(p.desc||''));
-  const isInside  = p => /dive|belly|sneak|plunge|trap|lead|wedge|middle|gap|draw/i.test(p.n+' '+(p.desc||''));
-  const isCounter = p => /counter|reverse|waggle|motion.*counter|misdirect/i.test(p.n+' '+(p.desc||''));
-  const isQBrun   = p => /qb|keeper|bootleg.*run|boot.*run|naked|sneak|draw.*keep/i.test(p.n+' '+(p.desc||'')) && !p.pass;
-  const isBootleg = p => /bootleg|waggle|rollout|boot/i.test(p.n+' '+(p.desc||'')) && p.pass;
+  // isTrick includes Advanced + Very High misdirection — the "show stopper" plays
+  const isTrick    = p => p.tier === 'Trick' || p.tier === 'Gimmick' || (p.tier === 'Advanced' && p.mis === 'Very High');
+  const isCore     = p => p.tier === 'Core';
+  const isReliable = p => isCore(p) || p.tier === 'Intermediate';
+  const isLowMis   = p => !p.mis || p.mis === 'Low';
+  const isEdge     = p => /sweep|jet|pitch|toss|option|wing.*run|edge|outside/i.test(p.n+' '+(p.desc||''));
+  const isInside   = p => /dive|belly|sneak|plunge|trap|lead|wedge|middle|gap|draw/i.test(p.n+' '+(p.desc||''));
+  const isCounter  = p => /counter|reverse|waggle|motion.*counter|misdirect/i.test(p.n+' '+(p.desc||''));
+  const isQBrun    = p => /qb|keeper|bootleg.*run|boot.*run|naked|sneak|draw.*keep/i.test(p.n+' '+(p.desc||'')) && !p.pass;
+  const isBootleg  = p => /bootleg|waggle|rollout|boot/i.test(p.n+' '+(p.desc||'')) && p.pass;
   const isPlayAction = p => /play.?action|action pass|fake.*throw|pa /i.test(p.n+' '+(p.desc||'')) && p.pass;
-  const isScreen  = p => /screen|pop pass|dump/i.test(p.n+' '+(p.desc||'')) && p.pass;
-  const isFlat    = p => /flat|flare|checkdown|bubble|angle route/i.test(p.n+' '+(p.desc||'')) && p.pass;
-  const isDeep    = p => /deep|fly|seam|post|corner|vertical|go route/i.test(p.n+' '+(p.desc||'')) && p.pass;
+  const isScreen   = p => /screen|pop pass|dump/i.test(p.n+' '+(p.desc||'')) && p.pass;
+  const isFlat     = p => /flat|flare|checkdown|bubble|angle route/i.test(p.n+' '+(p.desc||'')) && p.pass;
+  const isDeep     = p => /deep|fly|seam|post|corner|vertical|go route/i.test(p.n+' '+(p.desc||'')) && p.pass;
   const isPlayActionDeep = p => (isPlayAction(p) || isBootleg(p)) && isDeep(p);
 
-  // ── Categorized buckets ───────────────────────────────────────────────────
-  const runs   = pool.filter(p => !p.pass && !isTrick(p));
-  const passes = pool.filter(p =>  p.pass && !isTrick(p));
-  const tricks = pool.filter(p => isTrick(p));
+  // ── Categorized buckets from pool (active plays) ──────────────────────────
+  const runs    = pool.filter(p => !p.pass && !isTrick(p));
+  const passes  = pool.filter(p =>  p.pass && !isTrick(p));
+  const tricks  = pool.filter(p => isTrick(p));
 
   const edgeRuns    = runs.filter(isEdge);
   const insideRuns  = runs.filter(isInside);
@@ -4612,6 +4625,22 @@ function _defaultGridCS() {
   const quickPasses  = [...screens, ...flats].filter((p,i,a)=>a.indexOf(p)===i);
   const pureDropback = passes.filter(p=>!isBootleg(p)&&!isPlayAction(p));
 
+  // ── Full-bank fallback buckets (so categories are never empty) ────────────
+  const fbRuns      = fullBank.filter(p => !p.pass && !isTrick(p));
+  const fbPasses    = fullBank.filter(p =>  p.pass && !isTrick(p));
+  const fbTricks    = fullBank.filter(p => isTrick(p));
+  const fbEdge      = fbRuns.filter(isEdge);
+  const fbInside    = fbRuns.filter(isInside);
+  const fbCounter   = fbRuns.filter(isCounter);
+  const fbQBrun     = fbRuns.filter(isQBrun);
+  const fbBootlegs  = fbPasses.filter(p => isBootleg(p) || isPlayAction(p));
+  const fbScreens   = fbPasses.filter(isScreen);
+  const fbDeep      = fbPasses.filter(isDeep);
+  const fbPADeep    = fbPasses.filter(isPlayActionDeep);
+  const fbDropback  = fbPasses.filter(p => !isBootleg(p) && !isPlayAction(p));
+  // Prioritize active-play buckets; fall back to full bank when empty
+  const best = (primary, fallback) => primary.length ? primary : fallback;
+
   // ── Utility helpers ───────────────────────────────────────────────────────
   const g = (arr, i) => arr[i] ? arr[i].n : '';
   const merge = (...arrs) => {
@@ -4624,125 +4653,131 @@ function _defaultGridCS() {
 
   // ── OPENING SERIES (10 plays) ─────────────────────────────────────────────
   // Wing-T philosophy: establish the sweep first, then the belly/dive, then the counter.
-  // Defense has to stop one before the next opens. Open with your bread and butter in order.
-  //   1. Edge sweep (establish outside threat)
-  //   2. Inside run (draw box in)
-  //   3. Counter/reverse (punish over-pursuit)
-  //   4. QB outside run (third option, unblocked runners)
-  //   5. Bootleg pass (run action, easy throw)
-  //   6-10. Reliable mix, no tricks in opening
-  const opPool = merge(
-    edgeRuns.filter(isCore),
-    insideRuns.filter(isCore),
-    counterRuns.filter(isCore),
-    qbRuns.filter(isCore),
-    bootlegs.filter(isReliable),
-    edgeRuns.filter(isReliable),
-    insideRuns.filter(isReliable),
-    screens,
-    bootlegs,
-    passes.filter(isReliable),
-    runs
+  // Slot 1 = edge run (establish outside). Slot 2 = inside run (draw box in).
+  // Slot 3 = counter (punish over-pursuit). Slot 4 = QB keeper / boot.
+  // Slots 5-10 = reliable mix shuffled for variety, no tricks in the opener.
+  const opAnchor = merge(
+    best(edgeRuns.filter(isCore), fbEdge.filter(isCore)).slice(0,1),
+    best(insideRuns.filter(isCore), fbInside.filter(isCore)).slice(0,1),
+    best(counterRuns.filter(isCore), fbCounter).slice(0,1),
+    best(qbRuns.filter(isCore), fbQBrun).slice(0,1)
   );
-  const opPlays = pad(safeNames(opPool).slice(0,10), 10);
+  const opFill = shuffle(merge(
+    best(bootlegs.filter(isReliable), fbBootlegs),
+    best(edgeRuns.filter(isReliable), fbEdge),
+    best(insideRuns.filter(isReliable), fbInside),
+    best(screens, fbScreens),
+    best(passes.filter(isReliable), fbPasses),
+    fbRuns
+  ).filter(p => !opAnchor.find(q=>q.id===p.id)));
+  const opPlays = pad(safeNames(merge(opAnchor, opFill)).slice(0,10), 10);
 
   // ── BREAD & BUTTER ────────────────────────────────────────────────────────
-  // bbR = your #1 go-to run (sweep is the wing-T base)
-  // bbL = your #1 inside / complementary run
-  // bb2R = your #1 QB run or counter (punishes the box crashing on the sweep)
-  // bb2L = your best boot pass (extension of the run game)
-  const bbR   = g(edgeRuns.filter(isCore), 0) || g(edgeRuns, 0)  || g(runs, 0);
-  const bbL   = g(insideRuns.filter(isCore), 0) || g(insideRuns, 0) || g(runs, 1);
-  const bb2R  = g(qbRuns.filter(isCore), 0) || g(counterRuns.filter(isCore), 0) || g(qbRuns, 0) || g(counterRuns, 0) || g(runs, 2);
-  const bb2L  = g(bootlegs.filter(isCore), 0) || g(bootlegs, 0) || g(screens, 0) || g(passes, 0);
+  // bbR = #1 edge run (sweep establishes the Wing-T outside threat)
+  // bbL = #1 inside run (draw the box in, set up everything else)
+  // bb2R = QB keeper or counter (third dimension — punishes over-pursuit)
+  // bb2L = best bootleg pass (run action → easy throw to the flat)
+  const bbR  = g(best(edgeRuns.filter(isCore), best(edgeRuns, fbEdge)), 0) || g(best(runs, fbRuns), 0);
+  const bbL  = g(best(insideRuns.filter(isCore), best(insideRuns, fbInside)), 0) || g(best(runs, fbRuns), 1);
+  const bb2R = g(best(qbRuns.filter(isCore), best(counterRuns.filter(isCore), best(qbRuns, best(counterRuns, best(fbQBrun, fbCounter))))), 0) || g(best(runs, fbRuns), 2);
+  const bb2L = g(best(bootlegs.filter(isCore), best(bootlegs, best(screens, best(fbBootlegs, fbScreens)))), 0) || g(best(passes, fbPasses), 0);
 
   // ── RUNS LEFT / RIGHT ──────────────────────────────────────────────────────
+  // Named L/R plays first; fall back to alternating from full bank for variety
   const runsL = runs.filter(p => /left|\bL\b/i.test(p.n));
   const runsR = runs.filter(p => /right|\bR\b/i.test(p.n));
-  const runLfinal = pad(safeNames(runsL.length ? runsL : runs.filter((_,i)=>i%2===1)).slice(0,4), 4);
-  const runRfinal = pad(safeNames(runsR.length ? runsR : runs.filter((_,i)=>i%2===0)).slice(0,4), 4);
+  const fbRunsL = fbRuns.filter(p => /left|\bL\b/i.test(p.n));
+  const fbRunsR = fbRuns.filter(p => /right|\bR\b/i.test(p.n));
+  const runLpool = best(runsL, best(fbRunsL, shuffle(fbRuns).filter((_,i)=>i%2===1)));
+  const runRpool = best(runsR, best(fbRunsR, shuffle(fbRuns).filter((_,i)=>i%2===0)));
+  const runLfinal = pad(safeNames(shuffle(runLpool)).slice(0,4), 4);
+  const runRfinal = pad(safeNames(shuffle(runRpool)).slice(0,4), 4);
 
   // ── PASS COLUMNS ──────────────────────────────────────────────────────────
-  const passPAfinal  = pad(safeNames(bootlegs).slice(0,3), 3);
-  const passDBfinal  = pad(safeNames(pureDropback).slice(0,2), 2);
-  const specScrFinal = pad(safeNames(screens).slice(0,2), 2);
-  const specTrkFinal = pad(safeNames(tricks).slice(0,3), 3);
+  // Each column falls back to full bank so it's never empty
+  const passPAfinal  = pad(safeNames(shuffle(best(bootlegs, fbBootlegs))).slice(0,3), 3);
+  const passDBfinal  = pad(safeNames(shuffle(best(pureDropback, fbDropback))).slice(0,2), 2);
+  const specScrFinal = pad(safeNames(shuffle(best(screens, fbScreens))).slice(0,2), 2);
+  // Trick plays: active tricks first, then ALL advanced/trick plays from full bank
+  const trickPool = tricks.length ? tricks : fbTricks;
+  const specTrkFinal = pad(safeNames(shuffle(trickPool)).slice(0,3), 3);
 
   // ── SITUATIONAL PLAYS ─────────────────────────────────────────────────────
-  //
-  // SITUATION 0 — 1ST & FOREVER (behind, need a chunk):
+  // Each situation shuffles its pool for variety on every New Sheet press.
+  // Full-bank fallbacks ensure no situation is ever blank.
+
+  // SITUATION 0 — 1ST DOWN (establish your game):
   //   Wing-T answer: the sweep gets you 5-6 every time. Follow with bootleg to stress coverage.
   //   Do NOT abandon the run — misdirection is most effective on 1st down with fresh LBs.
-  const sit0 = pad(safeNames(merge(
-    edgeRuns.filter(isCore),
-    bootlegs.filter(isReliable),
-    counterRuns.filter(isReliable),
-    screens,
-    edgeRuns, bootlegs, passes
-  )).slice(0,4), 4);
+  const sit0 = pad(safeNames(shuffle(merge(
+    best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
+    best(bootlegs.filter(isReliable), fbBootlegs),
+    best(counterRuns.filter(isReliable), fbCounter),
+    best(screens, fbScreens),
+    best(edgeRuns, fbEdge),
+    best(bootlegs, fbBootlegs),
+    best(passes, fbPasses)
+  ))).slice(0,4), 4);
 
   // SITUATION 1 — 3RD & SHORT (1-3 yds, need to convert):
-  //   Short yardage = power inside. FB Dive, Belly, QB Sneak.
+  //   Short yardage = power inside. Dive, Belly, QB Sneak.
   //   The sweep is too wide — takes too long. Hit the gap NOW.
-  //   Rule: run your least-misdirection, highest-reliability play.
   const sit1 = pad(safeNames(merge(
-    insideRuns.filter(isCore),
-    insideRuns.filter(isReliable),
-    edgeRuns.filter(p => isCore(p) && isLowMis(p)),
-    qbRuns.filter(isCore),
-    insideRuns, edgeRuns.filter(isLowMis), qbRuns, runs
+    best(insideRuns.filter(isCore), fbInside.filter(isCore)).slice(0,1),
+    best(qbRuns.filter(isCore), fbQBrun.filter(isCore)).slice(0,1),
+    shuffle(best(insideRuns.filter(isReliable), best(fbInside, fbRuns.filter(isLowMis))))
   )).slice(0,4), 4);
 
   // SITUATION 2 — 3RD & LONG (5+ yds, must throw):
   //   Defense knows you need yardage. Bootleg gets QB outside the rush.
-  //   Screen stresses flat defenders who are playing off.
-  //   Play-action deep if you've run the ball enough.
-  const sit2 = pad(safeNames(merge(
-    bootlegs.filter(isReliable),
-    screens,
-    paDeep,
-    deepPasses,
-    flats,
-    pureDropback,
-    passes
-  )).slice(0,4), 4);
+  //   Screen stresses flat defenders. Play-action deep if you've run it enough.
+  const sit2 = pad(safeNames(shuffle(merge(
+    best(bootlegs.filter(isReliable), fbBootlegs),
+    best(screens, fbScreens),
+    best(paDeep, fbPADeep),
+    best(deepPasses, fbDeep),
+    best(flats, fbPasses.filter(isFlat)),
+    best(pureDropback, fbDropback),
+    best(passes, fbPasses)
+  ))).slice(0,4), 4);
 
-  // SITUATION 3 — BACKED UP (own 5 or inside, protect ball):
+  // SITUATION 3 — BACKED UP (own 5, protect ball):
   //   NO tricks. NO misdirection. NO passes.
-  //   Simple, direct, no fumble risk. The sweep is fine — at least it gets outside.
-  //   "No tricks" reminder always included.
-  const sit3_4 = pad(safeNames(merge(
-    safeRuns.filter(isCore),
-    safeRuns,
-    reliableRuns
-  )).slice(0,3).concat(['No tricks']), 4);
+  //   Simple, direct, no fumble risk.
+  const sit3_4 = pad(safeNames(shuffle(merge(
+    best(safeRuns.filter(isCore), fbRuns.filter(p=>isCore(p)&&isLowMis(p))),
+    best(safeRuns, best(reliableRuns, fbRuns.filter(isLowMis))),
+    best(reliableRuns, fbRuns)
+  ))).slice(0,3).concat(['No tricks']), 4);
 
   // SITUATION 4 — GOAL LINE (inside 5, score needed):
-  //   Every DL is crashing inside. Wing-T answer: QB bootleg run to the edge — they over-commit inside.
-  //   If they spread out: FB Dive or Belly up the gut.
-  //   Counter/reverse is a big play here if they are TRULY over-pursuing.
+  //   Every DL is crashing inside. Wing-T answer: QB bootleg run to edge.
+  //   If they spread: FB Dive or Belly up the gut. Counter if over-pursuing.
   const sit4 = pad(safeNames(merge(
-    qbRuns.filter(isCore),
-    insideRuns.filter(isCore),
-    edgeRuns.filter(isCore),
-    counterRuns.filter(isReliable),
-    qbRuns, insideRuns, edgeRuns, runs
+    best(qbRuns.filter(isCore), fbQBrun).slice(0,1),
+    best(insideRuns.filter(isCore), fbInside).slice(0,1),
+    shuffle(merge(
+      best(edgeRuns.filter(isCore), fbEdge),
+      best(counterRuns.filter(isReliable), fbCounter),
+      best(qbRuns, fbQBrun),
+      best(insideRuns, fbInside),
+      best(runs, fbRuns)
+    ))
   )).slice(0,4), 4);
 
   // SITUATION 5 — BIG PLAY NEEDED (trailing, need 10+):
-  //   Play-action deep is the Wing-T money play. Run sweep 3x then hit the bootleg deep.
-  //   Reverse or double-reverse — defense is over-pursuing.
-  //   Trick pass from the reverse. Once per game.
-  const sit5 = pad(safeNames(merge(
-    paDeep,
-    deepPasses.filter(isPlayAction),
-    counterRuns.filter(p=>p.mis==='Very High'),
-    tricks.filter(p=>p.pass),
-    tricks,
-    deepPasses,
-    bootlegs,
-    passes
-  )).slice(0,4), 4);
+  //   Play-action deep is the Wing-T money play. Run sweep 3x then hit the boot deep.
+  //   Reverse or double-reverse — defense is over-pursuing. Trick pass once per game.
+  const sit5 = pad(safeNames(shuffle(merge(
+    best(paDeep, fbPADeep),
+    best(deepPasses.filter(isPlayAction), fbDeep),
+    best(counterRuns.filter(p=>p.mis==='Very High'), fbCounter),
+    best(trickPool.filter(p=>p.pass), fbTricks.filter(p=>p.pass)),
+    best(trickPool, fbTricks),
+    best(deepPasses, fbDeep),
+    best(bootlegs, fbBootlegs),
+    best(passes, fbPasses)
+  ))).slice(0,4), 4);
 
   // ── DOWN & DISTANCE BY HASH POSITION ─────────────────────────────────────
   // 3 hash columns: LEFT HASH (boundary side), MIDDLE, RIGHT HASH (field side)
@@ -4764,97 +4799,119 @@ function _defaultGridCS() {
   //     → Counter BACK to boundary catches pursuit defenders over-running
 
   // 1st Down — establish your run game; set up the whole series
+  // Shuffled so different plays surface each New Sheet press
   const d1 = [
-    // LEFT HASH: run to field side or hit inside; bootleg away from boundary
-    pad(safeNames(merge(
-      insideRuns.filter(isCore), edgeRuns.filter(isCore),
-      qbRuns.filter(isCore), counterRuns.filter(isReliable),
-      bootlegs.filter(isReliable), insideRuns, edgeRuns, runs
-    )).slice(0,4), 4),
-    // MIDDLE: bread & butter, misdirection works equally both ways
-    pad(safeNames(merge(
-      edgeRuns.filter(isCore), insideRuns.filter(isCore),
-      counterRuns.filter(isCore), qbRuns.filter(isCore),
-      bootlegs.filter(isReliable), edgeRuns, insideRuns, runs, bootlegs
-    )).slice(0,4), 4),
-    // RIGHT HASH (field side): attack the open field, stretch the defense wide
-    pad(safeNames(merge(
-      edgeRuns.filter(isCore), qbRuns.filter(isCore),
-      bootlegs.filter(isReliable), counterRuns.filter(isReliable),
-      deepPasses.filter(isReliable), edgeRuns, runs, bootlegs
-    )).slice(0,4), 4)
+    // LEFT HASH: ball near boundary — hit inside or run away to field side
+    pad(safeNames(shuffle(merge(
+      best(insideRuns.filter(isCore), fbInside.filter(isCore)),
+      best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
+      best(qbRuns.filter(isCore), fbQBrun),
+      best(counterRuns.filter(isReliable), fbCounter),
+      best(bootlegs.filter(isReliable), fbBootlegs),
+      best(insideRuns, fbInside), best(edgeRuns, fbEdge), best(runs, fbRuns)
+    ))).slice(0,4), 4),
+    // MIDDLE: best balanced attack — misdirection works both ways
+    pad(safeNames(shuffle(merge(
+      best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
+      best(insideRuns.filter(isCore), fbInside.filter(isCore)),
+      best(counterRuns.filter(isCore), fbCounter.filter(isCore)),
+      best(qbRuns.filter(isCore), fbQBrun),
+      best(bootlegs.filter(isReliable), fbBootlegs),
+      best(edgeRuns, fbEdge), best(insideRuns, fbInside), best(runs, fbRuns)
+    ))).slice(0,4), 4),
+    // RIGHT HASH: most field to work with — attack wide, stretch the defense
+    pad(safeNames(shuffle(merge(
+      best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
+      best(qbRuns.filter(isCore), fbQBrun),
+      best(bootlegs.filter(isReliable), fbBootlegs),
+      best(counterRuns.filter(isReliable), fbCounter),
+      best(deepPasses, fbDeep), best(edgeRuns, fbEdge), best(runs, fbRuns)
+    ))).slice(0,4), 4)
   ];
 
-  // 2nd Down — depends on what you gained on 1st
-  // If 1st & 10 → 2nd & short (keep running) or 2nd & long (mix in pass)
+  // 2nd Down — depends on gain on 1st; keep runs going, mix in pass if needed
   const d2 = [
-    // LEFT HASH 2nd: inside run or quick boot, pick up the short yardage
-    pad(safeNames(merge(
-      insideRuns.filter(isCore), qbRuns.filter(isReliable),
-      bootlegs.filter(isReliable), screens, insideRuns, runs, passes
-    )).slice(0,3), 3),
-    // MIDDLE 2nd: flexible — run or pass based on down & distance
-    pad(safeNames(merge(
-      insideRuns.filter(isCore), edgeRuns.filter(isCore),
-      bootlegs, screens, counterRuns.filter(isReliable),
-      runs, passes
-    )).slice(0,3), 3),
-    // RIGHT HASH 2nd: open field — bootleg to gain space, or edge run
-    pad(safeNames(merge(
-      edgeRuns.filter(isCore), bootlegs.filter(isReliable),
-      qbRuns.filter(isReliable), deepPasses, screens, runs, passes
-    )).slice(0,3), 3)
+    // LEFT HASH 2nd: inside run or quick boot to get the short yardage
+    pad(safeNames(shuffle(merge(
+      best(insideRuns.filter(isCore), fbInside),
+      best(qbRuns.filter(isReliable), fbQBrun),
+      best(bootlegs.filter(isReliable), fbBootlegs),
+      best(screens, fbScreens),
+      best(insideRuns, fbInside), best(runs, fbRuns), best(passes, fbPasses)
+    ))).slice(0,3), 3),
+    // MIDDLE 2nd: flexible — run or pass, misdirection is wide open
+    pad(safeNames(shuffle(merge(
+      best(insideRuns.filter(isCore), fbInside),
+      best(edgeRuns.filter(isCore), fbEdge),
+      best(bootlegs, fbBootlegs), best(screens, fbScreens),
+      best(counterRuns.filter(isReliable), fbCounter),
+      best(runs, fbRuns), best(passes, fbPasses)
+    ))).slice(0,3), 3),
+    // RIGHT HASH 2nd: open field — edge run or bootleg to gain space
+    pad(safeNames(shuffle(merge(
+      best(edgeRuns.filter(isCore), fbEdge),
+      best(bootlegs.filter(isReliable), fbBootlegs),
+      best(qbRuns.filter(isReliable), fbQBrun),
+      best(deepPasses, fbDeep), best(screens, fbScreens),
+      best(runs, fbRuns), best(passes, fbPasses)
+    ))).slice(0,3), 3)
   ];
 
   // 3rd Down — must convert or you punt
   const d3 = [
-    // LEFT HASH 3rd: throw to field side (away from boundary = more space for route)
-    pad(safeNames(merge(
-      bootlegs, screens, flats, quickPasses, deepPasses, passes
-    )).slice(0,3), 3),
-    // MIDDLE 3rd: your most reliable conversion plays
-    pad(safeNames(merge(
-      bootlegs.filter(isCore), insideRuns.filter(isCore),
-      screens, bootlegs, pureDropback, quickPasses, passes, insideRuns
-    )).slice(0,3), 3),
-    // RIGHT HASH 3rd: open field, attack deep or bootleg into space
-    pad(safeNames(merge(
-      paDeep, bootlegs.filter(isReliable), deepPasses,
-      screens, bootlegs, passes
-    )).slice(0,3), 3)
+    // LEFT HASH 3rd: throw away from boundary (to field) for more route space
+    pad(safeNames(shuffle(merge(
+      best(bootlegs, fbBootlegs), best(screens, fbScreens),
+      best(flats, fbPasses.filter(isFlat)), best(quickPasses, fbScreens),
+      best(deepPasses, fbDeep), best(passes, fbPasses)
+    ))).slice(0,3), 3),
+    // MIDDLE 3rd: most reliable conversion plays — your money calls
+    pad(safeNames(shuffle(merge(
+      best(bootlegs.filter(isCore), fbBootlegs.filter(isCore)),
+      best(insideRuns.filter(isCore), fbInside),
+      best(screens, fbScreens), best(bootlegs, fbBootlegs),
+      best(pureDropback, fbDropback), best(passes, fbPasses)
+    ))).slice(0,3), 3),
+    // RIGHT HASH 3rd: open field — attack deep or bootleg into space
+    pad(safeNames(shuffle(merge(
+      best(paDeep, fbPADeep),
+      best(bootlegs.filter(isReliable), fbBootlegs),
+      best(deepPasses, fbDeep), best(screens, fbScreens),
+      best(bootlegs, fbBootlegs), best(passes, fbPasses)
+    ))).slice(0,3), 3)
   ];
 
   // ── DEFENSE MATCHUP NOTES ─────────────────────────────────────────────────
-  // vs 4-4 OVER (4 DL + 4 LBs, 8 in box, no deep safety):
-  //   → SWEEP beats this — DL are wide, LBs are playing run; edge is open
-  //   → Counter/reverse: they over-pursue the sweep, backside is empty
-  //   → Bootleg pass: LBs can't cover flat AND contain the QB
+  // vs 4-4 OVER (4 DL + 4 LBs = 8 defenders in the box, no deep safety):
+  //   → SWEEP beats this — DL are wide, all 4 LBs are playing run; edge opens up
+  //   → Counter/reverse: they over-pursue the sweep, backside is wide empty
+  //   → Bootleg pass: LBs can't cover the flat AND contain the QB
   //   → Screen: dump to wing in space behind the charging LBs
-  //   → AVOID: deep passes (no safety = CB playing you man-to-man = tighter coverage)
-  const vs44Run  = merge(edgeRuns.filter(isCore), counterRuns.filter(isReliable), edgeRuns, counterRuns);
-  const vs44Pass = merge(screens, flats, bootlegs.filter(isReliable), bootlegs);
+  //   → AVOID deep passes — no safety means CBs are in man, tighter coverage
+  const r44  = merge(best(edgeRuns.filter(isCore), fbEdge.filter(isCore)), best(counterRuns.filter(isReliable), fbCounter), best(edgeRuns, fbEdge), best(counterRuns, fbCounter));
+  const p44  = merge(best(screens, fbScreens), best(flats, fbPasses.filter(isFlat)), best(bootlegs.filter(isReliable), fbBootlegs), best(bootlegs, fbBootlegs));
   const def44 = [
-    g(vs44Run,0)+' — edge is open (8 in box)',
-    g(vs44Run,1)+' — punish over-pursuit',
-    g(vs44Pass,0)+' — screen behind charging LBs',
-    g(vs44Pass,1)+' — bootleg to flat (LBs can\'t cover both)',
-    'No deep shots — CBs in man coverage'
+    (g(r44,0)||'Edge run')+' — edge open, 8 in the box',
+    (g(r44,1)||'Counter')+' — punish over-pursuit',
+    (g(p44,0)||'Screen')+' — dump behind charging LBs',
+    (g(p44,1)||'Bootleg')+' — LBs can\'t cover flat AND contain QB',
+    'AVOID deep shots — CBs are in man coverage'
   ];
 
   // vs 4-3-1 DEEP SAFETY (4 DL + 3 LBs + 1 deep safety):
-  //   → INSIDE RUNS: only 3 LBs, gaps are wider with 4 DL spread out
-  //   → PLAY-ACTION DEEP: single safety has the whole deep half — throw seam/post
-  //   → QB bootleg: with 3 LBs, the flat is almost always open when QB rolls out
-  //   → Counter/reverse: 3 LBs = only 3 run stoppers; misdirection freezes them longer
-  //   → AVOID: quick screens (the safety can drift into coverage) — go deeper instead
-  const vs431Run  = merge(insideRuns.filter(isCore), edgeRuns.filter(isCore), qbRuns.filter(isReliable), insideRuns, edgeRuns);
-  const vs431Pass = merge(paDeep, deepPasses, bootlegs.filter(isReliable), bootlegs, passes);
+  //   → INSIDE RUNS: only 3 LBs to fill gaps — more room between the tackles
+  //   → PLAY-ACTION DEEP: single safety has to cover the WHOLE deep field alone
+  //   → QB bootleg to the flat: only 3 LBs, the flat opens every time QB rolls
+  //   → Counter/reverse: 3 LBs freeze easier on misdirection
+  //   → AVOID quick screens — the safety can cheat up; go OVER them instead
+  const r431 = merge(best(insideRuns.filter(isCore), fbInside.filter(isCore)), best(edgeRuns.filter(isCore), fbEdge), best(qbRuns.filter(isReliable), fbQBrun), best(insideRuns, fbInside), best(edgeRuns, fbEdge));
+  const p431 = merge(best(paDeep, fbPADeep), best(deepPasses, fbDeep), best(bootlegs.filter(isReliable), fbBootlegs), best(bootlegs, fbBootlegs), best(passes, fbPasses));
   const def431 = [
-    g(vs431Run,0)+' — 3 LBs = wider gaps',
-    g(vs431Run,1)+' — force the safety to choose side',
-    g(vs431Pass,0)+' — single safety can\'t cover the whole field',
-    g(vs431Pass,1)+' — PA freezes LBs; safety is alone deep',
-    'Attack the seam — safety is your only deep help'
+    (g(r431,0)||'Inside run')+' — only 3 LBs, gaps are wider',
+    (g(r431,1)||'Edge run')+' — force safety to pick a side',
+    (g(p431,0)||'PA deep')+' — 1 safety can\'t cover the whole field',
+    (g(p431,1)||'Bootleg')+' — PA freezes LBs; safety is alone',
+    'Throw over the defense — safety is your only deep help'
   ];
 
   return {
@@ -5016,13 +5073,16 @@ function renderGridCallSheet(el) {
   }
 
   // By defense — 2 fronts
-  const defLabels = ['[4-4] OVER','[4-3-1] DEEP SAFETY'];
+  const defLabels = [
+    {title:'[4-4] OVER', sub:'4 DL · 4 LBs · 0 Safety'},
+    {title:'[4-3-1] DEEP SAFETY', sub:'4 DL · 3 LBs · 1 Safety'}
+  ];
   const defBgs = ['#1c3a5c','#1a5c2a'];
   function defGrid() {
     return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
       ${defLabels.map((dl,c)=>`
         <div>
-          <div style="background:${defBgs[c]};color:#fff;font-size:9px;font-weight:800;padding:2px 4px;text-align:center;">${dl}</div>
+          <div style="background:${defBgs[c]};color:#fff;font-size:9px;font-weight:800;padding:2px 4px;text-align:center;line-height:1.3;">${dl.title}<br><span style="font-size:8px;opacity:.8;font-weight:600;">${dl.sub}</span></div>
           ${cs.def[c].map((v,r)=>ce('def_'+c+'_'+r, v)).join('')}
         </div>`).join('')}
     </div>`;
@@ -5193,7 +5253,7 @@ function printGridCallSheet() {
   const sitBgs   = [NAVY2,NAVY2,NAVY2,RED,RED,RED];
   const hashLabels = ['LEFT HASH','MIDDLE','RIGHT HASH'];
   const muLabels   = ['RB','RECEIVER','QB'];
-  const defLabels  = ['[4-4] OVER','[4-3-1] DEEP SAFETY'];
+  const defLabels  = ['[4-4] OVER (4DL+4LB)','[4-3-1] DEEP SAFETY (4DL+3LB+1S)'];
   const defBgs     = [NAVY2,GREEN];
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
