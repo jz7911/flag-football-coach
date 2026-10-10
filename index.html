@@ -4567,82 +4567,209 @@ function _defaultGridCS() {
     };
   }
 
-  // ── 7/8: build from active play bank ──────────────────────────────────────
+  // ── 7/8: build from active play bank with real football strategy logic ──────
   const activeIds = state.activePlays[curSystem] || [];
-  // Get active plays, skip Mirrors
-  const active = B.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror');
-  const runs  = active.filter(p => !p.pass);
-  const passes = active.filter(p => p.pass);
-  const tricks = active.filter(p => p.tier === 'Trick' || p.tier === 'Gimmick');
-  // Separate pass plays by type
-  const passPA = passes.filter(p => /bootleg|play.?action|action/i.test(p.n));
-  const passDB = passes.filter(p => !/bootleg|play.?action/i.test(p.n));
-  const screens = passes.filter(p => /screen/i.test(p.n));
+  // If nothing is in the active bank, fall back to all Core plays so the sheet is never blank
+  const active = activeIds.length
+    ? B.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror')
+    : B.filter(p => p.tier === 'Core');
 
-  // Helper: get name by index from array, or ''
+  // ── Play classifiers (by name/desc keywords) ───────────────────────────────
+  const isEdge    = p => /sweep|jet|pitch|toss|option|swing|out.*route|wide/i.test(p.n+' '+(p.desc||''));
+  const isInside  = p => /dive|isolation|iso|lead|sneak|plunge|trap|belly|wedge/i.test(p.n+' '+(p.desc||''));
+  const isCounter = p => /counter|cross|reverse|misdirect/i.test(p.n+' '+(p.desc||''));
+  const isBootleg = p => /bootleg|waggle|rollout|roll.?out|boot/i.test(p.n+' '+(p.desc||''));
+  const isPlayAction = p => /play.?action|play action|action pass/i.test(p.n+' '+(p.desc||''));
+  const isScreen  = p => /screen/i.test(p.n+' '+(p.desc||''));
+  const isFlat    = p => /flat|flare|checkdown|bubble/i.test(p.n+' '+(p.desc||''));
+  const isDeep    = p => /deep|fly|go route|seam|post|corner|vertical/i.test(p.n+' '+(p.desc||''));
+  const isQBrun   = p => /qb|quarterback.*run|bootleg.*run|keeper|sneak/i.test(p.n+' '+(p.desc||''));
+  const isTrick   = p => p.tier === 'Trick' || p.tier === 'Gimmick';
+  const isCore    = p => p.tier === 'Core';
+  const isReliable= p => isCore(p) || p.tier === 'Intermediate';
+
+  // ── Base filters ───────────────────────────────────────────────────────────
+  const runs   = active.filter(p => !p.pass);
+  const passes = active.filter(p => p.pass && !isTrick(p));
+  const tricks = active.filter(p => isTrick(p));
+
+  // ── Typed run categories ───────────────────────────────────────────────────
+  const edgeRuns    = runs.filter(isEdge);
+  const insideRuns  = runs.filter(isInside);
+  const counterRuns = runs.filter(isCounter);
+  const reliableRuns= runs.filter(p => isReliable(p));
+  const safeRuns    = reliableRuns.filter(p => !isTrick(p) && (p.mis||'Low')!=='Very High' && (p.mis||'Low')!=='High');
+
+  // ── Typed pass categories ──────────────────────────────────────────────────
+  const bootlegs    = passes.filter(p => isBootleg(p) || isPlayAction(p));
+  const pureDropback= passes.filter(p => !isBootleg(p) && !isPlayAction(p));
+  const screens     = passes.filter(isScreen);
+  const flats       = passes.filter(isFlat);
+  const deepPasses  = passes.filter(isDeep);
+  const quickPasses = [...screens, ...flats].filter((p,i,a) => a.indexOf(p)===i); // dedupe
+
+  // ── Helper: first match from list that exists in active ───────────────────
   const g = (arr, i) => arr[i] ? arr[i].n : '';
+  // Merge two lists, deduped, names only
+  const merge = (...arrs) => {
+    const seen = new Set(); const out = [];
+    arrs.forEach(a => a.forEach(p => { if(!seen.has(p.id)){seen.add(p.id);out.push(p);} }));
+    return out;
+  };
 
-  // Runs: split into left-tendency and right-tendency by name
-  const runsL = runs.filter(p => /left|L\b/i.test(p.n) || (runs.indexOf(p) % 2 === 1));
-  const runsR = runs.filter(p => !runsL.includes(p));
+  // ── Directional runs (true split from play name) ───────────────────────────
+  const runsL = runs.filter(p => /\bleft\b|wing.?left|\bL\b/i.test(p.n));
+  const runsR = runs.filter(p => /\bright\b|wing.?right|\bR\b/i.test(p.n));
+  // Fallback: alternate when no directional labels
+  const runsLfb = runsL.length ? runsL : runs.filter((_,i) => i%2===1);
+  const runsRfb = runsR.length ? runsR : runs.filter((_,i) => i%2===0);
 
-  // Opening plays: all active runs first, then passes up to 10 total
-  const opPlays = [...runs, ...passes].slice(0, 10).map(p => p.n);
+  // ── Opening plays: balanced, reliable, diverse ────────────────────────────
+  // Best opener: lead with a reliable edge run, then inside, then a pass
+  const opPool = merge(
+    edgeRuns.filter(isReliable),
+    insideRuns.filter(isReliable),
+    counterRuns.filter(isReliable),
+    bootlegs,
+    quickPasses,
+    edgeRuns, insideRuns, passes
+  );
+  const opPlays = pad(opPool.slice(0,10).map(p=>p.n), 10);
 
-  // Best bread-and-butter: first run right, first run left
-  const bb1R = runsR[0] ? runsR[0].n : (runs[0] ? runs[0].n : '');
-  const bb1L = runsL[0] ? runsL[0].n : (runs[1] ? runs[1].n : '');
-  const bb2R = runsR[1] ? runsR[1].n : (passes[0] ? passes[0].n : '');
-  const bb2L = runsL[1] ? runsL[1].n : (passes[1] ? passes[1].n : '');
+  // ── Bread & Butter: most reliable Core plays ──────────────────────────────
+  // Primary bread: best edge run (sweep = gains yards consistently)
+  const bbEdge = edgeRuns.find(isCore) || edgeRuns[0] || runs.find(isCore) || runs[0];
+  // Primary butter: best inside run (short yardage reliability)
+  const bbInside = insideRuns.find(isCore) || insideRuns[0] || runs.find((p,i)=>i>0&&isCore(p)) || runs[1];
+  // Secondary bread: counter or second edge
+  const bb2Edge = counterRuns.find(isCore) || edgeRuns[1] || runs.find((p,i)=>i>1&&isCore(p)) || runs[2];
+  // Secondary butter: second inside or best bootleg
+  const bb2In = insideRuns[1] || bootlegs.find(isCore) || bootlegs[0] || passes.find(isCore) || passes[0];
 
-  // Situational: use most reliable plays
-  const sit1 = passes[0] ? passes[0].n : '';  // 1st & forever — pass
-  const sit2 = screens[0] ? screens[0].n : (passes[0] ? passes[0].n : '');
-  const sit3 = runs[0] ? runs[0].n : '';
-  const sit4 = runs[1] ? runs[1].n : '';
+  const bbR  = bbEdge  ? bbEdge.n  : g(runs,0);
+  const bbL  = bbInside? bbInside.n: g(runs,1);
+  const bb2R = bb2Edge ? bb2Edge.n : g(runs,2);
+  const bb2L = bb2In   ? bb2In.n   : g(passes,0);
+
+  // ── Situational plays using real football logic ───────────────────────────
+  //
+  // 1st & Forever (behind the chains, need a chunk play):
+  //   → Best is a reliable edge run or bootleg to get yards in space.
+  //   → Follow with a screen or flat to pick up what you can.
+  //   → Third: safe pass; fourth: counter to reset the box.
+  const sit0Pool = merge(
+    edgeRuns.filter(isReliable),
+    bootlegs.filter(isReliable),
+    quickPasses,
+    counterRuns.filter(isReliable),
+    edgeRuns, bootlegs, passes
+  );
+  const sit0 = pad(sit0Pool.slice(0,4).map(p=>p.n), 4);
+
+  // 3rd & Short (1-3 yards needed — WIN at the line):
+  //   → Short-yardage = inside runs, QB sneak, quick pitch, power dive.
+  //   → Avoid passes — defense is reading pass on obvious downs if you tip it.
+  const shortPool = merge(
+    insideRuns.filter(isCore),
+    insideRuns.filter(isReliable),
+    edgeRuns.filter(isCore),   // quick pitch counts
+    active.filter(p => !p.pass && isQBrun(p)),
+    insideRuns, edgeRuns
+  );
+  const sit1 = pad(shortPool.slice(0,4).map(p=>p.n), 4);
+
+  // 3rd & Long (5+ yards needed — must throw):
+  //   → Passes first: screens to beat blitz, bootlegs for easy throws on the move.
+  //   → Deep pass if available; flat route as checkdown.
+  //   → No runs listed — this is a passing down.
+  const longPool = merge(screens, bootlegs, deepPasses, flats, pureDropback, passes);
+  const sit2 = pad(longPool.slice(0,4).map(p=>p.n), 4);
+
+  // Backed Up (own 5 or less — protect the ball above ALL else):
+  //   → Only the safest, most reliable runs. Nothing with high misdirection.
+  //   → No passes, no tricks, no exotic motion.
+  const backedPool = merge(
+    safeRuns.filter(isCore),
+    safeRuns.filter(isReliable),
+    safeRuns, reliableRuns
+  );
+  const sit3_4 = pad(backedPool.slice(0,3).map(p=>p.n).concat(['No tricks']), 4);
+
+  // Goal Line (1-3 yards, inside 5 — short field):
+  //   → Pure inside power: dive, isolation, QB sneak, lead block.
+  //   → Edge is OK if defense is pinching inside hard; no passes.
+  const glPool = merge(
+    insideRuns.filter(isCore),
+    insideRuns.filter(isReliable),
+    active.filter(p => !p.pass && isQBrun(p)),
+    edgeRuns.filter(isCore),
+    insideRuns, edgeRuns
+  );
+  const sit4 = pad(glPool.slice(0,4).map(p=>p.n), 4);
+
+  // Big Play Needed (trailing, need 10+):
+  //   → Play-action deep to freeze safeties; flea flicker; trick pass.
+  //   → High-risk, high-reward. Bootleg deep is safer version.
+  const bigPool = merge(
+    deepPasses.filter(isPlayAction),
+    tricks.filter(p => p.pass),
+    tricks,
+    deepPasses,
+    bootlegs
+  );
+  const sit5 = pad(bigPool.slice(0,4).map(p=>p.n), 4);
+
+  // ── Runs left / right ──────────────────────────────────────────────────────
+  const runLfinal = pad(runsLfb.slice(0,4).map(p=>p.n), 4);
+  const runRfinal = pad(runsRfb.slice(0,4).map(p=>p.n), 4);
+
+  // ── Pass columns ──────────────────────────────────────────────────────────
+  const passPAfinal = pad(bootlegs.slice(0,3).map(p=>p.n), 3);
+  const passDBfinal = pad(pureDropback.slice(0,2).map(p=>p.n), 2);
+  const specScrFinal= pad(screens.slice(0,2).map(p=>p.n), 2);
+  const specTrkFinal= pad(tricks.slice(0,3).map(p=>p.n), 3);
+
+  // ── Defense matchup logic ─────────────────────────────────────────────────
+  // vs 4-4 Over (8 in box): attack the edge and use screens — inside is congested
+  //   Run: edge sweeps, jet motion, counters to boundary
+  //   Pass: screens stress flat defenders, bootleg away from the box
+  const vs44RunPool  = merge(edgeRuns.filter(isReliable), counterRuns.filter(isReliable), edgeRuns, counterRuns);
+  const vs44PassPool = merge(screens, bootlegs.filter(isFlat), flats, bootlegs);
+  const d1_0 = pad(merge(vs44RunPool, vs44PassPool).slice(0,4).map(p=>p.n), 4);
+  const d2_0 = pad(vs44RunPool.slice(0,3).map(p=>p.n), 3);
+  const d3_0 = pad(vs44PassPool.slice(0,3).map(p=>p.n), 3);
+
+  // vs 4-3-1 Deep Safety (single high, 7 in box): attack the deep middle — safety is alone
+  //   Run: inside runs first (only 3 down linemen so gaps are wider)
+  //   Pass: deep seam/post beats the single safety; play-action freezes the linebackers
+  const vs431RunPool  = merge(insideRuns.filter(isReliable), edgeRuns.filter(isReliable), insideRuns, edgeRuns);
+  const vs431PassPool = merge(deepPasses, bootlegs.filter(isPlayAction), bootlegs, passes);
+  const d1_1 = pad(merge(vs431RunPool, vs431PassPool).slice(0,4).map(p=>p.n), 4);
+  const d2_1 = pad(vs431RunPool.slice(0,3).map(p=>p.n), 3);
+  const d3_1 = pad(vs431PassPool.slice(0,3).map(p=>p.n), 3);
 
   return {
-    op: pad(opPlays, 10),
-    runL: pad(runsL.slice(0,4).map(p=>p.n), 4),
-    runR: pad(runsR.slice(0,4).map(p=>p.n), 4),
-    passPA: pad(passPA.slice(0,3).map(p=>p.n), 3),
-    passDB: pad(passDB.slice(0,2).map(p=>p.n), 2),
-    specScr: pad(screens.slice(0,2).map(p=>p.n), 2),
-    specTrk: pad(tricks.slice(0,3).map(p=>p.n), 3),
-    bbL: bb1L, bbR: bb1R,
+    op: opPlays,
+    runL: runLfinal,
+    runR: runRfinal,
+    passPA: passPAfinal,
+    passDB: passDBfinal,
+    specScr: specScrFinal,
+    specTrk: specTrkFinal,
+    bbL: bbL, bbR: bbR,
     bb2L: bb2L, bb2R: bb2R,
-    sit: [
-      pad([sit1, g(screens,0), g(runs,0), g(runs,1)], 4),           // 1st & forever
-      pad([g(runs,0), g(runs,1), g(runs,2), g(runs,3)], 4),          // 3rd & short
-      pad([g(passes,0), g(passes,1), g(passes,2), g(passes,3)], 4),  // 3rd & long
-      pad([g(runs,0), g(runs,1), g(runs,2), 'No tricks'], 4),        // backed up
-      pad([g(runs,0), g(runs,2), g(runs,1), g(runs,3)], 4),          // goal line
-      pad([g(passes,0), g(runs,0), g(tricks,0), g(tricks,1)], 4)     // big play
-    ],
-    d1: [
-      pad(runs.slice(0,4).map(p=>p.n), 4),
-      pad([...runs.slice(0,2).map(p=>p.n), ...passes.slice(0,2).map(p=>p.n)], 4),
-      pad([...runs.slice(1,3).map(p=>p.n), ...passes.slice(0,2).map(p=>p.n)], 4)
-    ],
-    d2: [
-      pad([g(runs,0), g(passes,0), g(runs,1)], 3),
-      pad([g(runs,2), g(screens,0), g(runs,0)], 3),
-      pad([g(runs,1), g(passes,1), g(runs,2)], 3)
-    ],
-    d3: [
-      pad([g(passes,0), g(screens,0), g(tricks,0)], 3),
-      pad([g(screens,0), g(passes,1), g(passes,0)], 3),
-      pad([g(passes,1), g(screens,0), g(tricks,0)], 3)
-    ],
+    sit: [sit0, sit1, sit2, sit3_4, sit4, sit5],
+    d1: [d1_0, d1_1],
+    d2: [d2_0, d2_1],
+    d3: [d3_0, d3_1],
     mu: [
       ['Logan — Sweep/Counter','Charlie — Sweep/Dive','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
       ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
       ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
     ],
     def: [
-      [g(runs,0)+' — attack edge', g(runs,2)+' — misdirection', g(passes,0)+' — roll away', 'Counter off sweeps', 'Avoid up-middle vs 4-4'],
-      [g(runs,0)+' — LBs scraping', g(passes,0)+' — Cover 0 flat', g(runs,2)+' — beat blitz', g(screens,0)+' — RB vs. no one', 'Quick hits only'],
-      [g(runs,1)+' — A gap open', g(runs,2)+' — soft edge', g(runs,0)+' — LBs flow', g(passes,0)+' — man coverage', g(runs,0)+' — need seal block']
+      [g(vs44RunPool,0)+' — attack edge', g(vs44RunPool,1)+' — counter to boundary', g(vs44PassPool,0)+' — stress flats', 'Screens beat 4-4 cover', 'Stay off inside vs 8 box'],
+      [g(vs431RunPool,0)+' — gaps wider vs 3 DL', g(vs431RunPool,1)+' — force safety to commit', g(vs431PassPool,0)+' — deep middle open', 'Attack single high safety', 'PA freezes LBs every time']
     ]
   };
 }
@@ -4775,11 +4902,11 @@ function renderGridCallSheet(el) {
     </div>`;
   }
 
-  // By defense — 3 fronts
-  const defLabels = ['[4-4] OVER COVER 3','[3-4] UNDER COVER 0','[3-4] TITE COVER 1'];
-  const defBgs = ['#1c3a5c','#1a5c2a','#5c1c1c'];
+  // By defense — 2 fronts
+  const defLabels = ['[4-4] OVER','[4-3-1] DEEP SAFETY'];
+  const defBgs = ['#1c3a5c','#1a5c2a'];
   function defGrid() {
-    return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;">
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
       ${defLabels.map((dl,c)=>`
         <div>
           <div style="background:${defBgs[c]};color:#fff;font-size:9px;font-weight:800;padding:2px 4px;text-align:center;">${dl}</div>
@@ -4953,8 +5080,8 @@ function printGridCallSheet() {
   const sitBgs   = [NAVY2,NAVY2,NAVY2,RED,RED,RED];
   const hashLabels = ['LEFT HASH','MIDDLE','RIGHT HASH'];
   const muLabels   = ['RB','RECEIVER','QB'];
-  const defLabels  = ['[4-4] OVER','[3-4] UNDER','[3-4] TITE'];
-  const defBgs     = [NAVY2,GREEN,RED];
+  const defLabels  = ['[4-4] OVER','[4-3-1] DEEP SAFETY'];
+  const defBgs     = [NAVY2,GREEN];
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
   <title>Rebels Call Sheet Game ${gameNum}</title>
@@ -5071,7 +5198,7 @@ function printGridCallSheet() {
     </div>
     <div class="box">
       ${ph('BY DEFENSE')}
-      <div class="grid3">
+      <div class="grid2">
         ${defLabels.map((dl,c)=>`
           <div>
             <div style="background:${defBgs[c]};color:#fff;font-size:8px;font-weight:700;padding:2px 4px;text-align:center;">${dl}</div>
@@ -5081,12 +5208,35 @@ function printGridCallSheet() {
     </div>
   </div>
 
-  <script>window.onload=function(){window.print();}<\/script>
+  <script>
+    function doprint(){window.print();}
+  <\/script>
   </body></html>`;
 
-  const w = window.open('','_blank','width=1200,height=850');
-  if(w){ w.document.write(html); w.document.close(); }
-  else { alert('Allow pop-ups to print.'); }
+  const w = window.open('','_blank','width=1280,height=900');
+  if(w){
+    w.document.write(html);
+    w.document.close();
+    // Make every cell editable in the new window
+    w.addEventListener('load', function(){
+      w.document.querySelectorAll('div[style*="border-bottom"]').forEach(function(el){
+        el.contentEditable = 'true';
+        el.style.outline = 'none';
+        el.style.minHeight = '14px';
+      });
+      // Add a floating print button at top
+      var btn = w.document.createElement('button');
+      btn.textContent = '🖨️ Print Call Sheet';
+      btn.style.cssText = 'position:fixed;top:10px;right:10px;padding:10px 18px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:800;cursor:pointer;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+      btn.onclick = function(){ w.print(); };
+      w.document.body.appendChild(btn);
+      // Add edit hint bar
+      var hint = w.document.createElement('div');
+      hint.textContent = '✏️ Click any cell to edit before printing';
+      hint.style.cssText = 'position:fixed;top:10px;left:10px;padding:8px 14px;background:#f5a623;color:#1a3a5c;border-radius:6px;font-size:12px;font-weight:700;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);';
+      w.document.body.appendChild(hint);
+    });
+  } else { alert('Allow pop-ups to print.'); }
 }
 
 function printPlaySheet() {
