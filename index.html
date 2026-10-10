@@ -4567,18 +4567,17 @@ function _defaultGridCS() {
     };
   }
 
-  // ── 7/8: build from active play bank with real football strategy logic ──────
+  // ── 7/8: build from ACTIVE plays only (highlighted plays in the app) ────────
   const activeIds = state.activePlays[curSystem] || [];
-  // Pool = active plays (non-mirror) → Core tier → everything non-mirror
+  // Pool = active (highlighted) plays, non-mirror only
   const active = activeIds.length
     ? B.filter(p => activeIds.includes(p.id) && p.tier !== 'Mirror')
     : B.filter(p => p.tier === 'Core');
-  const pool = active.length ? active : B.filter(p => p.tier !== 'Mirror');
-  // Full bank (non-mirror) — used as fallback so no category is ever empty
+  const pool = active.length ? active : B.filter(p => p.tier !== 'Mirror' && p.tier === 'Core');
+  // Full bank only used for Trick section fallback (exception allowed by coach)
   const fullBank = B.filter(p => p.tier !== 'Mirror');
 
   // ── Shuffle for variety on every New Sheet press ──────────────────────────
-  // Fisher-Yates — returns a new shuffled array so originals are unchanged
   const shuffle = arr => {
     const a = arr.slice();
     for(let i = a.length-1; i > 0; i--) {
@@ -4589,7 +4588,6 @@ function _defaultGridCS() {
   };
 
   // ── Play classifiers ──────────────────────────────────────────────────────
-  // isTrick includes Advanced + Very High misdirection — the "show stopper" plays
   const isTrick    = p => p.tier === 'Trick' || p.tier === 'Gimmick' || (p.tier === 'Advanced' && p.mis === 'Very High');
   const isCore     = p => p.tier === 'Core';
   const isReliable = p => isCore(p) || p.tier === 'Intermediate';
@@ -4605,7 +4603,7 @@ function _defaultGridCS() {
   const isDeep     = p => /deep|fly|seam|post|corner|vertical|go route/i.test(p.n+' '+(p.desc||'')) && p.pass;
   const isPlayActionDeep = p => (isPlayAction(p) || isBootleg(p)) && isDeep(p);
 
-  // ── Categorized buckets from pool (active plays) ──────────────────────────
+  // ── Categorized buckets — ACTIVE PLAYS ONLY ───────────────────────────────
   const runs    = pool.filter(p => !p.pass && !isTrick(p));
   const passes  = pool.filter(p =>  p.pass && !isTrick(p));
   const tricks  = pool.filter(p => isTrick(p));
@@ -4625,21 +4623,60 @@ function _defaultGridCS() {
   const quickPasses  = [...screens, ...flats].filter((p,i,a)=>a.indexOf(p)===i);
   const pureDropback = passes.filter(p=>!isBootleg(p)&&!isPlayAction(p));
 
-  // ── Full-bank fallback buckets (so categories are never empty) ────────────
-  const fbRuns      = fullBank.filter(p => !p.pass && !isTrick(p));
-  const fbPasses    = fullBank.filter(p =>  p.pass && !isTrick(p));
-  const fbTricks    = fullBank.filter(p => isTrick(p));
-  const fbEdge      = fbRuns.filter(isEdge);
-  const fbInside    = fbRuns.filter(isInside);
-  const fbCounter   = fbRuns.filter(isCounter);
-  const fbQBrun     = fbRuns.filter(isQBrun);
-  const fbBootlegs  = fbPasses.filter(p => isBootleg(p) || isPlayAction(p));
-  const fbScreens   = fbPasses.filter(isScreen);
-  const fbDeep      = fbPasses.filter(isDeep);
-  const fbPADeep    = fbPasses.filter(isPlayActionDeep);
-  const fbDropback  = fbPasses.filter(p => !isBootleg(p) && !isPlayAction(p));
-  // Prioritize active-play buckets; fall back to full bank when empty
-  const best = (primary, fallback) => primary.length ? primary : fallback;
+  // Trick plays: active tricks OR (fallback) full-bank advanced/trick plays
+  const fbTricks  = fullBank.filter(p => isTrick(p));
+  const trickPool = tricks.length ? tricks : fbTricks;
+
+  // ── Look up opponent scout for this game ──────────────────────────────────
+  // "Next game" = games played so far + 1
+  const division = state.division;
+  const _games = division==='56' ? state.games56 : state.games;
+  const nextGameNum = (_games ? _games.length : 0) + 1;
+  const scout = (state.scouting||[]).find(s=>s.gameNum===nextGameNum&&s.division===division) || {};
+  // Shorthand for scout fields (default 'unknown' when not filled in)
+  const ath = scout.athleticism || 'unknown';  // outrun | even | contain
+  const def = scout.defStyle    || 'unknown';  // crash | drop | zone | mixed
+  const rot = scout.rotation    || 'unknown';  // yes | no
+  const off = scout.offStyle    || 'unknown';  // runheavy | passheavy | balanced | misdirection
+  const qbt = scout.qbThreat    || 'unknown';  // runner | pocket | both
+  const rec = scout.recThreat   || 'unknown';  // one | spread | none
+
+  // ── Scout-aware play priority ─────────────────────────────────────────────
+  // Returns plays in scout-adjusted order: high-value plays for this opponent first
+  const scoutSort = (arr) => {
+    if(!arr.length) return arr;
+    // Score each play based on opponent profile — higher score = better call this game
+    const score = p => {
+      let s = 0;
+      // Athleticism: can we outrun them?
+      if(ath === 'outrun') {
+        if(isEdge(p)) s += 3;      // sweep to space — our speed wins
+        if(isBootleg(p)) s += 2;   // QB rollout also exploits speed advantage
+      } else if(ath === 'contain') {
+        if(isInside(p)) s += 3;    // hit inside — don't rely on speed edge
+        if(isCounter(p)) s += 2;   // misdirection beats athletes too
+        if(isEdge(p)) s -= 1;      // risky if they can match our speed
+      }
+      // Defensive scheme
+      if(def === 'crash') {
+        if(isBootleg(p)||isPlayAction(p)) s += 3;  // they crash = bootleg/PA kills them
+        if(isScreen(p)) s += 2;                    // dump behind crashers
+        if(isCounter(p)) s += 2;                   // crash creates cutback lanes
+      } else if(def === 'drop') {
+        if(isEdge(p)||isInside(p)) s += 3;         // they drop = run it at them
+        if(isQBrun(p)) s += 2;                     // QB scrambles vs soft coverage
+        if(isDeep(p)) s -= 1;                      // they're in coverage — hard to beat deep
+      } else if(def === 'zone') {
+        if(isCounter(p)||isQBrun(p)) s += 2;       // attack zone seams with misdirection
+        if(isScreen(p)) s += 2;                    // screens stress zone underneath
+        if(isDeep(p)) s += 1;                      // over-the-top shots vs zone safeties
+      }
+      // Misdirection bump when they're disciplined (zone/mixed)
+      if((def==='zone'||def==='mixed') && isCounter(p)) s += 1;
+      return s;
+    };
+    return arr.slice().sort((a,b) => score(b)-score(a));
+  };
 
   // ── Utility helpers ───────────────────────────────────────────────────────
   const g = (arr, i) => arr[i] ? arr[i].n : '';
@@ -4648,248 +4685,105 @@ function _defaultGridCS() {
     arrs.forEach(a => (a||[]).forEach(p => { if(p && !seen.has(p.id)){seen.add(p.id);out.push(p);} }));
     return out;
   };
-  // Safe pad — always returns a string array of length `len`
   const safeNames = arr => (arr||[]).map(p => (p && p.n) ? p.n : '');
 
-  // ── OPENING SERIES (10 plays) ─────────────────────────────────────────────
-  // Wing-T philosophy: establish the sweep first, then the belly/dive, then the counter.
-  // Slot 1 = edge run (establish outside). Slot 2 = inside run (draw box in).
-  // Slot 3 = counter (punish over-pursuit). Slot 4 = QB keeper / boot.
-  // Slots 5-10 = reliable mix shuffled for variety, no tricks in the opener.
+  // ── OPENING SERIES (10 plays) — scout-adjusted ────────────────────────────
   const opAnchor = merge(
-    best(edgeRuns.filter(isCore), fbEdge.filter(isCore)).slice(0,1),
-    best(insideRuns.filter(isCore), fbInside.filter(isCore)).slice(0,1),
-    best(counterRuns.filter(isCore), fbCounter).slice(0,1),
-    best(qbRuns.filter(isCore), fbQBrun).slice(0,1)
+    scoutSort(edgeRuns.filter(isCore)).slice(0,1),
+    scoutSort(insideRuns.filter(isCore)).slice(0,1),
+    scoutSort(counterRuns.filter(isCore)).slice(0,1),
+    scoutSort(qbRuns.filter(isCore)).slice(0,1)
   );
-  const opFill = shuffle(merge(
-    best(bootlegs.filter(isReliable), fbBootlegs),
-    best(edgeRuns.filter(isReliable), fbEdge),
-    best(insideRuns.filter(isReliable), fbInside),
-    best(screens, fbScreens),
-    best(passes.filter(isReliable), fbPasses),
-    fbRuns
-  ).filter(p => !opAnchor.find(q=>q.id===p.id)));
+  const opFill = shuffle(scoutSort(merge(
+    bootlegs.filter(isReliable),
+    edgeRuns.filter(isReliable),
+    insideRuns.filter(isReliable),
+    screens,
+    passes.filter(isReliable),
+    runs
+  ).filter(p => !opAnchor.find(q=>q.id===p.id))));
   const opPlays = pad(safeNames(merge(opAnchor, opFill)).slice(0,10), 10);
 
   // ── BREAD & BUTTER ────────────────────────────────────────────────────────
-  // bbR = #1 edge run (sweep establishes the Wing-T outside threat)
-  // bbL = #1 inside run (draw the box in, set up everything else)
-  // bb2R = QB keeper or counter (third dimension — punishes over-pursuit)
-  // bb2L = best bootleg pass (run action → easy throw to the flat)
-  const bbR  = g(best(edgeRuns.filter(isCore), best(edgeRuns, fbEdge)), 0) || g(best(runs, fbRuns), 0);
-  const bbL  = g(best(insideRuns.filter(isCore), best(insideRuns, fbInside)), 0) || g(best(runs, fbRuns), 1);
-  const bb2R = g(best(qbRuns.filter(isCore), best(counterRuns.filter(isCore), best(qbRuns, best(counterRuns, best(fbQBrun, fbCounter))))), 0) || g(best(runs, fbRuns), 2);
-  const bb2L = g(best(bootlegs.filter(isCore), best(bootlegs, best(screens, best(fbBootlegs, fbScreens)))), 0) || g(best(passes, fbPasses), 0);
+  const bbR  = g(scoutSort(edgeRuns.filter(isCore)), 0) || g(scoutSort(edgeRuns), 0) || g(scoutSort(runs), 0);
+  const bbL  = g(scoutSort(insideRuns.filter(isCore)), 0) || g(scoutSort(insideRuns), 0) || g(scoutSort(runs), 1);
+  const bb2R = g(scoutSort(qbRuns.filter(isCore)), 0) || g(scoutSort(counterRuns.filter(isCore)), 0) || g(scoutSort([...qbRuns,...counterRuns]), 0) || g(scoutSort(runs), 2);
+  const bb2L = g(scoutSort(bootlegs.filter(isCore)), 0) || g(scoutSort(bootlegs), 0) || g(scoutSort(screens), 0) || g(scoutSort(passes), 0);
 
-  // ── RUNS LEFT / RIGHT ──────────────────────────────────────────────────────
-  // Named L/R plays first; fall back to alternating from full bank for variety
+  // ── RUNS LEFT / RIGHT ─────────────────────────────────────────────────────
   const runsL = runs.filter(p => /left|\bL\b/i.test(p.n));
   const runsR = runs.filter(p => /right|\bR\b/i.test(p.n));
-  const fbRunsL = fbRuns.filter(p => /left|\bL\b/i.test(p.n));
-  const fbRunsR = fbRuns.filter(p => /right|\bR\b/i.test(p.n));
-  const runLpool = best(runsL, best(fbRunsL, shuffle(fbRuns).filter((_,i)=>i%2===1)));
-  const runRpool = best(runsR, best(fbRunsR, shuffle(fbRuns).filter((_,i)=>i%2===0)));
-  const runLfinal = pad(safeNames(shuffle(runLpool)).slice(0,4), 4);
-  const runRfinal = pad(safeNames(shuffle(runRpool)).slice(0,4), 4);
+  const runLpool = runsL.length ? runsL : shuffle(runs).filter((_,i)=>i%2===1);
+  const runRpool = runsR.length ? runsR : shuffle(runs).filter((_,i)=>i%2===0);
+  const runLfinal = pad(safeNames(shuffle(scoutSort(runLpool))).slice(0,4), 4);
+  const runRfinal = pad(safeNames(shuffle(scoutSort(runRpool))).slice(0,4), 4);
 
-  // ── PASS COLUMNS ──────────────────────────────────────────────────────────
-  // Each column falls back to full bank so it's never empty
-  const passPAfinal  = pad(safeNames(shuffle(best(bootlegs, fbBootlegs))).slice(0,3), 3);
-  const passDBfinal  = pad(safeNames(shuffle(best(pureDropback, fbDropback))).slice(0,2), 2);
-  const specScrFinal = pad(safeNames(shuffle(best(screens, fbScreens))).slice(0,2), 2);
-  // Trick plays: active tricks first, then ALL advanced/trick plays from full bank
-  const trickPool = tricks.length ? tricks : fbTricks;
+  // ── PASS COLUMNS — active plays only, blank if none in category ───────────
+  const passPAfinal  = pad(safeNames(shuffle(scoutSort(bootlegs))).slice(0,3), 3);
+  const passDBfinal  = pad(safeNames(shuffle(scoutSort(pureDropback))).slice(0,2), 2);
+  const specScrFinal = pad(safeNames(shuffle(scoutSort(screens))).slice(0,2), 2);
+  // Tricks: active highlighted tricks first; full-bank trick fallback only here
   const specTrkFinal = pad(safeNames(shuffle(trickPool)).slice(0,3), 3);
 
-  // ── SITUATIONAL PLAYS ─────────────────────────────────────────────────────
-  // Each situation shuffles its pool for variety on every New Sheet press.
-  // Full-bank fallbacks ensure no situation is ever blank.
+  // ── SITUATIONAL PLAYS — active plays only ────────────────────────────────
 
-  // SITUATION 0 — 1ST DOWN (establish your game):
-  //   Wing-T answer: the sweep gets you 5-6 every time. Follow with bootleg to stress coverage.
-  //   Do NOT abandon the run — misdirection is most effective on 1st down with fresh LBs.
-  const sit0 = pad(safeNames(shuffle(merge(
-    best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
-    best(bootlegs.filter(isReliable), fbBootlegs),
-    best(counterRuns.filter(isReliable), fbCounter),
-    best(screens, fbScreens),
-    best(edgeRuns, fbEdge),
-    best(bootlegs, fbBootlegs),
-    best(passes, fbPasses)
-  ))).slice(0,4), 4);
+  // SITUATION 0 — 1ST DOWN
+  const sit0 = pad(safeNames(shuffle(scoutSort(merge(
+    edgeRuns.filter(isCore), bootlegs.filter(isReliable), counterRuns.filter(isReliable),
+    screens, edgeRuns, bootlegs, passes
+  )))).slice(0,4), 4);
 
-  // SITUATION 1 — 3RD & SHORT (1-3 yds, need to convert):
-  //   Short yardage = power inside. Dive, Belly, QB Sneak.
-  //   The sweep is too wide — takes too long. Hit the gap NOW.
+  // SITUATION 1 — 3RD & SHORT
   const sit1 = pad(safeNames(merge(
-    best(insideRuns.filter(isCore), fbInside.filter(isCore)).slice(0,1),
-    best(qbRuns.filter(isCore), fbQBrun.filter(isCore)).slice(0,1),
-    shuffle(best(insideRuns.filter(isReliable), best(fbInside, fbRuns.filter(isLowMis))))
+    scoutSort(insideRuns.filter(isCore)).slice(0,1),
+    scoutSort(qbRuns.filter(isCore)).slice(0,1),
+    shuffle(scoutSort(insideRuns.filter(isReliable)))
   )).slice(0,4), 4);
 
-  // SITUATION 2 — 3RD & LONG (5+ yds, must throw):
-  //   Defense knows you need yardage. Bootleg gets QB outside the rush.
-  //   Screen stresses flat defenders. Play-action deep if you've run it enough.
-  const sit2 = pad(safeNames(shuffle(merge(
-    best(bootlegs.filter(isReliable), fbBootlegs),
-    best(screens, fbScreens),
-    best(paDeep, fbPADeep),
-    best(deepPasses, fbDeep),
-    best(flats, fbPasses.filter(isFlat)),
-    best(pureDropback, fbDropback),
-    best(passes, fbPasses)
-  ))).slice(0,4), 4);
+  // SITUATION 2 — 3RD & LONG
+  const sit2 = pad(safeNames(shuffle(scoutSort(merge(
+    bootlegs.filter(isReliable), screens, paDeep, deepPasses, flats, pureDropback, passes
+  )))).slice(0,4), 4);
 
-  // SITUATION 3 — BACKED UP (own 5, protect ball):
-  //   NO tricks. NO misdirection. NO passes.
-  //   Simple, direct, no fumble risk.
-  const sit3_4 = pad(safeNames(shuffle(merge(
-    best(safeRuns.filter(isCore), fbRuns.filter(p=>isCore(p)&&isLowMis(p))),
-    best(safeRuns, best(reliableRuns, fbRuns.filter(isLowMis))),
-    best(reliableRuns, fbRuns)
-  ))).slice(0,3).concat(['No tricks']), 4);
+  // SITUATION 3 — BACKED UP (protect ball, no tricks)
+  const sit3_4 = pad(safeNames(shuffle(scoutSort(merge(
+    safeRuns.filter(isCore), safeRuns, reliableRuns
+  )))).slice(0,3).concat(['No tricks']), 4);
 
-  // SITUATION 4 — GOAL LINE (inside 5, score needed):
-  //   Every DL is crashing inside. Wing-T answer: QB bootleg run to edge.
-  //   If they spread: FB Dive or Belly up the gut. Counter if over-pursuing.
+  // SITUATION 4 — GOAL LINE
   const sit4 = pad(safeNames(merge(
-    best(qbRuns.filter(isCore), fbQBrun).slice(0,1),
-    best(insideRuns.filter(isCore), fbInside).slice(0,1),
-    shuffle(merge(
-      best(edgeRuns.filter(isCore), fbEdge),
-      best(counterRuns.filter(isReliable), fbCounter),
-      best(qbRuns, fbQBrun),
-      best(insideRuns, fbInside),
-      best(runs, fbRuns)
-    ))
+    scoutSort(qbRuns.filter(isCore)).slice(0,1),
+    scoutSort(insideRuns.filter(isCore)).slice(0,1),
+    shuffle(scoutSort(merge(edgeRuns.filter(isCore), counterRuns.filter(isReliable), qbRuns, insideRuns, runs)))
   )).slice(0,4), 4);
 
-  // SITUATION 5 — BIG PLAY NEEDED (trailing, need 10+):
-  //   Play-action deep is the Wing-T money play. Run sweep 3x then hit the boot deep.
-  //   Reverse or double-reverse — defense is over-pursuing. Trick pass once per game.
-  const sit5 = pad(safeNames(shuffle(merge(
-    best(paDeep, fbPADeep),
-    best(deepPasses.filter(isPlayAction), fbDeep),
-    best(counterRuns.filter(p=>p.mis==='Very High'), fbCounter),
-    best(trickPool.filter(p=>p.pass), fbTricks.filter(p=>p.pass)),
-    best(trickPool, fbTricks),
-    best(deepPasses, fbDeep),
-    best(bootlegs, fbBootlegs),
-    best(passes, fbPasses)
-  ))).slice(0,4), 4);
+  // SITUATION 5 — BIG PLAY NEEDED
+  const sit5 = pad(safeNames(shuffle(scoutSort(merge(
+    paDeep, deepPasses.filter(isPlayAction), counterRuns.filter(p=>p.mis==='Very High'),
+    trickPool.filter(p=>p.pass), trickPool, deepPasses, bootlegs, passes
+  )))).slice(0,4), 4);
 
-  // ── DOWN & DISTANCE BY HASH POSITION ─────────────────────────────────────
-  // 3 hash columns: LEFT HASH (boundary side), MIDDLE, RIGHT HASH (field side)
-  //
-  // Football logic:
-  //   LEFT HASH (ball on boundary): less space to the short side.
-  //     → Run AWAY from boundary (to field side) = sweeps/edges to field
-  //     → Or hit inside quickly (no time to develop to the short side)
-  //     → QB rollout AWAY from boundary (to open field)
-  //     → Counter/misdirection toward boundary (they won't expect it)
-  //
-  //   MIDDLE: most balanced spot on the field.
-  //     → Your best, most reliable plays with no directional bias
-  //     → Misdirection works great here — defense has to honor both sides equally
-  //
-  //   RIGHT HASH (ball on field side): most space to the open field (right side usually = field).
-  //     → Attack the open field with sweeps and bootlegs
-  //     → Play-action deep — single safety has a LOT of ground to cover
-  //     → Counter BACK to boundary catches pursuit defenders over-running
-
-  // 1st Down — establish your run game; set up the whole series
-  // Shuffled so different plays surface each New Sheet press
+  // ── DOWN & DISTANCE BY HASH POSITION — active plays only ─────────────────
   const d1 = [
-    // LEFT HASH: ball near boundary — hit inside or run away to field side
-    pad(safeNames(shuffle(merge(
-      best(insideRuns.filter(isCore), fbInside.filter(isCore)),
-      best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
-      best(qbRuns.filter(isCore), fbQBrun),
-      best(counterRuns.filter(isReliable), fbCounter),
-      best(bootlegs.filter(isReliable), fbBootlegs),
-      best(insideRuns, fbInside), best(edgeRuns, fbEdge), best(runs, fbRuns)
-    ))).slice(0,4), 4),
-    // MIDDLE: best balanced attack — misdirection works both ways
-    pad(safeNames(shuffle(merge(
-      best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
-      best(insideRuns.filter(isCore), fbInside.filter(isCore)),
-      best(counterRuns.filter(isCore), fbCounter.filter(isCore)),
-      best(qbRuns.filter(isCore), fbQBrun),
-      best(bootlegs.filter(isReliable), fbBootlegs),
-      best(edgeRuns, fbEdge), best(insideRuns, fbInside), best(runs, fbRuns)
-    ))).slice(0,4), 4),
-    // RIGHT HASH: most field to work with — attack wide, stretch the defense
-    pad(safeNames(shuffle(merge(
-      best(edgeRuns.filter(isCore), fbEdge.filter(isCore)),
-      best(qbRuns.filter(isCore), fbQBrun),
-      best(bootlegs.filter(isReliable), fbBootlegs),
-      best(counterRuns.filter(isReliable), fbCounter),
-      best(deepPasses, fbDeep), best(edgeRuns, fbEdge), best(runs, fbRuns)
-    ))).slice(0,4), 4)
+    pad(safeNames(shuffle(scoutSort(merge(insideRuns.filter(isCore), edgeRuns.filter(isCore), qbRuns.filter(isCore), counterRuns.filter(isReliable), bootlegs.filter(isReliable), insideRuns, edgeRuns, runs)))).slice(0,4), 4),
+    pad(safeNames(shuffle(scoutSort(merge(edgeRuns.filter(isCore), insideRuns.filter(isCore), counterRuns.filter(isCore), qbRuns.filter(isCore), bootlegs.filter(isReliable), edgeRuns, insideRuns, runs)))).slice(0,4), 4),
+    pad(safeNames(shuffle(scoutSort(merge(edgeRuns.filter(isCore), qbRuns.filter(isCore), bootlegs.filter(isReliable), counterRuns.filter(isReliable), deepPasses, edgeRuns, runs)))).slice(0,4), 4)
   ];
-
-  // 2nd Down — depends on gain on 1st; keep runs going, mix in pass if needed
   const d2 = [
-    // LEFT HASH 2nd: inside run or quick boot to get the short yardage
-    pad(safeNames(shuffle(merge(
-      best(insideRuns.filter(isCore), fbInside),
-      best(qbRuns.filter(isReliable), fbQBrun),
-      best(bootlegs.filter(isReliable), fbBootlegs),
-      best(screens, fbScreens),
-      best(insideRuns, fbInside), best(runs, fbRuns), best(passes, fbPasses)
-    ))).slice(0,3), 3),
-    // MIDDLE 2nd: flexible — run or pass, misdirection is wide open
-    pad(safeNames(shuffle(merge(
-      best(insideRuns.filter(isCore), fbInside),
-      best(edgeRuns.filter(isCore), fbEdge),
-      best(bootlegs, fbBootlegs), best(screens, fbScreens),
-      best(counterRuns.filter(isReliable), fbCounter),
-      best(runs, fbRuns), best(passes, fbPasses)
-    ))).slice(0,3), 3),
-    // RIGHT HASH 2nd: open field — edge run or bootleg to gain space
-    pad(safeNames(shuffle(merge(
-      best(edgeRuns.filter(isCore), fbEdge),
-      best(bootlegs.filter(isReliable), fbBootlegs),
-      best(qbRuns.filter(isReliable), fbQBrun),
-      best(deepPasses, fbDeep), best(screens, fbScreens),
-      best(runs, fbRuns), best(passes, fbPasses)
-    ))).slice(0,3), 3)
+    pad(safeNames(shuffle(scoutSort(merge(insideRuns.filter(isCore), qbRuns.filter(isReliable), bootlegs.filter(isReliable), screens, insideRuns, runs, passes)))).slice(0,3), 3),
+    pad(safeNames(shuffle(scoutSort(merge(insideRuns.filter(isCore), edgeRuns.filter(isCore), bootlegs, screens, counterRuns.filter(isReliable), runs, passes)))).slice(0,3), 3),
+    pad(safeNames(shuffle(scoutSort(merge(edgeRuns.filter(isCore), bootlegs.filter(isReliable), qbRuns.filter(isReliable), deepPasses, screens, runs, passes)))).slice(0,3), 3)
   ];
-
-  // 3rd Down — must convert or you punt
   const d3 = [
-    // LEFT HASH 3rd: throw away from boundary (to field) for more route space
-    pad(safeNames(shuffle(merge(
-      best(bootlegs, fbBootlegs), best(screens, fbScreens),
-      best(flats, fbPasses.filter(isFlat)), best(quickPasses, fbScreens),
-      best(deepPasses, fbDeep), best(passes, fbPasses)
-    ))).slice(0,3), 3),
-    // MIDDLE 3rd: most reliable conversion plays — your money calls
-    pad(safeNames(shuffle(merge(
-      best(bootlegs.filter(isCore), fbBootlegs.filter(isCore)),
-      best(insideRuns.filter(isCore), fbInside),
-      best(screens, fbScreens), best(bootlegs, fbBootlegs),
-      best(pureDropback, fbDropback), best(passes, fbPasses)
-    ))).slice(0,3), 3),
-    // RIGHT HASH 3rd: open field — attack deep or bootleg into space
-    pad(safeNames(shuffle(merge(
-      best(paDeep, fbPADeep),
-      best(bootlegs.filter(isReliable), fbBootlegs),
-      best(deepPasses, fbDeep), best(screens, fbScreens),
-      best(bootlegs, fbBootlegs), best(passes, fbPasses)
-    ))).slice(0,3), 3)
+    pad(safeNames(shuffle(scoutSort(merge(bootlegs, screens, flats, quickPasses, deepPasses, passes)))).slice(0,3), 3),
+    pad(safeNames(shuffle(scoutSort(merge(bootlegs.filter(isCore), insideRuns.filter(isCore), screens, bootlegs, pureDropback, passes)))).slice(0,3), 3),
+    pad(safeNames(shuffle(scoutSort(merge(paDeep, bootlegs.filter(isReliable), deepPasses, screens, bootlegs, passes)))).slice(0,3), 3)
   ];
 
   // ── DEFENSE MATCHUP NOTES ─────────────────────────────────────────────────
-  // vs 4-4 OVER (4 DL + 4 LBs = 8 defenders in the box, no deep safety):
-  //   → SWEEP beats this — DL are wide, all 4 LBs are playing run; edge opens up
-  //   → Counter/reverse: they over-pursue the sweep, backside is wide empty
-  //   → Bootleg pass: LBs can't cover the flat AND contain the QB
-  //   → Screen: dump to wing in space behind the charging LBs
-  //   → AVOID deep passes — no safety means CBs are in man, tighter coverage
-  const r44  = merge(best(edgeRuns.filter(isCore), fbEdge.filter(isCore)), best(counterRuns.filter(isReliable), fbCounter), best(edgeRuns, fbEdge), best(counterRuns, fbCounter));
-  const p44  = merge(best(screens, fbScreens), best(flats, fbPasses.filter(isFlat)), best(bootlegs.filter(isReliable), fbBootlegs), best(bootlegs, fbBootlegs));
+  // vs 4-4 OVER (4 DL + 4 LBs, no deep safety)
+  const r44 = merge(edgeRuns.filter(isCore), counterRuns.filter(isReliable), edgeRuns, counterRuns);
+  const p44 = merge(screens, flats, bootlegs.filter(isReliable), bootlegs);
   const def44 = [
     (g(r44,0)||'Edge run')+' — edge open, 8 in the box',
     (g(r44,1)||'Counter')+' — punish over-pursuit',
@@ -4898,14 +4792,9 @@ function _defaultGridCS() {
     'AVOID deep shots — CBs are in man coverage'
   ];
 
-  // vs 4-3-1 DEEP SAFETY (4 DL + 3 LBs + 1 deep safety):
-  //   → INSIDE RUNS: only 3 LBs to fill gaps — more room between the tackles
-  //   → PLAY-ACTION DEEP: single safety has to cover the WHOLE deep field alone
-  //   → QB bootleg to the flat: only 3 LBs, the flat opens every time QB rolls
-  //   → Counter/reverse: 3 LBs freeze easier on misdirection
-  //   → AVOID quick screens — the safety can cheat up; go OVER them instead
-  const r431 = merge(best(insideRuns.filter(isCore), fbInside.filter(isCore)), best(edgeRuns.filter(isCore), fbEdge), best(qbRuns.filter(isReliable), fbQBrun), best(insideRuns, fbInside), best(edgeRuns, fbEdge));
-  const p431 = merge(best(paDeep, fbPADeep), best(deepPasses, fbDeep), best(bootlegs.filter(isReliable), fbBootlegs), best(bootlegs, fbBootlegs), best(passes, fbPasses));
+  // vs 4-3-1 DEEP SAFETY (4 DL + 3 LBs + 1 deep safety)
+  const r431 = merge(insideRuns.filter(isCore), edgeRuns.filter(isCore), qbRuns.filter(isReliable), insideRuns, edgeRuns);
+  const p431 = merge(paDeep, deepPasses, bootlegs.filter(isReliable), bootlegs, passes);
   const def431 = [
     (g(r431,0)||'Inside run')+' — only 3 LBs, gaps are wider',
     (g(r431,1)||'Edge run')+' — force safety to pick a side',
@@ -4913,6 +4802,51 @@ function _defaultGridCS() {
     (g(p431,1)||'Bootleg')+' — PA freezes LBs; safety is alone',
     'Throw over the defense — safety is your only deep help'
   ];
+
+  // ── VS THEIR OFFENSE — defensive section built from scout data ────────────
+  // Only populated when we have scout data for this game
+  const hasScout = scout.offStyle || scout.qbThreat || scout.recThreat;
+  let defOff = null;
+  if(hasScout) {
+    const defLines = [];
+    // Offensive tendency → defensive priority
+    if(off==='runheavy') {
+      defLines.push('Set edge: they run — force everything inside and make them earn it');
+      defLines.push('LBs stay home — don\'t chase misdirection, hold your gaps');
+      defLines.push('Once you stop the run, bootleg screen will open up for us');
+    } else if(off==='passheavy') {
+      defLines.push('Drop deep early — they spread and throw, don\'t give up the quick out');
+      defLines.push('QB will hold the ball: force scramble with inside rush, not wide rush');
+      defLines.push('Watch flat routes — their passes are short, don\'t overrun deep');
+    } else if(off==='misdirection') {
+      defLines.push('STAY DISCIPLINED — don\'t bite on the fake, hold your gap assignment');
+      defLines.push('Eyes on the QB, not the ball carrier — misdirection sells with the mesh');
+      defLines.push('Delayed pursuit: let misdirection develop, then close on the ball');
+    } else if(off==='balanced') {
+      defLines.push('Read the line splits — tight = run, wide = pass. Trust your keys');
+      defLines.push('Contain QB: balanced offenses live on roll-outs and scrambles');
+    }
+    // QB threat
+    if(qbt==='runner') {
+      defLines.push('⚠️ QB RUNS — assign a spy. Don\'t over-pursue the receiver routes');
+      defLines.push('Force pocket: contain both edges, don\'t let QB escape to the outside');
+    } else if(qbt==='both') {
+      defLines.push('QB is a dual threat — spy him AND cover deep. Can\'t sacrifice either');
+    }
+    // Receiver threat
+    if(rec==='one') {
+      defLines.push(`⚠️ ONE STAR RECEIVER — bracket ${scout.bestPlayer||'their best'}: always two eyes on him`);
+      defLines.push('Take away their go-to: force QB to check down to someone else');
+    } else if(rec==='spread') {
+      defLines.push('They spread it around — don\'t single-focus, play zone coverage');
+      defLines.push('No bracketing: rotate to the ball, stay in your zones');
+    }
+    // Boundary rotation
+    if(rot==='yes') {
+      defLines.push('They rotate to the boundary — attack the open side, they\'re light there');
+    }
+    defOff = defLines.slice(0,5);
+  }
 
   return {
     op: opPlays,
@@ -4933,7 +4867,8 @@ function _defaultGridCS() {
       ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
       ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
     ],
-    def: [def44, def431]
+    def: [def44, def431],
+    defOff: defOff
   };
 }
 
@@ -4977,6 +4912,7 @@ function _saveGridCS() {
     else if(parts[0]==='d3') { const r=+parts[1],c=+parts[2]; cs.d3[r][c]=val; }
     else if(parts[0]==='mu') { const r=+parts[1],c=+parts[2]; cs.mu[r][c]=val; }
     else if(parts[0]==='def') { const r=+parts[1],c=+parts[2]; cs.def[r][c]=val; }
+    else if(parts[0]==='defOff') { if(cs.defOff) cs.defOff[+parts[1]] = val; }
   });
   const key = state.division === '56' ? 'gridCallSheet56' : ('gridCallSheet78_' + curSystem);
   state[key] = cs;
@@ -5207,6 +5143,17 @@ function renderGridCallSheet(el) {
       </div>
     </div>
 
+    ${cs.defOff && cs.defOff.length ? `
+    <!-- VS THEIR OFFENSE -->
+    <div style="background:var(--navy2);border-radius:8px;overflow:hidden;margin-bottom:8px;border:1px solid rgba(245,166,35,.35);">
+      <div style="background:#5c1c1c;color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;padding:4px 7px;border-radius:5px 5px 0 0;">🛡️ VS THEIR OFFENSE — DEFENSIVE KEYS</div>
+      <div style="padding:6px 8px;display:flex;flex-direction:column;gap:5px;">
+        ${cs.defOff.map((line,i)=>`
+          <div contenteditable="true" data-gcs="defOff_${i}" style="font-size:10px;line-height:1.45;padding:3px 5px;background:rgba(92,28,28,.18);border-radius:4px;border-left:3px solid #c0392b;outline:none;">${line}</div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
     <!-- Save reminder -->
     <div style="text-align:center;padding:8px;">
       <button onclick="_saveGridCS()" style="padding:10px 24px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation;">💾 Save Call Sheet</button>
@@ -5380,6 +5327,16 @@ function printGridCallSheet() {
       </div>
     </div>
   </div>
+
+  ${cs.defOff && cs.defOff.length ? `
+  <div class="box" style="margin-top:4px;border:1.5px solid #c0392b;">
+    ${ph('🛡️ VS THEIR OFFENSE — DEFENSIVE KEYS', RED)}
+    <div style="padding:3px 4px;display:flex;flex-direction:column;gap:3px;">
+      ${cs.defOff.map(line=>`
+        <div style="font-size:8px;padding:2px 4px;background:rgba(92,28,28,.08);border-left:2px solid #c0392b;line-height:1.4;">${line}</div>
+      `).join('')}
+    </div>
+  </div>` : ''}
 
   <script>
     function doprint(){window.print();}
@@ -6588,17 +6545,26 @@ function renderScouting(el) {
         <button onclick="openScoutEdit(${g})" class="btn btn-sm ${scout?'':'btn-gold'}" style="font-size:10px;">${scout?'Edit':'+ Add'}</button>
       </div>
       ${scout?`
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
-          ${scout.formation?`<div><span style="color:var(--g3);">Formation:</span> <strong>${scout.formation}</strong></div>`:''}
-          ${scout.bestPlayer?`<div><span style="color:var(--g3);">Watch:</span> <strong style="color:var(--red);">${scout.bestPlayer}</strong></div>`:''}
-          ${scout.tendencies?`<div style="grid-column:1/-1;"><span style="color:var(--g3);">Tendencies:</span> ${scout.tendencies}</div>`:''}
-          ${scout.watchFor?`<div style="grid-column:1/-1;"><span style="color:var(--g3);">Watch for:</span> ${scout.watchFor}</div>`:''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;margin-bottom:6px;">
+          ${scout.athleticism&&scout.athleticism!=='unknown'?`<div><span style="color:var(--g3);">Speed matchup:</span> <strong>${
+            scout.athleticism==='outrun'?'We outrun them':scout.athleticism==='even'?'Even matchup':'They can contain us'
+          }</strong></div>`:''}
+          ${scout.defStyle&&scout.defStyle!=='unknown'?`<div><span style="color:var(--g3);">Defense:</span> <strong>${
+            scout.defStyle==='crash'?'Crash the run':scout.defStyle==='drop'?'Drop to coverage':scout.defStyle==='zone'?'Zone halves':'Mixed/disguised'
+          }</strong></div>`:''}
+          ${scout.rotation&&scout.rotation!=='unknown'?`<div><span style="color:var(--g3);">Boundary rot.:</span> <strong>${scout.rotation==='yes'?'Yes':'No'}</strong></div>`:''}
+          ${scout.offStyle&&scout.offStyle!=='unknown'?`<div><span style="color:var(--g3);">Their offense:</span> <strong>${
+            scout.offStyle==='runheavy'?'Run heavy':scout.offStyle==='passheavy'?'Pass heavy':scout.offStyle==='misdirection'?'Misdirection':'Balanced'
+          }</strong></div>`:''}
+          ${scout.qbThreat&&scout.qbThreat!=='unknown'?`<div><span style="color:var(--g3);">QB:</span> <strong>${
+            scout.qbThreat==='runner'?'🏃 Runner':scout.qbThreat==='both'?'⚡ Run+Pass':'Pocket passer'
+          }</strong></div>`:''}
+          ${scout.recThreat&&scout.recThreat!=='unknown'?`<div><span style="color:var(--g3);">Receivers:</span> <strong>${
+            scout.recThreat==='one'?'⚠️ One star — bracket him':scout.recThreat==='spread'?'Spread multiple':'No standout'
+          }</strong></div>`:''}
+          ${scout.bestPlayer?`<div style="grid-column:1/-1;"><span style="color:var(--g3);">Watch:</span> <strong style="color:var(--red);">${scout.bestPlayer}</strong></div>`:''}
           ${scout.notes?`<div style="grid-column:1/-1;font-style:italic;color:var(--g3);">${scout.notes}</div>`:''}
         </div>
-        ${scout.playRecs?`<div style="margin-top:8px;padding:7px 10px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:7px;">
-          <div style="font-size:10px;color:var(--gold);font-weight:600;margin-bottom:3px;">SUGGESTED PLAYS</div>
-          <div style="font-size:11px;">${scout.playRecs}</div>
-        </div>`:''}
       `:''}
     </div>`;
   }
@@ -6610,24 +6576,78 @@ function renderScouting(el) {
 function openScoutEdit(gameNum) {
   editScoutingGame = gameNum;
   const division = state.division;
-  const existing = state.scouting.find(s=>s.gameNum===gameNum&&s.division===division)||{};
+  const e = state.scouting.find(s=>s.gameNum===gameNum&&s.division===division)||{};
+  // opt(value, currentValue, label) — generates <option> with correct selected state
+  const opt = (v, cur, label) => `<option value="${v}"${cur===v?' selected':''}>${label}</option>`;
   document.getElementById('slot-picker-content').innerHTML = `
-    <div class="modal-title">Scouting — Game ${gameNum}</div>
-    <label>Opponent name</label>
-    <input type="text" id="sc-opp" placeholder="e.g. Team Red" value="${existing.oppName||''}">
-    <label>Their formation</label>
-    <input type="text" id="sc-form" placeholder="e.g. Spread, Wing-T, Double Wing" value="${existing.formation||''}">
-    <label>Their tendencies</label>
-    <input type="text" id="sc-tend" placeholder="e.g. Always sweep right, heavy run game" value="${existing.tendencies||''}">
-    <label>Player to watch (# or name)</label>
-    <input type="text" id="sc-player" placeholder="e.g. #12, very fast" value="${existing.bestPlayer||''}">
-    <label>Watch out for</label>
-    <input type="text" id="sc-watch" placeholder="e.g. Reverse play, shotgun QB" value="${existing.watchFor||''}">
-    <label>Suggested plays vs this team</label>
-    <input type="text" id="sc-recs" placeholder="e.g. Counter, QB bootleg (they over-pursue)" value="${existing.playRecs||''}">
-    <label>Other notes</label>
-    <input type="text" id="sc-notes" placeholder="General observations" value="${existing.notes||''}">
-    <button class="btn btn-gold" onclick="saveScout()" style="width:100%;margin-top:10px;">Save scouting notes</button>
+    <div class="modal-title" style="margin-bottom:12px;">🔍 Game ${gameNum} Opponent Scout</div>
+
+    <label style="font-size:11px;color:var(--g3);font-weight:600;">OPPONENT NAME</label>
+    <input type="text" id="sc-opp" placeholder="e.g. Team Blue" value="${(e.oppName||'').replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
+
+    <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin-bottom:6px;">THEIR DEFENSE</div>
+
+    <label style="font-size:11px;color:var(--g3);">Athlete level — can they cover our speed?</label>
+    <select id="sc-athleticism" style="margin-bottom:8px;">
+      ${opt('unknown', e.athleticism||'unknown', '— Not sure yet')}
+      ${opt('outrun', e.athleticism, 'We can outrun them — our speed wins outside')}
+      ${opt('even', e.athleticism, 'Even matchup — use misdirection to create angles')}
+      ${opt('contain', e.athleticism, 'They can cover us — attack inside, don\'t rely on speed')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">How they play defense</label>
+    <select id="sc-defstyle" style="margin-bottom:8px;">
+      ${opt('unknown', e.defStyle||'unknown', '— Not sure yet')}
+      ${opt('crash', e.defStyle, 'Crash the run — they attack at the snap')}
+      ${opt('drop', e.defStyle, 'Drop into coverage — they give up the run, cover routes')}
+      ${opt('zone', e.defStyle, 'True zone halves — they split the field, rotate to ball')}
+      ${opt('mixed', e.defStyle, 'Mixed — hard to read, they disguise')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Do they rotate to the boundary?</label>
+    <select id="sc-rotation" style="margin-bottom:12px;">
+      ${opt('unknown', e.rotation||'unknown', '— Not sure')}
+      ${opt('yes', e.rotation, 'Yes — they rotate defenders toward the short side')}
+      ${opt('no', e.rotation, 'No — they stay home, play their gaps')}
+    </select>
+
+    <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin-bottom:6px;">THEIR OFFENSE</div>
+
+    <label style="font-size:11px;color:var(--g3);">Offensive tendency</label>
+    <select id="sc-offstyle" style="margin-bottom:8px;">
+      ${opt('unknown', e.offStyle||'unknown', '— Not sure yet')}
+      ${opt('runheavy', e.offStyle, 'Run heavy — they pound the ball, limited passing')}
+      ${opt('passheavy', e.offStyle, 'Pass heavy — quick routes, spread formation')}
+      ${opt('balanced', e.offStyle, 'Balanced — mix of both, hard to predict')}
+      ${opt('misdirection', e.offStyle, 'Misdirection heavy — reverses, motions, fakes')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">QB threat</label>
+    <select id="sc-qb" style="margin-bottom:8px;">
+      ${opt('unknown', e.qbThreat||'unknown', '— Not sure')}
+      ${opt('runner', e.qbThreat, 'QB runs a lot — scrambles, keeps on option')}
+      ${opt('pocket', e.qbThreat, 'Stays in pocket — arm only, doesn\'t run')}
+      ${opt('both', e.qbThreat, 'Both — can hurt you either way')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Receiver threat</label>
+    <select id="sc-rec" style="margin-bottom:8px;">
+      ${opt('unknown', e.recThreat||'unknown', '— Not sure')}
+      ${opt('one', e.recThreat, 'One go-to receiver — bracket him, take him away')}
+      ${opt('spread', e.recThreat, 'Spread multiple — no single star, they stress coverage')}
+      ${opt('none', e.recThreat, 'No standout — limited passing threat')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Player to watch (# or name)</label>
+    <input type="text" id="sc-player" placeholder="e.g. #7 — very fast, always gets the ball" value="${(e.bestPlayer||'').replace(/"/g,'&quot;')}" style="margin-bottom:12px;">
+
+    <label style="font-size:11px;color:var(--g3);">Other notes</label>
+    <input type="text" id="sc-notes" placeholder="Anything else — formations, trick plays, tendencies" value="${(e.notes||'').replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-slot-picker')" style="flex:1;">Cancel</button>
+      <button class="btn btn-gold" onclick="saveScout()" style="flex:2;">Save Scout</button>
+    </div>
   `;
   document.getElementById('slot-picker-pos').value = 'scout';
   openModal('modal-slot-picker');
@@ -6639,13 +6659,15 @@ function saveScout() {
   const existing = state.scouting.findIndex(s=>s.gameNum===gameNum&&s.division===division);
   const data = {
     gameNum, division,
-    oppName: document.getElementById('sc-opp').value,
-    formation: document.getElementById('sc-form').value,
-    tendencies: document.getElementById('sc-tend').value,
+    oppName:    document.getElementById('sc-opp').value,
+    athleticism:document.getElementById('sc-athleticism').value,
+    defStyle:   document.getElementById('sc-defstyle').value,
+    rotation:   document.getElementById('sc-rotation').value,
+    offStyle:   document.getElementById('sc-offstyle').value,
+    qbThreat:   document.getElementById('sc-qb').value,
+    recThreat:  document.getElementById('sc-rec').value,
     bestPlayer: document.getElementById('sc-player').value,
-    watchFor: document.getElementById('sc-watch').value,
-    playRecs: document.getElementById('sc-recs').value,
-    notes: document.getElementById('sc-notes').value,
+    notes:      document.getElementById('sc-notes').value,
   };
   if(existing>=0) state.scouting[existing]=data;
   else state.scouting.push(data);
