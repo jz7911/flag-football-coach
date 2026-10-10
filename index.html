@@ -4930,6 +4930,39 @@ function _resetGridCS() {
 function renderGridCallSheet(el) {
   const cs = _getGridCS();
 
+  // Scout card — next game's opponent profile
+  const _division = state.division;
+  const _games = _division==='56' ? state.games56 : state.games;
+  const _nextGameNum = (_games ? _games.length : 0) + 1;
+  const _scout = (state.scouting||[]).find(s=>s.gameNum===_nextGameNum&&s.division===_division);
+  const _athLabel = {outrun:'We outrun them',even:'Even matchup',contain:'They can contain us',unknown:''}[_scout&&_scout.athleticism||'unknown'];
+  const _defLabel = {crash:'Crash the run',drop:'Drop into coverage',zone:'True zone',mixed:'Mixed / disguise',unknown:''}[_scout&&_scout.defStyle||'unknown'];
+  const _offLabel = {runheavy:'Run heavy',passheavy:'Pass heavy',balanced:'Balanced',misdirection:'Misdirection heavy',unknown:''}[_scout&&_scout.offStyle||'unknown'];
+  const _scoutCard = _scout ? `
+    <div style="background:var(--navy2);border-radius:10px;border:1px solid rgba(245,166,35,.3);padding:10px 12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div>
+          <span style="font-size:12px;font-weight:800;color:var(--gold);">🔍 NEXT OPPONENT</span>
+          ${_scout.oppName?`<span style="font-size:12px;font-weight:700;color:#fff;margin-left:6px;">— ${_scout.oppName}</span>`:''}
+        </div>
+        <button onclick="openScoutEdit(${_nextGameNum})" style="padding:4px 10px;background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;">Edit Scout</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;">
+        ${_athLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">SPEED</span>${_athLabel}</div>`:''}
+        ${_defLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">THEIR D</span>${_defLabel}</div>`:''}
+        ${_offLabel?`<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:4px 6px;"><span style="color:var(--g3);font-size:9px;font-weight:700;display:block;margin-bottom:2px;">THEIR O</span>${_offLabel}</div>`:''}
+      </div>
+      ${_scout.bestPlayer?`<div style="margin-top:6px;font-size:11px;color:var(--g3);">⚠️ Watch: <strong style="color:#fff;">${_scout.bestPlayer}</strong></div>`:''}
+      <div style="margin-top:6px;font-size:10px;color:var(--g3);">Plays are weighted for this opponent · hit <strong style="color:var(--gold);">⚡ New Sheet</strong> to regenerate</div>
+    </div>` : `
+    <div style="background:var(--navy2);border-radius:10px;border:1px dashed rgba(245,166,35,.3);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--gold);">🔍 Scout Game ${_nextGameNum} opponent</div>
+        <div style="font-size:11px;color:var(--g3);margin-top:2px;">Add their profile and the play sheet adjusts automatically</div>
+      </div>
+      <button onclick="openScoutEdit(${_nextGameNum})" style="padding:6px 12px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;white-space:nowrap;">+ Add Scout</button>
+    </div>`;
+
   // Helper — makes a contenteditable cell
   function ce(key, val, extraStyle) {
     const s = extraStyle || '';
@@ -5037,6 +5070,8 @@ function renderGridCallSheet(el) {
       <button onclick="printGridCallSheet()" style="padding:7px 14px;background:#14213b;color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;">🖨️ Print</button>
       <button onclick="_resetGridCS()" style="padding:7px 14px;background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;">⚡ New Sheet</button>
     </div>
+
+    ${_scoutCard}
 
     <!-- LEFT BLOCK: Opening + Best Runs/Passes/Specials + B&B -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
