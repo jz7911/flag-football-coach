@@ -4886,6 +4886,49 @@ function _defaultGridCS() {
     defOff = defLines.slice(0,5);
   }
 
+  // ── SCRIPTED FIRST 15 — pulled from YOUR active plays ──────────────────────
+  // Helper: unique play names from a merged/sorted play-object array
+  const muNames = (arr, exclude) => {
+    const ex = new Set(exclude || []);
+    const seen = new Set();
+    const out = [];
+    (arr||[]).forEach(p => {
+      const nm = p && p.n ? p.n : '';
+      if(nm && !seen.has(nm) && !ex.has(nm)) { seen.add(nm); out.push(nm); }
+    });
+    return out;
+  };
+
+  // Series 1 (1-5): Establish the run — inside first, edge second
+  const s1objs = merge(
+    scoutSort(insideRuns.filter(isCore)),
+    scoutSort(edgeRuns.filter(isCore)),
+    scoutSort(insideRuns),
+    scoutSort(edgeRuns)
+  );
+  const s1 = pad(muNames(s1objs).slice(0,5), 5);
+
+  // Series 2 (6-10): Counter off Series 1 — misdirection, QB runs, reverses
+  const s2objs = merge(
+    scoutSort(counterRuns.filter(isCore)),
+    scoutSort(qbRuns.filter(isCore)),
+    scoutSort(counterRuns),
+    scoutSort(qbRuns),
+    scoutSort(insideRuns),
+    scoutSort(edgeRuns)
+  );
+  const s2 = pad(muNames(s2objs, s1.filter(Boolean)).slice(0,5), 5);
+
+  // Series 3 (11-15): Attack adjusted defense — passes, bootlegs, screens
+  const s3objs = merge(
+    scoutSort(bootlegs.filter(isCore)),
+    scoutSort(screens.filter(isCore)),
+    scoutSort([...bootlegs,...screens,...passes]),
+    scoutSort(counterRuns.filter(isReliable)),
+    scoutSort(runs)
+  );
+  const s3 = pad(muNames(s3objs, [...s1,...s2].filter(Boolean)).slice(0,5), 5);
+
   return {
     op: opPlays,
     runL: runLfinal,
@@ -4900,49 +4943,6 @@ function _defaultGridCS() {
     d1: d1,
     d2: d2,
     d3: d3,
-    // ── SCRIPTED FIRST 15 — pulled from YOUR active plays ──────────────────────
-    // Helper: unique play names from a merged/sorted play-object array
-    const muNames = (arr, exclude) => {
-      const ex = new Set(exclude || []);
-      const seen = new Set();
-      const out = [];
-      (arr||[]).forEach(p => {
-        const n = p && p.n ? p.n : '';
-        if(n && !seen.has(n) && !ex.has(n)) { seen.add(n); out.push(n); }
-      });
-      return out;
-    };
-
-    // Series 1 (1-5): Establish the run — inside first, edge second
-    const s1objs = merge(
-      scoutSort(insideRuns.filter(isCore)),
-      scoutSort(edgeRuns.filter(isCore)),
-      scoutSort(insideRuns),
-      scoutSort(edgeRuns)
-    );
-    const s1 = pad(muNames(s1objs).slice(0,5), 5);
-
-    // Series 2 (6-10): Counter off Series 1 — misdirection, QB runs, reverses
-    const s2objs = merge(
-      scoutSort(counterRuns.filter(isCore)),
-      scoutSort(qbRuns.filter(isCore)),
-      scoutSort(counterRuns),
-      scoutSort(qbRuns),
-      scoutSort(insideRuns),
-      scoutSort(edgeRuns)
-    );
-    const s2 = pad(muNames(s2objs, s1.filter(Boolean)).slice(0,5), 5);
-
-    // Series 3 (11-15): Attack adjusted defense — passes, bootlegs, screens
-    const s3objs = merge(
-      scoutSort(bootlegs.filter(isCore)),
-      scoutSort(screens.filter(isCore)),
-      scoutSort([...bootlegs,...screens,...passes]),
-      scoutSort(counterRuns.filter(isReliable)),
-      scoutSort(runs)
-    );
-    const s3 = pad(muNames(s3objs, [...s1,...s2].filter(Boolean)).slice(0,5), 5);
-
     mu: [s1, s2, s3],
     def: [def44, def431],
     defOff: defOff
