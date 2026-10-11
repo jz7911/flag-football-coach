@@ -4558,9 +4558,9 @@ function _defaultGridCS() {
         pad([n('sw20'),n('sw12'),n('sw15')], 3)
       ],
       mu: [
-        ['','','','',''],
-        ['','','','',''],
-        ['','','','','']
+        ['Fullback Dive','HB Sweep','Fullback Lead Dive','Quick Pitch','Isolation Dive'],
+        ['Belly Keep (FB Fake)','Counter Slant Pass','Jet Motion Sweep','QB Bootleg Run','Reverse'],
+        ['Screen Pass to Wing','Play-Action Deep','Bootleg Pass','HB Sweep Left','Waggle Pass']
       ],
       def: [
         [n('sw1')+' — attack edge',n('sw5')+' — cutback',n('sw3')+' — QB alley',n('sw19')+' — roll away','Avoid dive up middle'],
@@ -4639,7 +4639,8 @@ function _defaultGridCS() {
   // Shorthand for scout fields (default 'unknown' when not filled in)
   const ath = scout.athleticism  || 'unknown';  // burnall | burntop | even | contain | faster
   const dl  = scout.dLine        || 'unknown';  // bigquick | average | small
-  const lb  = scout.lbSpeed      || 'unknown';  // fasthands | average | slowpoor
+  const lb  = scout.lbSpeed      || 'unknown';  // fasthands | average | slowpoor (reused: disciplined | creepfwd | floatwide)
+  const saf = scout.safety       || 'unknown';  // deep | shallow | mixed
   const def = scout.defFormation || 'unknown';  // 44 | 431
   const off = scout.offStyle     || 'unknown';  // runheavy | passheavy | balanced | misdirection
   const qbt = scout.qbThreat    || 'unknown';  // runner | pocket | both
@@ -4700,6 +4701,23 @@ function _defaultGridCS() {
       } else if(def === '431') {
         if(isDeep(p)||isPlayAction(p)) s += 2;     // safety is alone covering the whole sky
         if(isInside(p)) s += 1;                    // only 3 LBs, more gaps inside
+      }
+      // Deep safety: no safety = flats and deep middle are wide open
+      if(saf === 'shallow') {
+        if(isDeep(p)||isPlayAction(p)) s += 3;     // no centerfield — attack the sky
+        if(isScreen(p)) s += 2;                    // screens release into open grass
+      } else if(saf === 'deep') {
+        if(isInside(p)) s += 2;                    // safety takes away deep, run at them
+        if(isScreen(p)) s += 1;                    // screens still good in flats
+      }
+      // LB alignment: under new meanings — fasthands=disciplined, average=creep, slowpoor=float wide
+      // (lb var is reused for alignment reads)
+      if(lb === 'average') {                        // LBs creep forward — attack behind them
+        if(isScreen(p)) s += 2;                    // screens attack the vacated flats
+        if(isDeep(p)||isPlayAction(p)) s += 2;     // they've abandoned depth, go over them
+      } else if(lb === 'slowpoor') {               // LBs float wide — punch it inside
+        if(isInside(p)) s += 3;                    // inside is vacated
+        if(isCounter(p)) s += 2;                   // counters cut back into the open middle
       }
       return s;
     };
@@ -4887,9 +4905,9 @@ function _defaultGridCS() {
     d2: d2,
     d3: d3,
     mu: [
-      ['','','','',''],
-      ['','','','',''],
-      ['','','','','']
+      ['Fullback Dive','HB Sweep','Fullback Lead Dive','Quick Pitch','Isolation Dive'],
+      ['Belly Keep (FB Fake)','Counter Slant Pass','Jet Motion Sweep','QB Bootleg Run','Reverse'],
+      ['Screen Pass to Wing','Play-Action Deep','Bootleg Pass','HB Sweep Left','Waggle Pass']
     ],
     def: [def44, def431],
     defOff: defOff
@@ -4971,7 +4989,7 @@ function renderGridCallSheet(el) {
   const _scout = (state.scouting||[]).find(s=>s.gameNum===_nextGameNum&&s.division===_division);
   const _athLabel = {burnall:'We burn everyone',burntop:'Top 2-3 burn them',even:'Speed is even',contain:'They can contain us',faster:'They\'re faster',unknown:''}[_scout&&_scout.athleticism||'unknown'];
   const _dlLabel  = {bigquick:'Big & quick D-line',average:'Average D-line',small:'Small/slow D-line',unknown:''}[_scout&&_scout.dLine||'unknown'];
-  const _lbLabel  = {fasthands:'Fast LBs, good hands',average:'Average LBs',slowpoor:'Slow / poor flag pull',unknown:''}[_scout&&_scout.lbSpeed||'unknown'];
+  const _lbLabel  = {fasthands:'LBs disciplined at 5 yds',average:'LBs creep forward',slowpoor:'LBs float wide',unknown:''}[_scout&&_scout.lbSpeed||'unknown'];
   const _offLabel = {runheavy:'Run heavy',passheavy:'Pass heavy',balanced:'Balanced',misdirection:'Misdirection heavy',unknown:''}[_scout&&_scout.offStyle||'unknown'];
   const _scoutCard = _scout ? `
     <div style="background:var(--navy2);border-radius:10px;border:1px solid rgba(245,166,35,.3);padding:10px 12px;margin-bottom:10px;">
@@ -6667,8 +6685,11 @@ function renderScouting(el) {
           ${scout.dLine&&scout.dLine!=='unknown'?`<div><span style="color:var(--g3);">D-line:</span> <strong>${
             scout.dLine==='bigquick'?'Big & quick':scout.dLine==='average'?'Average':'Small / slow'
           }</strong></div>`:''}
-          ${scout.lbSpeed&&scout.lbSpeed!=='unknown'?`<div><span style="color:var(--g3);">Linebackers:</span> <strong>${
-            scout.lbSpeed==='fasthands'?'Fast, good hands':scout.lbSpeed==='average'?'Average':'Slow / poor pullers'
+          ${scout.lbSpeed&&scout.lbSpeed!=='unknown'?`<div><span style="color:var(--g3);">LBs:</span> <strong>${
+            scout.lbSpeed==='fasthands'?'Disciplined at 5 yds':scout.lbSpeed==='average'?'Creep forward':'Float wide'
+          }</strong></div>`:''}
+          ${scout.safety&&scout.safety!=='unknown'?`<div><span style="color:var(--g3);">Safety:</span> <strong>${
+            scout.safety==='deep'?'Centerfield (deep shots contested)':scout.safety==='shallow'?'All up near LOS':'Rotates'
           }</strong></div>`:''}
           ${scout.offStyle&&scout.offStyle!=='unknown'?`<div><span style="color:var(--g3);">Their offense:</span> <strong>${
             scout.offStyle==='runheavy'?'Run heavy':scout.offStyle==='passheavy'?'Pass heavy':scout.offStyle==='misdirection'?'Misdirection':'Balanced'
@@ -6678,6 +6699,9 @@ function renderScouting(el) {
           }</strong></div>`:''}
           ${scout.recThreat&&scout.recThreat!=='unknown'?`<div><span style="color:var(--g3);">Receivers:</span> <strong>${
             scout.recThreat==='one'?'⚠️ One star — bracket him':scout.recThreat==='spread'?'Spread multiple':'No standout'
+          }</strong></div>`:''}
+          ${scout.bcRotation&&scout.bcRotation!=='unknown'?`<div><span style="color:var(--g3);">BC rotation:</span> <strong>${
+            scout.bcRotation==='heavy2'?'⚠️ 2 kids dominate carries':scout.bcRotation==='top4'?'Top 4 rotate':'True rotation'
           }</strong></div>`:''}
           ${scout.bestPlayer?`<div style="grid-column:1/-1;"><span style="color:var(--g3);">Watch:</span> <strong style="color:var(--red);">${scout.bestPlayer}</strong></div>`:''}
           ${scout.notes?`<div style="grid-column:1/-1;font-style:italic;color:var(--g3);">${scout.notes}</div>`:''}
@@ -6718,12 +6742,20 @@ function openScoutEdit(gameNum) {
       ${opt('small', e.dLine, 'Small or slow — we can run at them all day')}
     </select>
 
-    <label style="font-size:11px;color:var(--g3);">Their linebackers — speed and flag pulling</label>
+    <label style="font-size:11px;color:var(--g3);">LB alignment — where do they set up? (rule: 5 yds off LOS)</label>
     <select id="sc-lb" style="margin-bottom:8px;">
       ${opt('unknown', e.lbSpeed||'unknown', '— Not sure yet')}
-      ${opt('fasthands', e.lbSpeed, 'Fast and good hands — they track everything down')}
-      ${opt('average', e.lbSpeed, 'Average — they make some plays, miss some')}
-      ${opt('slowpoor', e.lbSpeed, 'Slow or poor flag pullers — keep the ball moving')}
+      ${opt('fasthands', e.lbSpeed, 'Disciplined — stay at 5 yds, read and react')}
+      ${opt('average', e.lbSpeed, 'Creep forward — cheat inside 5 yds, aggressive read')}
+      ${opt('slowpoor', e.lbSpeed, 'Float wide — overpursue edge runs, inside is open')}
+    </select>
+
+    <label style="font-size:11px;color:var(--g3);">Deep coverage — do they have a true centerfield safety?</label>
+    <select id="sc-safety" style="margin-bottom:8px;">
+      ${opt('unknown', e.safety||'unknown', '— Not sure yet')}
+      ${opt('deep', e.safety, 'Yes — centerfield safety, deep shots contested')}
+      ${opt('shallow', e.safety, 'No — all 8 up near LOS, flats and deep middle open')}
+      ${opt('mixed', e.safety, 'Sometimes — rotates based on formation or motion')}
     </select>
 
     <label style="font-size:11px;color:var(--g3);">Speed matchup — can we burn them?</label>
@@ -6763,6 +6795,14 @@ function openScoutEdit(gameNum) {
       ${opt('none', e.recThreat, 'No standout — limited passing threat')}
     </select>
 
+    <label style="font-size:11px;color:var(--g3);">Ball carrier rotation — do they run everyone? (rule: must rotate ALL carriers)</label>
+    <select id="sc-bcrot" style="margin-bottom:8px;">
+      ${opt('unknown', e.bcRotation||'unknown', '— Not sure')}
+      ${opt('heavy2', e.bcRotation, '2 kids get 80% of carries — find and key on them')}
+      ${opt('top4', e.bcRotation, 'Top 4 rotate — watch for their athletes coming in')}
+      ${opt('true', e.bcRotation, 'True rotation — every kid gets carries, hard to key one')}
+    </select>
+
     <label style="font-size:11px;color:var(--g3);">Player to watch (# or name)</label>
     <input type="text" id="sc-player" placeholder="e.g. #7 — very fast, always gets the ball" value="${(e.bestPlayer||'').replace(/"/g,'&quot;')}" style="margin-bottom:8px;">
 
@@ -6788,10 +6828,12 @@ function saveScout() {
     defFormation: document.getElementById('sc-defformation').value,
     dLine:        document.getElementById('sc-dline').value,
     lbSpeed:      document.getElementById('sc-lb').value,
+    safety:       document.getElementById('sc-safety').value,
     athleticism:  document.getElementById('sc-athleticism').value,
     offStyle:     document.getElementById('sc-offstyle').value,
     qbThreat:     document.getElementById('sc-qb').value,
     recThreat:    document.getElementById('sc-rec').value,
+    bcRotation:   document.getElementById('sc-bcrot').value,
     bestPlayer:   document.getElementById('sc-player').value,
     notes:        document.getElementById('sc-notes').value,
   };
