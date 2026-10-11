@@ -94,6 +94,9 @@ body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);d
 .p-row:last-child{border-bottom:none;}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--navy3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--gold);flex-shrink:0;}
 
+/* SCRIPTED PLAYS PLACEHOLDER */
+[data-ph]:empty:before{content:attr(data-ph);color:var(--g4);font-style:italic;pointer-events:none;}
+
 /* DRILL / PLAY CARDS */
 .drill-card{background:var(--navy2);border:1px solid var(--navy3);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
 .drill-card:active{border-color:var(--gold);}
@@ -5078,7 +5081,7 @@ function renderGridCallSheet(el) {
           ${padSeries(cs.mu[c]).map((v,r)=>`
             <div style="display:flex;align-items:baseline;gap:3px;border-bottom:1px solid rgba(255,255,255,.06);padding:1px 3px;">
               <span style="font-size:9px;color:var(--g3);min-width:12px;">${c*5+r+1}.</span>
-              ${ce('mu_'+c+'_'+r, v)}
+              <div contenteditable="true" data-gcs="mu_${c}_${r}" data-ph="play name" style="min-height:18px;font-size:10px;line-height:1.35;padding:2px 3px;outline:none;border-bottom:1px solid rgba(255,255,255,.06);flex:1;">${v||''}</div>
             </div>`).join('')}
         </div>`).join('')}
     </div>`;
@@ -5208,6 +5211,7 @@ function renderGridCallSheet(el) {
     <!-- SCRIPTED FIRST 15 PLAYS -->
     <div style="background:var(--navy2);border-radius:8px;overflow:hidden;margin-bottom:8px;">
       ${secH('SCRIPTED FIRST 15 PLAYS')}
+      <div style="font-size:9px;color:var(--g3);padding:3px 7px 1px;font-style:italic;">Play names only — no players</div>
       <div style="padding:4px;">
         ${muGrid()}
       </div>
