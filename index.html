@@ -4555,9 +4555,9 @@ function _defaultGridCS() {
         pad([n('sw20'),n('sw12'),n('sw15')], 3)
       ],
       mu: [
-        ['Logan — Sweep/Counter','Charlie — Dive/Counter','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
-        ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
-        ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
+        ['','','','',''],
+        ['','','','',''],
+        ['','','','','']
       ],
       def: [
         [n('sw1')+' — attack edge',n('sw5')+' — cutback',n('sw3')+' — QB alley',n('sw19')+' — roll away','Avoid dive up middle'],
@@ -4884,9 +4884,9 @@ function _defaultGridCS() {
     d2: d2,
     d3: d3,
     mu: [
-      ['Logan — Sweep/Counter','Charlie — Sweep/Dive','Noah — Sweep/Jet','Sawyer — Counter/Dive','Ollie — Sweep/Screen'],
-      ['Sawyer — Screen/Bootleg flat','Ollie — Screen/Sweep out','Noah — Jet/Bootleg deep','Matteo — Bootleg flat/Screen'],
-      ['Logan — best athlete, use on big downs','Charlie — reliable QB','Noah — fast, great bootleg','Sawyer/Ollie as backups']
+      ['','','','',''],
+      ['','','','',''],
+      ['','','','','']
     ],
     def: [def44, def431],
     defOff: defOff
@@ -4902,6 +4902,16 @@ function _getGridCS() {
   if(!cs.d1 || cs.d1.length !== 3 || !cs.d2 || cs.d2.length !== 3 || !cs.d3 || cs.d3.length !== 3) {
     state[key] = _defaultGridCS();
     save();
+  }
+  // Guard: mu must be 3 columns of at least 5 rows each (was 3-4 rows before scripted-15 update)
+  const cs2 = state[key];
+  if(!cs2.mu || cs2.mu.length !== 3) {
+    cs2.mu = [['','','','',''],['','','','',''],['','','','','']];
+    save();
+  } else {
+    for(let i=0; i<3; i++) {
+      while((cs2.mu[i]||[]).length < 5) (cs2.mu[i]=cs2.mu[i]||[]).push('');
+    }
   }
   return state[key];
 }
@@ -5051,15 +5061,25 @@ function renderGridCallSheet(el) {
     </div>`;
   }
 
-  // Matchup grid — RB / RECEIVER / QB
-  const muLabels = ['RB','RECEIVER','QB'];
-  const muBgs = ['#1c3a5c','#1c3a5c','#5c1c1c'];
+  // Scripted first 15 plays — 3 series × 5 plays (stored in mu columns 0/1/2)
+  const seriesLabels = ['SERIES 1 (Plays 1–5)','SERIES 2 (Plays 6–10)','SERIES 3 (Plays 11–15)'];
+  const seriesBgs = ['#1c3a5c','#1a5c2a','#5c1c1c'];
+  // Pad each series to 5 rows
+  function padSeries(arr) {
+    const a = (arr||[]).slice(0,5);
+    while(a.length < 5) a.push('');
+    return a;
+  }
   function muGrid() {
     return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;">
-      ${muLabels.map((ml,c)=>`
+      ${seriesLabels.map((sl,c)=>`
         <div>
-          <div style="background:${muBgs[c]};color:#fff;font-size:9px;font-weight:800;padding:2px 4px;text-align:center;">${ml}</div>
-          ${cs.mu[c].map((v,r)=>ce('mu_'+c+'_'+r, v)).join('')}
+          <div style="background:${seriesBgs[c]};color:#fff;font-size:9px;font-weight:800;padding:2px 4px;text-align:center;line-height:1.3;">${sl}</div>
+          ${padSeries(cs.mu[c]).map((v,r)=>`
+            <div style="display:flex;align-items:baseline;gap:3px;border-bottom:1px solid rgba(255,255,255,.06);padding:1px 3px;">
+              <span style="font-size:9px;color:var(--g3);min-width:12px;">${c*5+r+1}.</span>
+              ${ce('mu_'+c+'_'+r, v)}
+            </div>`).join('')}
         </div>`).join('')}
     </div>`;
   }
@@ -5185,11 +5205,30 @@ function renderGridCallSheet(el) {
       </div>
     </div>
 
-    <!-- MATCHUPS -->
+    <!-- SCRIPTED FIRST 15 PLAYS -->
     <div style="background:var(--navy2);border-radius:8px;overflow:hidden;margin-bottom:8px;">
-      ${secH('MATCHUPS')}
+      ${secH('SCRIPTED FIRST 15 PLAYS')}
       <div style="padding:4px;">
         ${muGrid()}
+      </div>
+    </div>
+
+    <!-- SURE FIRE PASSES -->
+    <div style="background:var(--navy2);border-radius:8px;overflow:hidden;margin-bottom:8px;border:1px solid rgba(59,130,246,.35);">
+      <div style="background:#1c3a5c;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:4px 7px;">⚡ SURE FIRE PASSES</div>
+      <div style="padding:5px 7px;display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;gap:6px;align-items:baseline;">
+          <span style="font-size:10px;font-weight:800;color:var(--gold);min-width:90px;">SCREEN PASS</span>
+          <span style="font-size:9px;color:var(--g2);line-height:1.4;">Fake run → RB leaks flat. Call after 2 inside runs.</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:baseline;">
+          <span style="font-size:10px;font-weight:800;color:var(--gold);min-width:90px;">BOOTLEG PASS</span>
+          <span style="font-size:9px;color:var(--g2);line-height:1.4;">Fake sweep → QB rolls opposite. WR runs deep corner.</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:baseline;">
+          <span style="font-size:10px;font-weight:800;color:var(--gold);min-width:90px;">PLAY ACTION</span>
+          <span style="font-size:9px;color:var(--g2);line-height:1.4;">Fake dive → throw deep. LBs bite hard after early dives.</span>
+        </div>
       </div>
     </div>
 
@@ -5257,7 +5296,8 @@ function printGridCallSheet() {
   const sitLabels = ['1ST&nbsp;&amp;&nbsp;FOREVER','3RD&nbsp;&amp;&nbsp;SHORT','3RD&nbsp;&amp;&nbsp;LONG','BACKED UP','GOAL LINE','BIG PLAY'];
   const sitBgs   = [NAVY2,NAVY2,NAVY2,RED,RED,RED];
   const hashLabels = ['LEFT HASH','MIDDLE','RIGHT HASH'];
-  const muLabels   = ['RB','RECEIVER','QB'];
+  const muLabels   = ['SERIES 1 (1–5)','SERIES 2 (6–10)','SERIES 3 (11–15)'];
+  const muBgsPrint = [NAVY2, '#1a5c2a', '#7f1d1d'];
   const defLabels  = ['[4-4] OVER (4DL+4LB)','[4-3-1] DEEP SAFETY (4DL+3LB+1S)'];
   const defBgs     = [NAVY2,GREEN];
 
@@ -5362,15 +5402,15 @@ function printGridCallSheet() {
     </div>
   </div>
 
-  <!-- Row 5: Matchups + By Defense side by side -->
+  <!-- Row 5: Scripted 15 + By Defense side by side -->
   <div class="grid2" style="gap:3px;">
     <div class="box">
-      ${ph('MATCHUPS')}
+      ${ph('SCRIPTED FIRST 15 PLAYS')}
       <div class="grid3">
         ${muLabels.map((ml,c)=>`
           <div>
-            <div style="background:${NAVY2};color:#fff;font-size:8px;font-weight:700;padding:2px 4px;text-align:center;">${ml}</div>
-            ${cs.mu[c].map(v=>cell(v)).join('')}
+            <div style="background:${muBgsPrint[c]};color:#fff;font-size:8px;font-weight:700;padding:2px 4px;text-align:center;">${ml}</div>
+            ${(cs.mu[c]||[]).slice(0,5).map((v,r)=>`<div style="display:flex;gap:2px;border-bottom:1px solid #eee;padding:1px 3px;"><span style="font-size:7px;color:#999;min-width:10px;">${c*5+r+1}.</span><div style="font-size:8px;line-height:1.3;padding:1px 2px;">${v||''}</div></div>`).join('')}
           </div>`).join('')}
       </div>
     </div>
@@ -5383,6 +5423,16 @@ function printGridCallSheet() {
             ${cs.def[c].map(v=>cell(v)).join('')}
           </div>`).join('')}
       </div>
+    </div>
+  </div>
+
+  <!-- Sure fire passes print row -->
+  <div class="box" style="margin-top:4px;border:1.5px solid #1c5c8c;">
+    ${ph('⚡ SURE FIRE PASSES', '#1c3a5c')}
+    <div style="padding:3px 4px;display:flex;gap:8px;">
+      <div style="flex:1;font-size:8px;padding:2px 4px;background:rgba(28,58,92,.08);border-left:2px solid #1c5c8c;line-height:1.5;"><strong>SCREEN PASS</strong> — Fake run → RB leaks flat. Call after 2 inside runs.</div>
+      <div style="flex:1;font-size:8px;padding:2px 4px;background:rgba(28,58,92,.08);border-left:2px solid #1c5c8c;line-height:1.5;"><strong>BOOTLEG PASS</strong> — Fake sweep → QB rolls opposite. WR deep corner.</div>
+      <div style="flex:1;font-size:8px;padding:2px 4px;background:rgba(28,58,92,.08);border-left:2px solid #1c5c8c;line-height:1.5;"><strong>PLAY ACTION</strong> — Fake dive → throw deep. LBs bite after early dives.</div>
     </div>
   </div>
 
