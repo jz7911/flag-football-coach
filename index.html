@@ -4557,11 +4557,7 @@ function _defaultGridCS() {
         pad([n('sw12'),n('sw15'),n('sw19')], 3),
         pad([n('sw20'),n('sw12'),n('sw15')], 3)
       ],
-      mu: [
-        ['Fullback Dive','HB Sweep','Fullback Lead Dive','Quick Pitch','Isolation Dive'],
-        ['Belly Keep (FB Fake)','Counter Slant Pass','Jet Motion Sweep','QB Bootleg Run','Reverse'],
-        ['Screen Pass to Wing','Play-Action Deep','Bootleg Pass','HB Sweep Left','Waggle Pass']
-      ],
+      mu: [['','','','',''],['','','','',''],['','','','','']],
       def: [
         [n('sw1')+' — attack edge',n('sw5')+' — cutback',n('sw3')+' — QB alley',n('sw19')+' — roll away','Avoid dive up middle'],
         [n('sw3')+' — LBs scraping',n('sw19')+' — Cover 0 flat',n('sw15')+' — beat blitz',n('sw12')+' — RB vs. no one','Quick hits only'],
@@ -4904,11 +4900,50 @@ function _defaultGridCS() {
     d1: d1,
     d2: d2,
     d3: d3,
-    mu: [
-      ['Fullback Dive','HB Sweep','Fullback Lead Dive','Quick Pitch','Isolation Dive'],
-      ['Belly Keep (FB Fake)','Counter Slant Pass','Jet Motion Sweep','QB Bootleg Run','Reverse'],
-      ['Screen Pass to Wing','Play-Action Deep','Bootleg Pass','HB Sweep Left','Waggle Pass']
-    ],
+    // ── SCRIPTED FIRST 15 — pulled from YOUR active plays ──────────────────────
+    // Helper: unique play names from a merged/sorted play-object array
+    const muNames = (arr, exclude) => {
+      const ex = new Set(exclude || []);
+      const seen = new Set();
+      const out = [];
+      (arr||[]).forEach(p => {
+        const n = p && p.n ? p.n : '';
+        if(n && !seen.has(n) && !ex.has(n)) { seen.add(n); out.push(n); }
+      });
+      return out;
+    };
+
+    // Series 1 (1-5): Establish the run — inside first, edge second
+    const s1objs = merge(
+      scoutSort(insideRuns.filter(isCore)),
+      scoutSort(edgeRuns.filter(isCore)),
+      scoutSort(insideRuns),
+      scoutSort(edgeRuns)
+    );
+    const s1 = pad(muNames(s1objs).slice(0,5), 5);
+
+    // Series 2 (6-10): Counter off Series 1 — misdirection, QB runs, reverses
+    const s2objs = merge(
+      scoutSort(counterRuns.filter(isCore)),
+      scoutSort(qbRuns.filter(isCore)),
+      scoutSort(counterRuns),
+      scoutSort(qbRuns),
+      scoutSort(insideRuns),
+      scoutSort(edgeRuns)
+    );
+    const s2 = pad(muNames(s2objs, s1.filter(Boolean)).slice(0,5), 5);
+
+    // Series 3 (11-15): Attack adjusted defense — passes, bootlegs, screens
+    const s3objs = merge(
+      scoutSort(bootlegs.filter(isCore)),
+      scoutSort(screens.filter(isCore)),
+      scoutSort([...bootlegs,...screens,...passes]),
+      scoutSort(counterRuns.filter(isReliable)),
+      scoutSort(runs)
+    );
+    const s3 = pad(muNames(s3objs, [...s1,...s2].filter(Boolean)).slice(0,5), 5);
+
+    mu: [s1, s2, s3],
     def: [def44, def431],
     defOff: defOff
   };
@@ -4926,8 +4961,14 @@ function _getGridCS() {
   }
   // Guard: mu must be 3 columns of at least 5 rows each (was 3-4 rows before scripted-15 update)
   const cs2 = state[key];
-  if(!cs2.mu || cs2.mu.length !== 3) {
-    cs2.mu = [['','','','',''],['','','','',''],['','','','','']];
+  // Also clear stale hardcoded generic names from earlier app versions so real plays show
+  const _staleGeneric = new Set(['Fullback Dive','HB Sweep','Fullback Lead Dive','Quick Pitch','Isolation Dive',
+    'Belly Keep (FB Fake)','Counter Slant Pass','Jet Motion Sweep','QB Bootleg Run','Reverse',
+    'Screen Pass to Wing','Play-Action Deep','Bootleg Pass','HB Sweep Left','Waggle Pass']);
+  const _hasStale = cs2.mu && cs2.mu[0] && cs2.mu[0].some(v => _staleGeneric.has(v));
+  if(!cs2.mu || cs2.mu.length !== 3 || _hasStale) {
+    const fresh = _defaultGridCS();
+    cs2.mu = fresh.mu;
     save();
   } else {
     for(let i=0; i<3; i++) {
